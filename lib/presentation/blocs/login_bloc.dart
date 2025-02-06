@@ -1,7 +1,9 @@
 //events
 
+import 'package:bcrypt/bcrypt.dart';
 import 'package:dauco/domain/usercases/login_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class UserLoginEvent {}
 
@@ -24,7 +26,6 @@ class LoginSuccess extends LoginState {}
 
 class LoginError extends LoginState {
   final String error;
-
   LoginError({required this.error});
 }
 
@@ -39,8 +40,9 @@ class LoginBloc extends Bloc<UserLoginEvent, LoginState> {
       try {
         await loginUseCase.execute(event.email, event.password);
         emit(LoginSuccess());
-      } catch (e) {
+      } on AuthException catch (e) {
         emit(LoginError(error: e.toString()));
+        print(e.toString());
       }
     });
   }

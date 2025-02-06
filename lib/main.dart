@@ -1,4 +1,6 @@
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
+import 'package:dauco/presentation/pages/data_page.dart';
+import 'package:dauco/presentation/pages/home_page.dart';
 import 'package:dauco/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -27,7 +29,7 @@ class Dauco extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const HomePage(),
     );
   }
 }
