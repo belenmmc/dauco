@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/presentation/blocs/login_bloc.dart';
-import 'package:dauco/domain/usercases/login_use_case.dart';
+import 'package:dauco/domain/usecases/login_use_case.dart';
 import 'package:dauco/presentation/pages/home_page.dart';
 import 'package:dauco/presentation/widgets/background_widget.dart';
 import 'package:dauco/presentation/widgets/custom_text_widget.dart';

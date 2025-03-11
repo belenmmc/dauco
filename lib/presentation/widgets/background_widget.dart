@@ -1,7 +1,4 @@
-import 'package:dauco/presentation/pages/home_page.dart';
-import 'package:dauco/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 class Background extends StatelessWidget {
   final String title;
