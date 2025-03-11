@@ -1,7 +1,5 @@
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
-import 'package:dauco/presentation/pages/data_page.dart';
 import 'package:dauco/presentation/pages/home_page.dart';
-import 'package:dauco/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -19,7 +17,6 @@ Future<void> main() async {
 class Dauco extends StatelessWidget {
   const Dauco({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

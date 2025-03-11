@@ -1,9 +1,8 @@
-//events
-
-import 'package:bcrypt/bcrypt.dart';
-import 'package:dauco/domain/usercases/login_use_case.dart';
+import 'package:dauco/domain/usecases/login_use_case.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+//events
 
 abstract class UserLoginEvent {}
 
