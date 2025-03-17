@@ -1,7 +1,10 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
+import 'package:dauco/presentation/pages/minor_info_page.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 
 class MinorsListWidget extends StatefulWidget {
+  final Excel file;
   final List<Minor> children;
   final double screenWidth;
   final int? selectedIndex;
@@ -13,6 +16,7 @@ class MinorsListWidget extends StatefulWidget {
 
   const MinorsListWidget({
     super.key,
+    required this.file,
     required this.children,
     required this.screenWidth,
     required this.selectedIndex,
@@ -140,25 +144,19 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${minor.registeredAt} ${minor.birthdate}',
+                  'Id: ${minor.minorId}',
                   style: TextStyle(
                     color: const Color(0xFF065591),
-                    fontSize: screenWidth * 0.015,
+                    fontSize: screenWidth * 0.02,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  '• Manager ID: ${minor.managerId}',
+                  'Referencia: ${minor.reference}',
                   style: TextStyle(
-                    color: const Color.fromARGB(255, 0, 0, 0),
-                    fontSize: screenWidth * 0.01,
-                  ),
-                ),
-                Text(
-                  '• Minors: ${minor.fatherJob}',
-                  style: TextStyle(
-                    color: const Color.fromARGB(255, 0, 0, 0),
-                    fontSize: screenWidth * 0.01,
+                    color: const Color(0xFF065591),
+                    fontSize: screenWidth * 0.02,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -167,7 +165,13 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
         ],
       ),
       onTap: () {
-        // Handle minor item tap
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                MinorInfoPage(file: widget.file, minor: minor),
+          ),
+        );
       },
     );
   }

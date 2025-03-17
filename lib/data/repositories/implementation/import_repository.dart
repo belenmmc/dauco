@@ -2,6 +2,7 @@ import 'package:dauco/data/repositories/import_repository_interface.dart';
 import 'package:dauco/data/services/import_service.dart';
 import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
+import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:excel/excel.dart';
 
 class ImportRepository implements ImportRepositoryInterface {
@@ -22,5 +23,10 @@ class ImportRepository implements ImportRepositoryInterface {
   @override
   Future<List<Minor>> getMinors(file, int page, int pageSize) {
     return importService.getMinors(file, page: page, pageSize: pageSize);
+  }
+
+  @override
+  Future<List<Test>> getTests(file, int minorId) {
+    return importService.getTests(file, minorId);
   }
 }

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
+import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -158,5 +159,42 @@ class ImportService {
     }
 
     return minors;
+  }
+
+  Future<List<Test>> getTests(file, int minorId) async {
+    var sheet = file?.tables.keys.elementAt(2);
+
+    List<Test> tests = [];
+
+    var rows = file!.tables[sheet]!.rows.skip(1).toList();
+
+    for (var row in rows) {
+      if (row.isNotEmpty) {
+        int testId = int.parse(row[0]?.value.toString() ?? "0");
+        int minorId = int.parse(row[1]?.value.toString() ?? "0");
+        DateTime registeredAt = DateTime.parse(
+            row[2]?.value.toString() ?? DateTime.now().toString());
+        String cronologicalAge = row[3]?.value.toString() ?? "";
+        String evolutiveAge = row[4]?.value.toString() ?? "";
+        String mChatTest = row[5]?.value.toString() ?? "";
+        String progress = row[6]?.value.toString() ?? "";
+        String activeAreas = row[7]?.value.toString() ?? "";
+        String proffesionalType = row[8]?.value.toString() ?? "";
+
+        tests.add(Test(
+          testId: testId,
+          minorId: minorId,
+          registeredAt: registeredAt,
+          cronologicalAge: cronologicalAge,
+          evolutiveAge: evolutiveAge,
+          mChatTest: mChatTest,
+          progress: progress,
+          activeAreas: activeAreas,
+          proffesionalType: proffesionalType,
+        ));
+      }
+    }
+
+    return tests.where((test) => test.minorId == minorId).toList();
   }
 }

@@ -1,5 +1,5 @@
-import 'package:dauco/domain/usecases/import_minors_use_case.dart';
-import 'package:dauco/presentation/blocs/import_minors_bloc.dart';
+import 'package:dauco/domain/usecases/get_minors_use_case.dart';
+import 'package:dauco/presentation/blocs/get_minors_bloc.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,14 +35,87 @@ class HomePageState extends State<HomePage> {
           ),
         ),
         BlocProvider(
-          create: (context) => ImportMinorsBloc(
-            importMinorsUseCase: appInjector.get<ImportMinorsUseCase>(),
+          create: (context) => GetMinorsBloc(
+            importMinorsUseCase: appInjector.get<GetMinorsUseCase>(),
           ),
         ),
       ],
       child: Builder(
         builder: (context) {
           return Scaffold(
+            appBar: AppBar(
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(50.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: screenWidth * 0.4,
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black,
+                                  spreadRadius: 0.2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.menu, color: Colors.grey),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Search',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[100],
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 16),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.search),
+                                  onPressed: () {
+                                    print('Search button pressed');
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 58),
+                        IconButton(
+                          icon: Icon(
+                            Icons.filter_alt_outlined,
+                            size: 60,
+                          ),
+                          onPressed: () {
+                            print('Filter button pressed');
+                          },
+                        ),
+                        const SizedBox(width: 438),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
             body: Stack(
               children: [
                 const Background(
@@ -61,8 +134,8 @@ class HomePageState extends State<HomePage> {
                             listener: (context, state) {
                               if (state is LoadFileSuccess) {
                                 _file = state.file;
-                                BlocProvider.of<ImportMinorsBloc>(context)
-                                    .add(ImportEvent(state.file));
+                                BlocProvider.of<GetMinorsBloc>(context)
+                                    .add(GetEvent(state.file));
                               } else if (state is LoadFileError) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -72,11 +145,10 @@ class HomePageState extends State<HomePage> {
                                 );
                               }
                             },
-                            child: BlocBuilder<ImportMinorsBloc,
-                                ImportMinorsState>(
+                            child: BlocBuilder<GetMinorsBloc, GetMinorsState>(
                               builder: (context, state) {
-                                if (state is ImportMinorsInitial ||
-                                    state is ImportMinorsLoading) {
+                                if (state is GetMinorsInitial ||
+                                    state is GetMinorsLoading) {
                                   return Column(
                                     children: [
                                       SizedBox(
@@ -118,12 +190,13 @@ class HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                       ),
-                                      if (state is ImportMinorsInitial)
+                                      if (state is GetMinorsInitial)
                                         const Text('No users added'),
                                     ],
                                   );
-                                } else if (state is ImportMinorsSuccess) {
+                                } else if (state is GetMinorsSuccess) {
                                   return MinorsListWidget(
+                                    file: _file!,
                                     children: state.minors,
                                     screenWidth: screenWidth,
                                     selectedIndex: _selectedIndex,
@@ -132,14 +205,13 @@ class HomePageState extends State<HomePage> {
                                         _selectedIndex = index;
                                       });
                                     },
-                                    onNextPage: () => _goToNextPage(
-                                        context), // Pass the context
-                                    onPreviousPage: () => _goToPreviousPage(
-                                        context), // Pass the context
+                                    onNextPage: () => _goToNextPage(context),
+                                    onPreviousPage: () =>
+                                        _goToPreviousPage(context),
                                     hasNextPage: _hasNextPage,
                                     hasPreviousPage: _hasPreviousPage,
                                   );
-                                } else if (state is ImportMinorsError) {
+                                } else if (state is GetMinorsError) {
                                   return Text('Error: ${state.error}');
                                 }
                                 return const Text('No minors added');
@@ -163,12 +235,11 @@ class HomePageState extends State<HomePage> {
     if (!_isLoading && _file != null) {
       setState(() {
         _isLoading = true;
-        _page++; // Increment the page
-        _hasPreviousPage = true; // Enable the "Previous Page" button
+        _page++;
+        _hasPreviousPage = true;
       });
 
-      // Fetch the next page of users
-      BlocProvider.of<ImportMinorsBloc>(context)
+      BlocProvider.of<GetMinorsBloc>(context)
           .add(LoadMoreMinorsEvent(_file!, _page));
 
       setState(() {
@@ -181,14 +252,12 @@ class HomePageState extends State<HomePage> {
     if (!_isLoading && _file != null && _page > 1) {
       setState(() {
         _isLoading = true;
-        _page--; // Decrement the page
-        _hasNextPage = true; // Enable the "Next Page" button
-        _hasPreviousPage = _page >
-            1; // Disable the "Previous Page" button if on the first page
+        _page--;
+        _hasNextPage = true;
+        _hasPreviousPage = _page > 1;
       });
 
-      // Fetch the previous page of users
-      BlocProvider.of<ImportMinorsBloc>(context)
+      BlocProvider.of<GetMinorsBloc>(context)
           .add(LoadMoreMinorsEvent(_file!, _page));
 
       setState(() {
