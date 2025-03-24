@@ -3,7 +3,6 @@ import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/presentation/blocs/login_bloc.dart';
 import 'package:dauco/domain/usecases/login_use_case.dart';
 import 'package:dauco/presentation/pages/home_page.dart';
-import 'package:dauco/presentation/widgets/background_widget.dart';
 import 'package:dauco/presentation/widgets/custom_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,12 +26,9 @@ class LoginUserPageState extends State<LoginPage> {
       create: (context) =>
           LoginBloc(loginUseCase: appInjector.get<LoginUseCase>()),
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 167, 168, 213),
         body: Stack(
           children: [
-            const Background(
-              title: 'Inicia sesión',
-              home: false,
-            ),
             Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
