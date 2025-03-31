@@ -28,11 +28,13 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
         getTestsUseCase: appInjector.get<GetTestsUseCase>(),
       ),
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 167, 168, 213),
         appBar: AppBar(
-          title: Text(_currentIndex == 0
-              ? 'Información del Menor'
-              : 'Información de Pruebas'),
+          title: Text(
+              _currentIndex == 0 ? 'Información del Menor' : 'Lista de Tests',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
           automaticallyImplyLeading: true,
+          backgroundColor: Color.fromARGB(255, 167, 168, 213),
         ),
         body: BlocListener<GetTestsBloc, GetTestsState>(
           listener: (context, state) {
@@ -50,6 +52,16 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
         floatingActionButton: Builder(
           builder: (context) {
             return FloatingActionButton(
+              backgroundColor: Color.fromARGB(255, 167, 168, 213),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              tooltip: _currentIndex == 0
+                  ? 'Ver lista de tests'
+                  : 'Volver a información del menor',
+              child: Icon(
+                  _currentIndex == 0 ? Icons.arrow_forward : Icons.arrow_back),
               onPressed: () {
                 setState(() {
                   _currentIndex = (_currentIndex + 1) % 2;
@@ -61,7 +73,6 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                       .add(GetEvent(widget.file, widget.minor.minorId));
                 }
               },
-              child: Icon(Icons.arrow_forward),
             );
           },
         ),
@@ -79,6 +90,11 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
             if (state is GetTestsLoading) {
               return Center(child: CircularProgressIndicator());
             } else if (state is GetTestsSuccess) {
+              if (state.tests.isEmpty) {
+                return Center(
+                    child: Text('No hay tests disponibles',
+                        style: TextStyle(fontSize: 20)));
+              }
               return TestsListWidget(tests: state.tests);
             } else if (state is GetTestsError) {
               return Center(child: Text('Error: ${state.error}'));

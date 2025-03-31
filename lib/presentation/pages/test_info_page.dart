@@ -15,6 +15,7 @@ class _TestInfoPageState extends State<TestInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 167, 168, 213),
       appBar: AppBar(
         title: Text(widget.test.testId.toString()),
         automaticallyImplyLeading: true,
