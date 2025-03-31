@@ -1,6 +1,7 @@
 import 'package:dauco/data/repositories/import_repository_interface.dart';
 import 'package:dauco/data/services/import_service.dart';
 import 'package:dauco/domain/entities/imported_user.entity.dart';
+import 'package:dauco/domain/entities/item.entity.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:excel/excel.dart';
@@ -28,5 +29,10 @@ class ImportRepository implements ImportRepositoryInterface {
   @override
   Future<List<Test>> getTests(file, int minorId) {
     return importService.getTests(file, minorId);
+  }
+
+  @override
+  Future<List<Item>> getItems(file, int testId) {
+    return importService.getItems(file, testId);
   }
 }
