@@ -13,61 +13,129 @@ class MinorInfoWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Info del menor'),
-          _buildInfoRow('Id del menor', minor.minorId.toString()),
-          _buildInfoRow('Id del responsable', minor.managerId.toString()),
-          _buildInfoRow('Fecha de nacimiento', minor.birthdate.toString()),
-          _buildInfoRow('Sexo', minor.sex),
-          _buildInfoRow('Código Postal', minor.zipCode.toString()),
-          _buildInfoRow('Nivel de escolarización', minor.schoolingLevel),
-          _buildInfoRow(
-              'Situación socioeconómica', minor.socioeconomicSituation),
-          _buildInfoRow('Enfermedades relevantes', minor.relevantDiseases),
-          _buildInfoRow('Motivo de valoración', minor.evaluationReason),
-          SizedBox(height: 20),
-          _buildSectionTitle('Info familia'),
-          _buildFamilyInfoRow('Edad madre', minor.motherAge.toString(),
-              'Edad padre', minor.fatherAge.toString()),
-          _buildFamilyInfoRow('Trabajo madre', minor.motherJob, 'Trabajo padre',
-              minor.fatherJob),
-          _buildFamilyInfoRow('Nº hermanos', minor.siblings.toString(),
-              'Posición herm.', minor.siblingsPosition.toString()),
-          _buildFamilyInfoRow('Nví estudios madre', minor.motherStudies,
-              'Nví estudios padre', minor.fatherStudies),
-          _buildFamilyInfoRow('Estado civil madre', minor.motherJob,
-              'Estado civil padre', minor.fatherJob),
-          SizedBox(height: 20),
-          _buildSectionTitle('Info parto'),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: _buildMinorInfoCard(),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildFamilyInfoCard(), // Family info
+                    SizedBox(height: 16),
+                    _buildBirthInfoCard(), // Birth info (now below family)
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+  Widget _buildMinorInfoCard() {
+    return _buildCard(
+      title: 'Info del menor',
+      children: [
+        _buildSingleInfoLine('Id del menor', minor.minorId.toString()),
+        _buildSingleInfoLine('Referencia', minor.reference),
+        _buildSingleInfoLine('Id del responsable', minor.managerId.toString()),
+        _buildSingleInfoLine('Fecha de nacimiento',
+            '${minor.birthdate.day}/${minor.birthdate.month}/${minor.birthdate.year}'),
+        _buildSingleInfoLine('Rango de edad', minor.ageRange),
+        _buildSingleInfoLine('Registrado el',
+            '${minor.registeredAt.day}/${minor.registeredAt.month}/${minor.registeredAt.year}'),
+        _buildSingleInfoLine('Número de pruebas', minor.testsNum.toString()),
+        _buildSingleInfoLine(
+            'Pruebas completadas', minor.completedTests.toString()),
+        _buildSingleInfoLine('Sexo', minor.sex),
+        _buildSingleInfoLine('Código Postal', minor.zipCode.toString()),
+        _buildSingleInfoLine('Nivel de escolarización', minor.schoolingLevel),
+        _buildSingleInfoLine(
+            'Observaciones escolarización', minor.schoolingObservations),
+        _buildSingleInfoLine(
+            'Situación socioeconómica', minor.socioeconomicSituation),
+        _buildSingleInfoLine('Enfermedades relevantes', minor.relevantDiseases),
+        _buildSingleInfoLine('Motivo de valoración', minor.evaluationReason),
+        _buildSingleInfoLine('Test de Apgar', minor.apgarTest.toString()),
+        _buildSingleInfoLine('Adopción', minor.adoption.toString()),
+        _buildSingleInfoLine('Juicio clínico', minor.clinicalJudgement),
+      ],
+    );
+  }
+
+  Widget _buildFamilyInfoCard() {
+    return _buildCard(
+      title: 'Info familia',
+      children: [
+        _buildDoubleInfoLine('Edad madre', minor.motherAge.toString(),
+            'Edad padre', minor.fatherAge.toString()),
+        _buildDoubleInfoLine(
+            'Trabajo madre', minor.motherJob, 'Trabajo padre', minor.fatherJob),
+        _buildDoubleInfoLine('Estudios madre', minor.motherStudies,
+            'Estudios padre', minor.fatherStudies),
+        _buildDoubleInfoLine('Nº hermanos', minor.siblings.toString(),
+            'Posición herm.', minor.siblingsPosition.toString()),
+        _buildDoubleInfoLine('Estado civil padres', minor.parentsCivilStatus,
+            'Antecedentes familiares', minor.familyBackground),
+        _buildDoubleInfoLine('Miembros familia', minor.familyMembers.toString(),
+            'Discapacidades familia', minor.familyDisabilities),
+      ],
+    );
+  }
+
+  Widget _buildBirthInfoCard() {
+    return _buildCard(
+      title: 'Info parto',
+      children: [
+        _buildSingleInfoLine('Tipo de parto', minor.birthType),
+        _buildSingleInfoLine(
+            'Semanas de gestación', minor.gestationWeeks.toString()),
+        _buildSingleInfoLine('Incidentes en el parto', minor.birthIncidents),
+        _buildSingleInfoLine('Peso al nacer', minor.birthWeight.toString())
+      ],
+    );
+  }
+
+  Widget _buildCard({required String title, required List<Widget> children}) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      color: Color.fromARGB(255, 247, 238, 255),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            ...children,
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildSingleInfoLine(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Text(
               label,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
+          SizedBox(width: 32),
           Expanded(
             flex: 3,
             child: Text(
@@ -80,19 +148,15 @@ class MinorInfoWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildFamilyInfoRow(
+  Widget _buildDoubleInfoLine(
       String label1, String value1, String label2, String value2) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Expanded(
-            child: _buildInfoRow(label1, value1),
-          ),
+          Expanded(child: _buildSingleInfoLine(label1, value1)),
           SizedBox(width: 16),
-          Expanded(
-            child: _buildInfoRow(label2, value2),
-          ),
+          Expanded(child: _buildSingleInfoLine(label2, value2)),
         ],
       ),
     );

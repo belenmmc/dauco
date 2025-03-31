@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dauco/domain/entities/imported_user.entity.dart';
+import 'package:dauco/domain/entities/item.entity.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:excel/excel.dart';
@@ -163,7 +164,6 @@ class ImportService {
 
   Future<List<Test>> getTests(file, int minorId) async {
     var sheet = file?.tables.keys.elementAt(2);
-
     List<Test> tests = [];
 
     var rows = file!.tables[sheet]!.rows.skip(1).toList();
@@ -196,5 +196,36 @@ class ImportService {
     }
 
     return tests.where((test) => test.minorId == minorId).toList();
+  }
+
+  Future<List<Item>> getItems(file, int testId) async {
+    var sheet = file?.tables.keys.elementAt(3);
+    List<Item> items = [];
+
+    var rows = file!.tables[sheet]!.rows.skip(1).toList();
+
+    for (var row in rows) {
+      if (row.isNotEmpty) {
+        int responseId = int.parse(row[0]?.value.toString() ?? "0");
+        int itemId = int.parse(row[1]?.value.toString() ?? "0");
+        String item = row[2]?.value.toString() ?? "";
+        int testId = int.parse(row[3]?.value.toString() ?? "0");
+        String area = row[4]?.value.toString() ?? "";
+        String question = row[5]?.value.toString() ?? "";
+        String answer = row[6]?.value.toString() ?? "";
+
+        items.add(Item(
+          responseId: responseId,
+          itemId: itemId,
+          item: item,
+          testId: testId,
+          area: area,
+          question: question,
+          answer: answer,
+        ));
+      }
+    }
+
+    return items.where((item) => item.testId == testId).toList();
   }
 }

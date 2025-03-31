@@ -1,6 +1,7 @@
 import 'package:dauco/presentation/pages/test_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class TestsListWidget extends StatelessWidget {
   final List<Test> tests;
@@ -17,22 +18,8 @@ class TestsListWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Lista de Pruebas'),
           ...tests.map((test) => _buildTestItem(context, test)).toList(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
       ),
     );
   }
@@ -50,14 +37,42 @@ class TestsListWidget extends StatelessWidget {
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildInfoRow('Áreas Activas', test.activeAreas),
-              _buildInfoRow('Progreso', test.progress.toString()),
-              _buildInfoRow('Fecha',
-                  test.registeredAt.toString()), // Add more fields as needed
+              Text(
+                'Test ${test.testId.toString()}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildInfoRow(
+                            'Fecha de alta', test.registeredAt.toString()),
+                        _buildInfoRow('Edad cronológica', test.cronologicalAge),
+                        _buildInfoRow('Edad evolutiva', test.evolutiveAge),
+                      ],
+                    ),
+                  ),
+                  CircularPercentIndicator(
+                    radius: 40.0,
+                    lineWidth: 7.0,
+                    percent: double.tryParse(test.progress)!,
+                    center: Text(
+                        "${(double.tryParse(test.progress)! * 100).round()}%",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20)),
+                    progressColor: Color.fromARGB(255, 76, 77, 176),
+                    backgroundColor: Color.fromARGB(255, 167, 168, 213),
+                    circularStrokeCap: CircularStrokeCap.round,
+                  ),
+                ],
+              ),
             ],
           ),
         ),
