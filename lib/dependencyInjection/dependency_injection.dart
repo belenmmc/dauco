@@ -2,6 +2,7 @@ import 'package:dauco/data/repositories/implementation/import_repository.dart';
 import 'package:dauco/data/repositories/implementation/user_repository.dart';
 import 'package:dauco/data/services/import_service.dart';
 import 'package:dauco/data/services/user_service.dart';
+import 'package:dauco/domain/usecases/get_items_use_case.dart';
 import 'package:dauco/domain/usecases/get_minors_use_case.dart';
 import 'package:dauco/domain/usecases/get_tests_use_case.dart';
 import 'package:dauco/domain/usecases/import_users_use_case.dart';
@@ -36,4 +37,7 @@ void initInjection() {
 
   appInjector.registerSingleton<GetTestsUseCase>(() =>
       GetTestsUseCase(importRepository: appInjector.get<ImportRepository>()));
+
+  appInjector.registerSingleton<GetItemsUseCase>(() =>
+      GetItemsUseCase(importRepository: appInjector.get<ImportRepository>()));
 }
