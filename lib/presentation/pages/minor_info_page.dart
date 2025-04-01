@@ -95,7 +95,7 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                     child: Text('No hay tests disponibles',
                         style: TextStyle(fontSize: 20)));
               }
-              return TestsListWidget(tests: state.tests);
+              return TestsListWidget(file: widget.file, tests: state.tests);
             } else if (state is GetTestsError) {
               return Center(child: Text('Error: ${state.error}'));
             }

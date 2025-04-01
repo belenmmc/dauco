@@ -1,13 +1,16 @@
 import 'package:dauco/presentation/pages/test_info_page.dart';
+import 'package:dauco/presentation/widgets/test_progress_indicator_widget.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class TestsListWidget extends StatelessWidget {
+  final Excel file;
   final List<Test> tests;
 
   const TestsListWidget({
     super.key,
+    required this.file,
     required this.tests,
   });
 
@@ -30,12 +33,13 @@ class TestsListWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TestInfoPage(test: test),
+            builder: (context) => TestInfoPage(file: file, test: test),
           ),
         ),
       },
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0),
+        color: Color.fromARGB(255, 247, 238, 255),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
           child: Column(
@@ -55,22 +59,11 @@ class TestsListWidget extends StatelessWidget {
                         _buildInfoRow(
                             'Fecha de alta', test.registeredAt.toString()),
                         _buildInfoRow('Edad cronológica', test.cronologicalAge),
-                        _buildInfoRow('Edad evolutiva', test.evolutiveAge),
+                        _buildInfoRow('Edad evolutiva', test.evolutionaryAge),
                       ],
                     ),
                   ),
-                  CircularPercentIndicator(
-                    radius: 40.0,
-                    lineWidth: 7.0,
-                    percent: double.tryParse(test.progress)!,
-                    center: Text(
-                        "${(double.tryParse(test.progress)! * 100).round()}%",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20)),
-                    progressColor: Color.fromARGB(255, 76, 77, 176),
-                    backgroundColor: Color.fromARGB(255, 167, 168, 213),
-                    circularStrokeCap: CircularStrokeCap.round,
-                  ),
+                  TestProgressIndicatorWidget(progress: test.progress),
                 ],
               ),
             ],
