@@ -175,22 +175,22 @@ class ImportService {
         DateTime registeredAt = DateTime.parse(
             row[2]?.value.toString() ?? DateTime.now().toString());
         String cronologicalAge = row[3]?.value.toString() ?? "";
-        String evolutiveAge = row[4]?.value.toString() ?? "";
+        String evolutionaryAge = row[4]?.value.toString() ?? "";
         String mChatTest = row[5]?.value.toString() ?? "";
         String progress = row[6]?.value.toString() ?? "";
         String activeAreas = row[7]?.value.toString() ?? "";
-        String proffesionalType = row[8]?.value.toString() ?? "";
+        String professionalType = row[8]?.value.toString() ?? "";
 
         tests.add(Test(
           testId: testId,
           minorId: minorId,
           registeredAt: registeredAt,
           cronologicalAge: cronologicalAge,
-          evolutiveAge: evolutiveAge,
+          evolutionaryAge: evolutionaryAge,
           mChatTest: mChatTest,
           progress: progress,
           activeAreas: activeAreas,
-          proffesionalType: proffesionalType,
+          professionalType: professionalType,
         ));
       }
     }
