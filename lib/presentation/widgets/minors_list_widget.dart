@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class MinorsListWidget extends StatefulWidget {
   final Excel file;
-  final List<Minor> children;
+  final List<Minor> minors;
   final double screenWidth;
   final int? selectedIndex;
   final Function(int) onItemSelected;
@@ -17,7 +17,7 @@ class MinorsListWidget extends StatefulWidget {
   const MinorsListWidget({
     super.key,
     required this.file,
-    required this.children,
+    required this.minors,
     required this.screenWidth,
     required this.selectedIndex,
     required this.onItemSelected,
@@ -28,159 +28,196 @@ class MinorsListWidget extends StatefulWidget {
   });
 
   @override
-  _MinorsListWidgetState createState() => _MinorsListWidgetState();
+  State<MinorsListWidget> createState() => _MinorsListWidgetState();
 }
 
 class _MinorsListWidgetState extends State<MinorsListWidget> {
+  static const _cardColor = Color.fromARGB(255, 247, 238, 255);
+  static const _buttonColor = Color.fromARGB(255, 76, 77, 176);
+  static const _animationDuration = Duration(milliseconds: 200);
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.8,
+      height: MediaQuery.of(context).size.height * 0.9,
       child: Column(
         children: [
-          Expanded(
-            child: widget.children.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No hay menores registrados',
-                      style: TextStyle(
-                        color: Color(0xFF065591),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: widget.children.length,
-                    itemBuilder: (context, index) {
-                      final minor = widget.children[index];
-                      return GestureDetector(
-                        onTap: () {
-                          widget.onItemSelected(index);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MinorInfoPage(
-                                  file: widget.file, minor: minor),
-                            ),
-                          );
-                        },
-                        child: AnimatedScale(
-                          duration: const Duration(milliseconds: 200),
-                          scale: widget.selectedIndex == index ? 0.95 : 1.0,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 6.0, horizontal: 8.0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.white.withOpacity(0.6),
-                              boxShadow: widget.selectedIndex == index
-                                  ? [
-                                      const BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 8,
-                                        spreadRadius: 0.5,
-                                      )
-                                    ]
-                                  : null,
-                            ),
-                            padding: const EdgeInsets.all(12.0),
-                            child: _buildMinorItem(minor),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-
-          // Pagination buttons (only if there's data)
-          if (widget.children.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.only(bottom: 16.0, top: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (widget.hasPreviousPage)
-                    _buildPaginationButton(
-                      text: 'Anterior',
-                      onPressed: widget.onPreviousPage,
-                    ),
-                  if (widget.hasPreviousPage && widget.hasNextPage)
-                    const SizedBox(width: 20),
-                  if (widget.hasNextPage)
-                    _buildPaginationButton(
-                      text: 'Siguiente',
-                      onPressed: widget.onNextPage,
-                    ),
-                ],
-              ),
-            ),
+          _buildMinorsList(),
+          if (widget.minors.isNotEmpty) _buildPaginationControls(),
         ],
       ),
     );
   }
 
-  Widget _buildPaginationButton({
-    required String text,
-    required Function() onPressed,
-  }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF4B8DAF),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 3,
+  Widget _buildMinorsList() {
+    return Expanded(
+      child: widget.minors.isEmpty
+          ? const _EmptyState()
+          : ListView.builder(
+              physics: const BouncingScrollPhysics(),
+              itemCount: widget.minors.length,
+              itemBuilder: (context, index) => _buildMinorCard(index),
+            ),
+    );
+  }
+
+  Widget _buildMinorCard(int index) {
+    final minor = widget.minors[index];
+    bool isHovered = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return MouseRegion(
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          child: GestureDetector(
+            onTap: () => _handleMinorSelected(index, minor),
+            child: AnimatedContainer(
+              duration: _animationDuration,
+              margin:
+                  const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: isHovered ? _cardColor.withOpacity(0.8) : _cardColor,
+              ),
+              padding: const EdgeInsets.all(10.0),
+              child: _MinorItem(minor: minor, screenWidth: widget.screenWidth),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _handleMinorSelected(int index, Minor minor) {
+    widget.onItemSelected(index);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MinorInfoPage(file: widget.file, minor: minor),
       ),
+    );
+  }
+
+  Widget _buildPaginationControls() {
+    return Container(
+      padding: const EdgeInsets.only(bottom: 2.0, top: 6.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Always show previous button
+          _PaginationButton(
+            icon: Icons.arrow_back_ios_rounded,
+            onPressed: widget.hasPreviousPage ? widget.onPreviousPage : null,
+            color: widget.hasPreviousPage
+                ? _buttonColor
+                : _buttonColor.withOpacity(0.5),
+          ),
+          const SizedBox(width: 20), // Consistent spacing between buttons
+          // Always show next button
+          _PaginationButton(
+            icon: Icons.arrow_forward_ios_rounded,
+            onPressed: widget.hasNextPage ? widget.onNextPage : null,
+            color: widget.hasNextPage
+                ? _buttonColor
+                : _buttonColor.withOpacity(0.5),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
       child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
+        'No hay menores registrados',
+        style: TextStyle(
+          color: Color.fromARGB(255, 43, 45, 66),
+          fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
+}
 
-  Widget _buildMinorItem(Minor minor) {
+class _MinorItem extends StatelessWidget {
+  final Minor minor;
+  final double screenWidth;
+
+  const _MinorItem({
+    required this.minor,
+    required this.screenWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.child_care,
-          color: Color(0xFF065591),
-          size: 32,
-        ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'ID: ${minor.minorId}',
+                'Id del menor: ${minor.minorId}',
                 style: TextStyle(
-                  color: const Color(0xFF065591),
-                  fontSize: widget.screenWidth * 0.035,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
-                'Referencia: ${minor.reference}',
+                'Id del responsable: ${minor.managerId}',
                 style: TextStyle(
-                  color: const Color(0xFF065591),
-                  fontSize: widget.screenWidth * 0.03,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                'Fecha de nacimiento: ${minor.birthdate}',
+                style: TextStyle(
+                  fontSize: 14,
                 ),
               ),
             ],
           ),
         ),
-        const Icon(Icons.chevron_right, color: Color(0xFF065591)),
+        const Icon(Icons.chevron_right),
       ],
+    );
+  }
+}
+
+class _PaginationButton extends StatelessWidget {
+  final IconData icon;
+  final Function()? onPressed; // Make nullable
+  final Color color;
+
+  const _PaginationButton({
+    required this.icon,
+    required this.onPressed,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.all(12),
+        shape: const CircleBorder(),
+        minimumSize: const Size.square(40),
+        disabledBackgroundColor: color.withOpacity(0.3),
+        disabledForegroundColor: Colors.white.withOpacity(0.5),
+      ),
+      child: Icon(icon, size: 16, color: Colors.white),
     );
   }
 }

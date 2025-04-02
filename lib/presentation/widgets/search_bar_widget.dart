@@ -48,7 +48,6 @@ class SearchBarWidget extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
               ),
-              // Filter Button
               IconButton(
                 icon: Icon(
                   Icons.filter_list_alt,
@@ -67,5 +66,5 @@ class SearchBarWidget extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 30.0);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 20.0);
 }
