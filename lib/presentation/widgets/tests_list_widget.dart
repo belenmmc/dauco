@@ -21,13 +21,13 @@ class TestsListWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...tests.map((test) => _buildTestItem(context, test)).toList(),
+          ...tests.map((test) => _buildTestCard(context, test)).toList(),
         ],
       ),
     );
   }
 
-  Widget _buildTestItem(BuildContext context, Test test) {
+  Widget _buildTestCard(BuildContext context, Test test) {
     return GestureDetector(
       onTap: () => {
         Navigator.push(

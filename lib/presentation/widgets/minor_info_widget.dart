@@ -24,9 +24,9 @@ class MinorInfoWidget extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    _buildFamilyInfoCard(), // Family info
+                    _buildFamilyInfoCard(),
                     SizedBox(height: 16),
-                    _buildBirthInfoCard(), // Birth info (now below family)
+                    _buildBirthInfoCard(),
                   ],
                 ),
               ),

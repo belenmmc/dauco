@@ -57,11 +57,10 @@ class HomePageState extends State<HomePage> {
                     child: Center(
                       child: Container(
                         constraints: BoxConstraints(
-                          maxWidth:
-                              1200, // Set a reasonable max width for desktop
-                          minWidth: 600, // Set a minimum width
+                          maxWidth: 1200,
+                          minWidth: 600,
                         ),
-                        padding: const EdgeInsets.all(22),
+                        padding: const EdgeInsets.all(12),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -101,12 +100,12 @@ class HomePageState extends State<HomePage> {
                                   } else if (state is GetMinorsSuccess) {
                                     return ConstrainedBox(
                                       constraints: BoxConstraints(
-                                        maxHeight: constraints.maxHeight - 100,
-                                        minHeight: 400,
+                                        maxHeight: constraints.maxHeight - 20,
+                                        minHeight: 40,
                                       ),
                                       child: MinorsListWidget(
                                         file: _file!,
-                                        children: state.minors,
+                                        minors: state.minors,
                                         screenWidth: screenWidth,
                                         selectedIndex: _selectedIndex,
                                         onItemSelected: (index) {
