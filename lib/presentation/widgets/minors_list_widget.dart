@@ -13,6 +13,7 @@ class MinorsListWidget extends StatefulWidget {
   final Function() onPreviousPage;
   final bool hasNextPage;
   final bool hasPreviousPage;
+  final String searchQuery;
 
   const MinorsListWidget({
     super.key,
@@ -25,6 +26,7 @@ class MinorsListWidget extends StatefulWidget {
     required this.onPreviousPage,
     required this.hasNextPage,
     required this.hasPreviousPage,
+    required this.searchQuery,
   });
 
   @override
@@ -50,19 +52,28 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
   }
 
   Widget _buildMinorsList() {
+    final query = widget.searchQuery.toLowerCase();
+
+    final filteredMinors = query.isEmpty
+        ? widget.minors
+        : widget.minors.where((minor) {
+            return minor.minorId.toString() == query ||
+                minor.managerId.toString() == query;
+          }).toList();
+
     return Expanded(
-      child: widget.minors.isEmpty
+      child: filteredMinors.isEmpty
           ? const _EmptyState()
           : ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: widget.minors.length,
-              itemBuilder: (context, index) => _buildMinorCard(index),
+              itemCount: filteredMinors.length,
+              itemBuilder: (context, index) =>
+                  _buildMinorCard(filteredMinors[index]),
             ),
     );
   }
 
-  Widget _buildMinorCard(int index) {
-    final minor = widget.minors[index];
+  Widget _buildMinorCard(Minor minor) {
     bool isHovered = false;
 
     return StatefulBuilder(
@@ -71,7 +82,7 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
           onEnter: (_) => setState(() => isHovered = true),
           onExit: (_) => setState(() => isHovered = false),
           child: GestureDetector(
-            onTap: () => _handleMinorSelected(index, minor),
+            onTap: () => _handleMinorSelected(minor),
             child: AnimatedContainer(
               duration: _animationDuration,
               margin:
@@ -89,7 +100,8 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
     );
   }
 
-  void _handleMinorSelected(int index, Minor minor) {
+  void _handleMinorSelected(Minor minor) {
+    final index = widget.minors.indexOf(minor);
     widget.onItemSelected(index);
     Navigator.push(
       context,
@@ -135,7 +147,7 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        'No hay menores registrados',
+        'No hay menores que coincidan con la búsqueda',
         style: TextStyle(
           color: Color.fromARGB(255, 43, 45, 66),
           fontSize: 18,

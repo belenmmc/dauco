@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 
-class SearchBarWidget extends StatelessWidget implements PreferredSizeWidget {
-  const SearchBarWidget({super.key});
+class SearchBarWidget extends StatefulWidget implements PreferredSizeWidget {
+  final ValueChanged<String> onChanged;
+
+  const SearchBarWidget({super.key, required this.onChanged});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 20.0);
+
+  @override
+  State<SearchBarWidget> createState() => _SearchBarWidgetState();
+}
+
+class _SearchBarWidgetState extends State<SearchBarWidget> {
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -15,56 +27,57 @@ class SearchBarWidget extends StatelessWidget implements PreferredSizeWidget {
         child: Padding(
           padding: const EdgeInsets.only(left: 20.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                width: screenWidth * 0.7,
+                width: screenWidth * 0.6,
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(237, 247, 238, 255),
+                    color: const Color.fromARGB(237, 247, 238, 255),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(width: 8),
-                      Icon(Icons.search,
+                      const SizedBox(width: 10),
+                      const Icon(Icons.search,
                           color: Color.fromARGB(255, 43, 45, 66)),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
+                          controller: _controller,
+                          onChanged: widget.onChanged,
+                          style: const TextStyle(fontSize: 16),
                           decoration: InputDecoration(
+                            isCollapsed: true,
                             hintText: 'Search',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(28),
-                              borderSide: BorderSide.none,
-                            ),
+                            border: InputBorder.none,
                             contentPadding:
-                                EdgeInsets.symmetric(horizontal: 16),
+                                const EdgeInsets.symmetric(vertical: 14),
+                            suffixIcon: _controller.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear,
+                                        color: Color.fromARGB(255, 43, 45, 66)),
+                                    padding: const EdgeInsets.only(right: 8),
+                                    onPressed: () {
+                                      _controller.clear();
+                                      widget.onChanged('');
+                                      setState(() {});
+                                    },
+                                  )
+                                : null,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.filter_list_alt,
-                  color: Color.fromARGB(255, 43, 45, 66),
-                  size: 30,
-                ),
-                onPressed: () {
-                  print('Filter button pressed');
-                },
-              ),
+              )
             ],
           ),
         ),
       ),
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 20.0);
 }

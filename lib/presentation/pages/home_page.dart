@@ -25,6 +25,7 @@ class HomePageState extends State<HomePage> {
   Excel? _file;
   bool _hasNextPage = true;
   bool _hasPreviousPage = false;
+  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,13 @@ class HomePageState extends State<HomePage> {
         builder: (context) {
           return Scaffold(
             backgroundColor: Color.fromARGB(255, 167, 168, 213),
-            appBar: SearchBarWidget(),
+            appBar: SearchBarWidget(
+              onChanged: (query) {
+                setState(() {
+                  _searchQuery = query;
+                });
+              },
+            ),
             body: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
@@ -119,6 +126,7 @@ class HomePageState extends State<HomePage> {
                                             _goToPreviousPage(context),
                                         hasNextPage: _hasNextPage,
                                         hasPreviousPage: _hasPreviousPage,
+                                        searchQuery: _searchQuery,
                                       ),
                                     );
                                   } else if (state is GetMinorsError) {
