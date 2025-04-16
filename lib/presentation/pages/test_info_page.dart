@@ -27,9 +27,12 @@ class _TestInfoPageState extends State<TestInfoPage> {
       child: Scaffold(
         backgroundColor: Color.fromARGB(255, 167, 168, 213),
         appBar: AppBar(
-          title: Text(
-            'Información del Test',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          title: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              'Información del Test',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
           ),
           automaticallyImplyLeading: true,
           backgroundColor: Color.fromARGB(255, 167, 168, 213),

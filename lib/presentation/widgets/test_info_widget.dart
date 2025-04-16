@@ -193,7 +193,7 @@ class TestInfoWidget extends StatelessWidget {
         children: [
           TextSpan(
             text: title,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           TextSpan(
             text: value,

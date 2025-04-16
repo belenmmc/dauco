@@ -30,9 +30,13 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
       child: Scaffold(
         backgroundColor: Color.fromARGB(255, 167, 168, 213),
         appBar: AppBar(
-          title: Text(
+          title: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
               _currentIndex == 0 ? 'Información del Menor' : 'Lista de Tests',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            ),
+          ),
           automaticallyImplyLeading: true,
           backgroundColor: Color.fromARGB(255, 167, 168, 213),
         ),
@@ -49,33 +53,7 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
           },
           child: _buildBody(),
         ),
-        floatingActionButton: Builder(
-          builder: (context) {
-            return FloatingActionButton(
-              backgroundColor: Color.fromARGB(255, 167, 168, 213),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              tooltip: _currentIndex == 0
-                  ? 'Ver lista de tests'
-                  : 'Volver a información del menor',
-              child: Icon(
-                  _currentIndex == 0 ? Icons.arrow_forward : Icons.arrow_back),
-              onPressed: () {
-                setState(() {
-                  _currentIndex = (_currentIndex + 1) % 2;
-                });
-
-                if (_currentIndex == 1) {
-                  context
-                      .read<GetTestsBloc>()
-                      .add(GetEvent(widget.file, widget.minor.minorId));
-                }
-              },
-            );
-          },
-        ),
+        bottomNavigationBar: _buildPaginationControls(context),
       ),
     );
   }
@@ -103,6 +81,73 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildPaginationControls(BuildContext context) {
+    return Builder(
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.only(bottom: 8.0, top: 6.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _PaginationButton(
+                icon: Icons.arrow_back_ios_rounded,
+                onPressed: _currentIndex == 1
+                    ? () => setState(() => _currentIndex = 0)
+                    : null,
+                color: _currentIndex == 1
+                    ? Color.fromARGB(255, 104, 106, 195)
+                    : Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
+              ),
+              const SizedBox(width: 20),
+              _PaginationButton(
+                icon: Icons.arrow_forward_ios_rounded,
+                onPressed: _currentIndex == 0
+                    ? () {
+                        setState(() => _currentIndex = 1);
+                        context
+                            .read<GetTestsBloc>()
+                            .add(GetEvent(widget.file, widget.minor.minorId));
+                      }
+                    : null,
+                color: _currentIndex == 0
+                    ? Color.fromARGB(255, 104, 106, 195)
+                    : Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PaginationButton extends StatelessWidget {
+  final IconData icon;
+  final Function()? onPressed;
+  final Color color;
+
+  const _PaginationButton({
+    required this.icon,
+    required this.onPressed,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.all(12),
+        shape: const CircleBorder(),
+        minimumSize: const Size.square(40),
+        disabledBackgroundColor: color.withOpacity(0.3),
+        disabledForegroundColor: Colors.white.withOpacity(0.5),
+      ),
+      child: Icon(icon, size: 16, color: Colors.white),
     );
   }
 }

@@ -9,68 +9,84 @@ class MinorInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: Card(
+        margin: const EdgeInsets.all(16.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: const Color.fromARGB(255, 206, 206, 237),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.4,
-                child: _buildMinorInfoCard(),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  children: [
-                    _buildFamilyInfoCard(),
-                    SizedBox(height: 16),
-                    _buildBirthInfoCard(),
-                  ],
-                ),
+              // Main content row
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left column (minor info) - 40% width
+                      SizedBox(
+                        width: constraints.maxWidth * 0.5,
+                        child: _buildMinorInfoCard(),
+                      ),
+                      const SizedBox(width: 16),
+                      // Right column (family + birth info) - remaining width
+                      Expanded(
+                        child: Column(
+                          children: [
+                            _buildFamilyInfoCard(),
+                            const SizedBox(height: 16),
+                            _buildBirthInfoCard(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildMinorInfoCard() {
     return _buildCard(
-      title: 'Info del menor',
+      title: 'Información del menor',
       children: [
-        _buildSingleInfoLine('Id del menor', minor.minorId.toString()),
-        _buildSingleInfoLine('Referencia', minor.reference),
-        _buildSingleInfoLine('Id del responsable', minor.managerId.toString()),
-        _buildSingleInfoLine('Fecha de nacimiento',
+        _buildDoubleInfoLine('Id del menor', minor.minorId.toString(),
+            'Referencia', minor.reference),
+        _buildDoubleInfoLine(
+            'Id del responsable',
+            minor.managerId.toString(),
+            'Fecha de nacimiento',
             '${minor.birthdate.day}/${minor.birthdate.month}/${minor.birthdate.year}'),
-        _buildSingleInfoLine('Rango de edad', minor.ageRange),
-        _buildSingleInfoLine('Registrado el',
+        _buildDoubleInfoLine('Rango de edad', minor.ageRange, 'Registrado el',
             '${minor.registeredAt.day}/${minor.registeredAt.month}/${minor.registeredAt.year}'),
-        _buildSingleInfoLine('Número de pruebas', minor.testsNum.toString()),
-        _buildSingleInfoLine(
+        _buildDoubleInfoLine('Número de pruebas', minor.testsNum.toString(),
             'Pruebas completadas', minor.completedTests.toString()),
-        _buildSingleInfoLine('Sexo', minor.sex),
-        _buildSingleInfoLine('Código Postal', minor.zipCode.toString()),
-        _buildSingleInfoLine('Nivel de escolarización', minor.schoolingLevel),
-        _buildSingleInfoLine(
+        _buildDoubleInfoLine(
+            'Sexo', minor.sex, 'Código Postal', minor.zipCode.toString()),
+        _buildDoubleInfoLine('Nivel de escolarización', minor.schoolingLevel,
             'Observaciones escolarización', minor.schoolingObservations),
-        _buildSingleInfoLine(
-            'Situación socioeconómica', minor.socioeconomicSituation),
-        _buildSingleInfoLine('Enfermedades relevantes', minor.relevantDiseases),
-        _buildSingleInfoLine('Motivo de valoración', minor.evaluationReason),
-        _buildSingleInfoLine('Test de Apgar', minor.apgarTest.toString()),
-        _buildSingleInfoLine('Adopción', minor.adoption.toString()),
-        _buildSingleInfoLine('Juicio clínico', minor.clinicalJudgement),
+        _buildDoubleInfoLine(
+            'Situación socioeconómica',
+            minor.socioeconomicSituation,
+            'Enfermedades relevantes',
+            minor.relevantDiseases),
+        _buildDoubleInfoLine('Motivo de valoración', minor.evaluationReason,
+            'Test de Apgar', minor.apgarTest.toString()),
+        _buildDoubleInfoLine('Adopción', minor.adoption.toString(),
+            'Juicio clínico', minor.clinicalJudgement),
       ],
     );
   }
 
   Widget _buildFamilyInfoCard() {
     return _buildCard(
-      title: 'Info familia',
+      title: 'Información de la familia',
       children: [
         _buildDoubleInfoLine('Edad madre', minor.motherAge.toString(),
             'Edad padre', minor.fatherAge.toString()),
@@ -78,8 +94,8 @@ class MinorInfoWidget extends StatelessWidget {
             'Trabajo madre', minor.motherJob, 'Trabajo padre', minor.fatherJob),
         _buildDoubleInfoLine('Estudios madre', minor.motherStudies,
             'Estudios padre', minor.fatherStudies),
-        _buildDoubleInfoLine('Nº hermanos', minor.siblings.toString(),
-            'Posición herm.', minor.siblingsPosition.toString()),
+        _buildDoubleInfoLine('Número de hermanos', minor.siblings.toString(),
+            'Posición hermanos', minor.siblingsPosition.toString()),
         _buildDoubleInfoLine('Estado civil padres', minor.parentsCivilStatus,
             'Antecedentes familiares', minor.familyBackground),
         _buildDoubleInfoLine('Miembros familia', minor.familyMembers.toString(),
@@ -90,7 +106,7 @@ class MinorInfoWidget extends StatelessWidget {
 
   Widget _buildBirthInfoCard() {
     return _buildCard(
-      title: 'Info parto',
+      title: 'Información del parto',
       children: [
         _buildSingleInfoLine('Tipo de parto', minor.birthType),
         _buildSingleInfoLine(
@@ -105,7 +121,7 @@ class MinorInfoWidget extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
-      color: Color.fromARGB(255, 247, 238, 255),
+      color: const Color.fromARGB(255, 247, 238, 255),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -113,9 +129,12 @@ class MinorInfoWidget extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 104, 106, 195)),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 12),
             ...children,
           ],
         ),
@@ -125,22 +144,26 @@ class MinorInfoWidget extends StatelessWidget {
 
   Widget _buildSingleInfoLine(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 3,
             child: Text(
               label,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87),
             ),
           ),
-          SizedBox(width: 32),
+          const SizedBox(width: 8),
           Expanded(
             flex: 3,
             child: Text(
-              value,
-              style: TextStyle(fontSize: 16),
+              value.isNotEmpty ? value : '-',
+              style: const TextStyle(fontSize: 18, color: Colors.black54),
             ),
           ),
         ],
@@ -151,12 +174,17 @@ class MinorInfoWidget extends StatelessWidget {
   Widget _buildDoubleInfoLine(
       String label1, String value1, String label2, String value2) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: _buildSingleInfoLine(label1, value1)),
-          SizedBox(width: 16),
-          Expanded(child: _buildSingleInfoLine(label2, value2)),
+          Expanded(
+            child: _buildSingleInfoLine(label1, value1),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: _buildSingleInfoLine(label2, value2),
+          ),
         ],
       ),
     );
