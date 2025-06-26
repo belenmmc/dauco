@@ -1,3 +1,4 @@
+import 'package:dauco/data/services/import_service.dart';
 import 'package:dauco/domain/usecases/load_file_use_case.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,6 +38,7 @@ class LoadFileError extends LoadFileState {
 
 class LoadFileBloc extends Bloc<LoadEvent, LoadFileState> {
   LoadFileUseCase loadFileUseCase;
+  ImportService importService = ImportService();
 
   LoadFileBloc({required this.loadFileUseCase}) : super(LoadFileInitial()) {
     on<LoadFileEvent>((event, emit) async {
@@ -45,6 +47,9 @@ class LoadFileBloc extends Bloc<LoadEvent, LoadFileState> {
         final file = await loadFileUseCase.execute();
         if (file != null) {
           emit(LoadFileSuccess(file));
+          await importService.uploadAll(file, (progress) {
+            print('Progreso: ${(progress * 100).toStringAsFixed(0)}%');
+          });
         } else {
           emit(LoadFileCancelled());
         }

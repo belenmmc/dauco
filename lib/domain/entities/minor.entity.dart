@@ -1,6 +1,6 @@
 class Minor {
   final int minorId;
-  final String reference;
+  final int reference;
   final int managerId;
   final DateTime birthdate;
   final String ageRange;
@@ -70,4 +70,43 @@ class Minor {
     required this.adoption,
     required this.clinicalJudgement,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'menor_id': minorId,
+      'referencia': reference,
+      'responsable_id': managerId,
+      'fecha_nacimiento': birthdate.toIso8601String(),
+      'rango_edad': ageRange,
+      'alta': registeredAt.toIso8601String(),
+      'num_tests': testsNum,
+      'test_completados': completedTests,
+      'sexo': sex,
+      'cp': zipCode,
+      'edad_padre': fatherAge,
+      'edad_madre': motherAge,
+      'trabajo_padre': fatherJob,
+      'trabajo_madre': motherJob,
+      'estudios_padre': fatherStudies,
+      'estudios_madre': motherStudies,
+      'estado_civil_padres': parentsCivilStatus,
+      'hermanos': siblings,
+      'posicion_hermanos': siblingsPosition,
+      'tipo_parto': birthType,
+      'semana_gestacion': gestationWeeks,
+      'incidencias_parto': birthIncidents,
+      'peso_nacimiento': birthWeight,
+      'situacion_socioeconomica': socioeconomicSituation,
+      'antecedentes_familiares': familyBackground,
+      'familiares_domicilio': familyMembers,
+      'familiares_discapacidad': familyDisabilities,
+      'nivel_escolarizacion': schoolingLevel,
+      'observaciones_escolarizacion': schoolingObservations,
+      'enfermedades_relevantes': relevantDiseases,
+      'motivo_valoracion': evaluationReason,
+      'test_apgar': apgarTest,
+      'adopcion': adoption,
+      'juicio_clinico': clinicalJudgement,
+    };
+  }
 }

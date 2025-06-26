@@ -69,13 +69,14 @@ class TestInfoWidget extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            _buildHeaderItem('Test M-CHAT: ', test.mChatTest),
+                            _buildHeaderItem(
+                                'Test M-CHAT: ', test.mChatTest.toString()),
                             SizedBox(height: 8),
                             _buildHeaderItem(
                                 'Tipo profesional: ', test.professionalType),
                             SizedBox(height: 8),
                             _buildHeaderItem(
-                                'Áreas activas: ', test.activeAreas),
+                                'Áreas activas: ', test.activeAreas.toString()),
                           ],
                         ),
                       ),
