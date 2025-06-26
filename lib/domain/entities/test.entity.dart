@@ -4,9 +4,9 @@ class Test {
   final DateTime registeredAt;
   final String cronologicalAge;
   final String evolutionaryAge;
-  final String mChatTest;
+  final bool mChatTest;
   final String progress;
-  final String activeAreas;
+  final int activeAreas;
   final String professionalType;
 
   Test({
@@ -20,4 +20,18 @@ class Test {
     required this.activeAreas,
     required this.professionalType,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'test_id': testId,
+      'menor_id': minorId,
+      'alta': registeredAt.toIso8601String(),
+      'edad_cronologica': cronologicalAge,
+      'edad_evolutiva': evolutionaryAge,
+      'test_mchat': mChatTest,
+      'progreso': progress,
+      'areas_activas': activeAreas,
+      'tipo_profesional': professionalType,
+    };
+  }
 }

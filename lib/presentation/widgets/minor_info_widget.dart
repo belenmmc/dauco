@@ -57,7 +57,7 @@ class MinorInfoWidget extends StatelessWidget {
       title: 'Información del menor',
       children: [
         _buildDoubleInfoLine('Id del menor', minor.minorId.toString(),
-            'Referencia', minor.reference),
+            'Referencia', minor.reference.toString()),
         _buildDoubleInfoLine(
             'Id del responsable',
             minor.managerId.toString(),
