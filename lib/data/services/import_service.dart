@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dauco/data/services/mappers/item_mapper.dart';
+import 'package:dauco/data/services/mappers/minor_mapper.dart';
+import 'package:dauco/data/services/mappers/test_mapper.dart';
 import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/entities/item.entity.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
@@ -10,7 +13,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ImportService {
-  Future<Excel?> loadFile() async {
+  Future<Excel?> pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
@@ -25,7 +28,7 @@ class ImportService {
 
     return Excel.decodeBytes(fileBytes);
   }
-
+/*
   Future<List<ImportedUser>> getUsers(file,
       {int page = 1, int pageSize = 10}) async {
     var sheet = file?.tables.keys.first;
@@ -228,29 +231,32 @@ class ImportService {
     }
 
     return items.where((item) => item.testId == testId).toList();
-  }
+  } */
 
-  Future<void> uploadAll(Excel file, Function(double) onProgress) async {
+  Future<void> loadFile(Excel file, Function(double) onProgress) async {
     final totalSteps = 3.0;
     double currentStep = 0.0;
 
     // Upload users
-    final users = await getAllUsers(file);
+    final users = await uploadUsers(file);
     await uploadInBatches("Usuarios", users.map((u) => u.toJson()).toList());
     currentStep++;
     onProgress(currentStep / totalSteps);
 
     // Upload minors
-    final minors = await getAllMinors(file);
-    await uploadInBatches("Menores", minors.map((m) => m.toJson()).toList());
+    final minors = await uploadMinors(file);
+    await uploadInBatches(
+        "Menores", minors.map((m) => MinorMapper.toJson(m)).toList());
     currentStep++;
     onProgress(currentStep / totalSteps);
 
     // Upload tests and items
-    final tests = await getAllTests(file);
-    final items = await getAllItems(file);
-    await uploadInBatches("Tests", tests.map((t) => t.toJson()).toList());
-    await uploadInBatches("Items", items.map((i) => i.toJson()).toList());
+    final tests = await uploadTests(file);
+    final items = await uploadItems(file);
+    await uploadInBatches(
+        "Tests", tests.map((t) => TestMapper.toJson(t)).toList());
+    await uploadInBatches(
+        "Items", items.map((i) => ItemMapper.toJson(i)).toList());
     currentStep++;
     onProgress(currentStep / totalSteps);
   }
@@ -268,7 +274,7 @@ class ImportService {
     }
   }
 
-  Future<List<ImportedUser>> getAllUsers(Excel file) async {
+  Future<List<ImportedUser>> uploadUsers(Excel file) async {
     var sheet = file.tables.keys.first;
     List<ImportedUser> users = [];
     var rows = file.tables[sheet]!.rows.skip(1);
@@ -298,7 +304,7 @@ class ImportService {
     return users;
   }
 
-  Future<List<Minor>> getAllMinors(Excel file) async {
+  Future<List<Minor>> uploadMinors(Excel file) async {
     var sheet = file.tables.keys.elementAt(1);
     List<Minor> minors = [];
     var rows = file.tables[sheet]!.rows.skip(1);
@@ -349,7 +355,7 @@ class ImportService {
     return minors;
   }
 
-  Future<List<Test>> getAllTests(Excel file) async {
+  Future<List<Test>> uploadTests(Excel file) async {
     var sheet = file.tables.keys.elementAt(2);
     List<Test> tests = [];
     var rows = file.tables[sheet]!.rows.skip(1);
@@ -374,7 +380,7 @@ class ImportService {
     return tests;
   }
 
-  Future<List<Item>> getAllItems(Excel file) async {
+  Future<List<Item>> uploadItems(Excel file) async {
     var sheet = file.tables.keys.elementAt(3);
     List<Item> items = [];
     var rows = file.tables[sheet]!.rows.skip(1);

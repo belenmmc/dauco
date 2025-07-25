@@ -20,18 +20,4 @@ class Test {
     required this.activeAreas,
     required this.professionalType,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'test_id': testId,
-      'menor_id': minorId,
-      'alta': registeredAt.toIso8601String(),
-      'edad_cronologica': cronologicalAge,
-      'edad_evolutiva': evolutionaryAge,
-      'test_mchat': mChatTest,
-      'progreso': progress,
-      'areas_activas': activeAreas,
-      'tipo_profesional': professionalType,
-    };
-  }
 }

@@ -64,7 +64,8 @@ class LoginUserPageState extends State<LoginPage> {
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text('Login successful!'),
+                                  content:
+                                      Text('Sesión iniciada correctamente'),
                                 ),
                               );
                             } else if (state is LoginError) {
@@ -90,13 +91,13 @@ class LoginUserPageState extends State<LoginPage> {
                                 TextField(
                                   controller: _emailController,
                                   decoration: const InputDecoration(
-                                    hintText: 'user@example.com',
+                                    hintText: 'usuario@ejemplo.com',
                                     border: OutlineInputBorder(),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
                                 const CustomText(
-                                  text: 'Password',
+                                  text: 'Contraseña',
                                   color: Colors.black,
                                 ),
                                 TextField(
@@ -129,7 +130,6 @@ class LoginUserPageState extends State<LoginPage> {
                                       ),
                                     ),
                                     onPressed: () {
-                                      print(_emailController.text);
                                       context.read<LoginBloc>().add(LoginEvent(
                                           email: _emailController.text,
                                           password: _passwordController.text));

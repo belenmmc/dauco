@@ -6,11 +6,11 @@ import 'package:mockito/mockito.dart';
 import 'package:excel/excel.dart';
 
 import 'package:dauco/domain/entities/item.entity.dart';
-import 'package:dauco/domain/usecases/get_items_use_case.dart';
+import 'package:dauco/domain/usecases/get_all_items_use_case.dart';
 
 import 'get_items_bloc_test.mocks.dart';
 
-@GenerateMocks([GetItemsUseCase])
+@GenerateMocks([GetAllItemsUseCase])
 void main() {
   late MockGetItemsUseCase mockGetItemsUseCase;
   late GetItemsBloc bloc;

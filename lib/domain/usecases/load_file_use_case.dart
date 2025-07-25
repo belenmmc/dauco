@@ -6,7 +6,7 @@ class LoadFileUseCase {
 
   LoadFileUseCase({required this.importRepository});
 
-  Future<Excel?> execute() async {
-    return await importRepository.loadFile();
+  Future<void> execute(Excel file, Function(double) onProgress) async {
+    return await importRepository.loadFile(file, onProgress);
   }
 }

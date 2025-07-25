@@ -41,7 +41,6 @@ class LoginBloc extends Bloc<UserLoginEvent, LoginState> {
         emit(LoginSuccess());
       } on AuthException catch (e) {
         emit(LoginError(error: e.toString()));
-        print(e.toString());
       }
     });
   }

@@ -8,7 +8,7 @@ import 'dart:async' as _i4;
 import 'package:dauco/data/repositories/implementation/import_repository.dart'
     as _i2;
 import 'package:dauco/domain/entities/item.entity.dart' as _i5;
-import 'package:dauco/domain/usecases/get_items_use_case.dart' as _i3;
+import 'package:dauco/domain/usecases/get_all_items_use_case.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -28,33 +28,30 @@ import 'package:mockito/mockito.dart' as _i1;
 class _FakeImportRepository_0 extends _i1.SmartFake
     implements _i2.ImportRepository {
   _FakeImportRepository_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+      : super(parent, parentInvocation);
 }
 
 /// A class which mocks [GetItemsUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockGetItemsUseCase extends _i1.Mock implements _i3.GetItemsUseCase {
+class MockGetItemsUseCase extends _i1.Mock implements _i3.GetAllItemsUseCase {
   MockGetItemsUseCase() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i2.ImportRepository get importRepository =>
-      (super.noSuchMethod(
-            Invocation.getter(#importRepository),
-            returnValue: _FakeImportRepository_0(
-              this,
-              Invocation.getter(#importRepository),
-            ),
-          )
-          as _i2.ImportRepository);
+  _i2.ImportRepository get itemRepository => (super.noSuchMethod(
+        Invocation.getter(#importRepository),
+        returnValue: _FakeImportRepository_0(
+          this,
+          Invocation.getter(#importRepository),
+        ),
+      ) as _i2.ImportRepository);
 
   @override
   _i4.Future<List<_i5.Item>> execute(dynamic file, int? testId) =>
       (super.noSuchMethod(
-            Invocation.method(#execute, [file, testId]),
-            returnValue: _i4.Future<List<_i5.Item>>.value(<_i5.Item>[]),
-          )
-          as _i4.Future<List<_i5.Item>>);
+        Invocation.method(#execute, [file, testId]),
+        returnValue: _i4.Future<List<_i5.Item>>.value(<_i5.Item>[]),
+      ) as _i4.Future<List<_i5.Item>>);
 }

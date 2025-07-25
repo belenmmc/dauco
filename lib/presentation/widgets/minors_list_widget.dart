@@ -1,10 +1,8 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/presentation/pages/minor_info_page.dart';
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 
 class MinorsListWidget extends StatefulWidget {
-  final Excel file;
   final List<Minor> minors;
   final double screenWidth;
   final int? selectedIndex;
@@ -17,7 +15,6 @@ class MinorsListWidget extends StatefulWidget {
 
   const MinorsListWidget({
     super.key,
-    required this.file,
     required this.minors,
     required this.screenWidth,
     required this.selectedIndex,
@@ -57,8 +54,7 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
     final filteredMinors = query.isEmpty
         ? widget.minors
         : widget.minors.where((minor) {
-            return minor.minorId.toString() == query ||
-                minor.managerId.toString() == query;
+            return minor.minorId.toString() == query;
           }).toList();
 
     return Expanded(
@@ -106,7 +102,7 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MinorInfoPage(file: widget.file, minor: minor),
+        builder: (context) => MinorInfoPage(minor: minor),
       ),
     );
   }
