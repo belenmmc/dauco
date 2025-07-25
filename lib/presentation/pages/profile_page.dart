@@ -2,9 +2,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/user_model.entity.dart';
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
+import 'package:dauco/domain/usecases/logout_use_case.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
+import 'package:dauco/presentation/blocs/logout_bloc.dart';
 import 'package:dauco/presentation/blocs/update_user_bloc.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
+import 'package:dauco/presentation/widgets/logout_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -86,13 +89,31 @@ class _ProfilePageState extends State<ProfilePage> {
           create: (context) => UpdateUserBloc(
               updateUserUseCase: appInjector.get<UpdateUserUseCase>()),
         ),
+        BlocProvider(
+          create: (context) =>
+              LogoutBloc(logoutUseCase: appInjector.get<LogoutUseCase>())
+                ..add(LogoutEvent()),
+        )
       ],
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 167, 168, 213),
         appBar: AppBar(
-          title: const Text("Perfil"),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
+          title: Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Mi perfil',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(width: 20),
+                LogoutWidget(context: this.context),
+              ],
+            ),
+          ),
+          automaticallyImplyLeading: true,
+          backgroundColor: Color.fromARGB(255, 167, 168, 213),
         ),
         body: BlocListener<UpdateUserBloc, UpdateUserState>(
           listener: (context, state) {

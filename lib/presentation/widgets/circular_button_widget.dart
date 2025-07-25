@@ -19,7 +19,7 @@ class CircularButtonWidget extends StatelessWidget {
           backgroundColor: const Color.fromARGB(237, 247, 238, 255),
           shape: const CircleBorder(),
         ),
-        onPressed: onPressed, // 👉 Aquí usamos la función pasada
+        onPressed: onPressed,
         child: Icon(
           iconData,
           size: 28,

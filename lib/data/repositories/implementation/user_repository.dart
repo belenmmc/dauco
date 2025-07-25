@@ -14,8 +14,7 @@ class UserRepository implements UserRepositoryInterface {
 
   @override
   Future<void> logout() {
-    // TODO: implement logout
-    throw UnimplementedError();
+    return userService.logout();
   }
 
   @override
