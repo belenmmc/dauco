@@ -16,6 +16,7 @@ import 'package:dauco/domain/usecases/get_all_minors_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_tests_use_case.dart';
 import 'package:dauco/domain/usecases/load_file_use_case.dart';
 import 'package:dauco/domain/usecases/login_use_case.dart';
+import 'package:dauco/domain/usecases/logout_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
 import 'package:dauco/domain/usecases/register_use_case.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
@@ -51,6 +52,9 @@ void initInjection() {
 
   appInjector.registerSingleton<LoginUseCase>(
       () => LoginUseCase(userRepository: appInjector.get<UserRepository>()));
+
+  appInjector.registerSingleton<LogoutUseCase>(
+      () => LogoutUseCase(userRepository: appInjector.get<UserRepository>()));
 
   appInjector.registerSingleton<GetCurrentUserUseCase>(() =>
       GetCurrentUserUseCase(userRepository: appInjector.get<UserRepository>()));

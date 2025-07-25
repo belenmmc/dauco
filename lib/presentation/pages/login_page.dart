@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
+  static final String routeName = '/login';
+
   const LoginPage({super.key});
 
   @override
