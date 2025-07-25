@@ -1,16 +1,13 @@
 import 'package:dauco/presentation/pages/test_info_page.dart';
 import 'package:dauco/presentation/widgets/test_progress_indicator_widget.dart';
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
 
 class TestsListWidget extends StatelessWidget {
-  final Excel file;
   final List<Test> tests;
 
   const TestsListWidget({
     super.key,
-    required this.file,
     required this.tests,
   });
 
@@ -33,7 +30,7 @@ class TestsListWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TestInfoPage(file: file, test: test),
+            builder: (context) => TestInfoPage(test: test),
           ),
         ),
       },

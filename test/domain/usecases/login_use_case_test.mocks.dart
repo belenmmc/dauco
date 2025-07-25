@@ -26,7 +26,7 @@ import 'package:mockito/mockito.dart' as _i1;
 
 class _FakeUserService_0 extends _i1.SmartFake implements _i2.UserService {
   _FakeUserService_0(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
+      : super(parent, parentInvocation);
 }
 
 /// A class which mocks [UserRepository].
@@ -38,55 +38,39 @@ class MockUserRepository extends _i1.Mock implements _i3.UserRepository {
   }
 
   @override
-  _i2.UserService get userService =>
-      (super.noSuchMethod(
-            Invocation.getter(#userService),
-            returnValue: _FakeUserService_0(
-              this,
-              Invocation.getter(#userService),
-            ),
-          )
-          as _i2.UserService);
+  _i2.UserService get userService => (super.noSuchMethod(
+        Invocation.getter(#userService),
+        returnValue: _FakeUserService_0(
+          this,
+          Invocation.getter(#userService),
+        ),
+      ) as _i2.UserService);
 
   @override
   set userService(_i2.UserService? _userService) => super.noSuchMethod(
-    Invocation.setter(#userService, _userService),
-    returnValueForMissingStub: null,
-  );
+        Invocation.setter(#userService, _userService),
+        returnValueForMissingStub: null,
+      );
 
   @override
   _i4.Future<void> login(String? email, String? password) =>
       (super.noSuchMethod(
-            Invocation.method(#login, [email, password]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
+        Invocation.method(#login, [email, password]),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
-  _i4.Future<void> logout() =>
-      (super.noSuchMethod(
-            Invocation.method(#logout, []),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
+  _i4.Future<void> logout() => (super.noSuchMethod(
+        Invocation.method(#logout, []),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
-  _i4.Future<void> register(String? email, String? password) =>
-      (super.noSuchMethod(
-            Invocation.method(#register, [email, password]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
-
-  @override
-  _i4.Future<void> resetPassword(String? email) =>
-      (super.noSuchMethod(
-            Invocation.method(#resetPassword, [email]),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
+  _i4.Future<void> resetPassword(String? email) => (super.noSuchMethod(
+        Invocation.method(#resetPassword, [email]),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 }

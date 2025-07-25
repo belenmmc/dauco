@@ -36,12 +36,10 @@ class MockImportService extends _i1.Mock implements _i2.ImportService {
   }
 
   @override
-  _i3.Future<_i4.Excel?> loadFile() =>
-      (super.noSuchMethod(
-            Invocation.method(#loadFile, []),
-            returnValue: _i3.Future<_i4.Excel?>.value(),
-          )
-          as _i3.Future<_i4.Excel?>);
+  _i3.Future<_i4.Excel?> pickFile() => (super.noSuchMethod(
+        Invocation.method(#loadFile, []),
+        returnValue: _i3.Future<_i4.Excel?>.value(),
+      ) as _i3.Future<_i4.Excel?>);
 
   @override
   _i3.Future<List<_i5.ImportedUser>> getUsers(
@@ -50,16 +48,15 @@ class MockImportService extends _i1.Mock implements _i2.ImportService {
     int? pageSize = 10,
   }) =>
       (super.noSuchMethod(
-            Invocation.method(
-              #getUsers,
-              [file],
-              {#page: page, #pageSize: pageSize},
-            ),
-            returnValue: _i3.Future<List<_i5.ImportedUser>>.value(
-              <_i5.ImportedUser>[],
-            ),
-          )
-          as _i3.Future<List<_i5.ImportedUser>>);
+        Invocation.method(
+          #getUsers,
+          [file],
+          {#page: page, #pageSize: pageSize},
+        ),
+        returnValue: _i3.Future<List<_i5.ImportedUser>>.value(
+          <_i5.ImportedUser>[],
+        ),
+      ) as _i3.Future<List<_i5.ImportedUser>>);
 
   @override
   _i3.Future<List<_i6.Minor>> getMinors(
@@ -68,28 +65,25 @@ class MockImportService extends _i1.Mock implements _i2.ImportService {
     int? pageSize = 10,
   }) =>
       (super.noSuchMethod(
-            Invocation.method(
-              #getMinors,
-              [file],
-              {#page: page, #pageSize: pageSize},
-            ),
-            returnValue: _i3.Future<List<_i6.Minor>>.value(<_i6.Minor>[]),
-          )
-          as _i3.Future<List<_i6.Minor>>);
+        Invocation.method(
+          #getMinors,
+          [file],
+          {#page: page, #pageSize: pageSize},
+        ),
+        returnValue: _i3.Future<List<_i6.Minor>>.value(<_i6.Minor>[]),
+      ) as _i3.Future<List<_i6.Minor>>);
 
   @override
   _i3.Future<List<_i7.Test>> getTests(dynamic file, int? minorId) =>
       (super.noSuchMethod(
-            Invocation.method(#getTests, [file, minorId]),
-            returnValue: _i3.Future<List<_i7.Test>>.value(<_i7.Test>[]),
-          )
-          as _i3.Future<List<_i7.Test>>);
+        Invocation.method(#getTests, [file, minorId]),
+        returnValue: _i3.Future<List<_i7.Test>>.value(<_i7.Test>[]),
+      ) as _i3.Future<List<_i7.Test>>);
 
   @override
   _i3.Future<List<_i8.Item>> getItems(dynamic file, int? testId) =>
       (super.noSuchMethod(
-            Invocation.method(#getItems, [file, testId]),
-            returnValue: _i3.Future<List<_i8.Item>>.value(<_i8.Item>[]),
-          )
-          as _i3.Future<List<_i8.Item>>);
+        Invocation.method(#getItems, [file, testId]),
+        returnValue: _i3.Future<List<_i8.Item>>.value(<_i8.Item>[]),
+      ) as _i3.Future<List<_i8.Item>>);
 }

@@ -2,7 +2,6 @@ import 'package:dauco/data/repositories/import_repository_interface.dart';
 import 'package:dauco/data/services/import_service.dart';
 import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/entities/item.entity.dart';
-import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:excel/excel.dart';
 
@@ -12,27 +11,30 @@ class ImportRepository implements ImportRepositoryInterface {
   ImportRepository({required this.importService});
 
   @override
-  Future<Excel?> loadFile() {
-    return importService.loadFile();
+  Future<Excel?> pickFile() {
+    return importService.pickFile();
   }
 
   @override
-  Future<List<ImportedUser>> getUsers(file, int page, int pageSize) async {
-    return await importService.getUsers(file, page: page, pageSize: pageSize);
-  }
-
-  @override
-  Future<List<Minor>> getMinors(file, int page, int pageSize) {
-    return importService.getMinors(file, page: page, pageSize: pageSize);
-  }
-
-  @override
-  Future<List<Test>> getTests(file, int minorId) {
-    return importService.getTests(file, minorId);
+  Future<void> loadFile(Excel file, Function(double p1) onProgress) {
+    return importService.loadFile(file, onProgress);
   }
 
   @override
   Future<List<Item>> getItems(file, int testId) {
-    return importService.getItems(file, testId);
+    // TODO: implement getItems
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Test>> getTests(file, int minorId) {
+    // TODO: implement getTests
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<ImportedUser>> getUsers(file, int page, int pageSize) {
+    // TODO: implement getUsers
+    throw UnimplementedError();
   }
 }

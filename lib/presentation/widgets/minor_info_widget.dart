@@ -10,7 +10,7 @@ class MinorInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Card(
-        margin: const EdgeInsets.all(16.0),
+        margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: const Color.fromARGB(255, 206, 206, 237),
         child: Padding(

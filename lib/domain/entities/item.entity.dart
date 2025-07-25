@@ -16,16 +16,4 @@ class Item {
     required this.question,
     required this.answer,
   });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'respuesta_id': responseId,
-      'item_id': itemId,
-      'num_item_id': item,
-      'test_id': testId,
-      'area': area,
-      'pregunta': question,
-      'respuesta': answer,
-    };
-  }
 }

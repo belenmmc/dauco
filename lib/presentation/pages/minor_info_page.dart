@@ -1,18 +1,17 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
+import 'package:dauco/presentation/widgets/circular_button_widget.dart';
 import 'package:dauco/presentation/widgets/minor_info_widget.dart';
 import 'package:dauco/presentation/widgets/tests_list_widget.dart';
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
-import 'package:dauco/domain/usecases/get_tests_use_case.dart';
-import 'package:dauco/presentation/blocs/get_tests_bloc.dart';
+import 'package:dauco/domain/usecases/get_all_tests_use_case.dart';
+import 'package:dauco/presentation/blocs/get_all_tests_bloc.dart';
 
 class MinorInfoPage extends StatefulWidget {
-  final Excel file;
   final Minor minor;
 
-  const MinorInfoPage({super.key, required this.file, required this.minor});
+  const MinorInfoPage({super.key, required this.minor});
 
   @override
   _MinorInfoPageState createState() => _MinorInfoPageState();
@@ -25,16 +24,32 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => GetTestsBloc(
-        getTestsUseCase: appInjector.get<GetTestsUseCase>(),
-      ),
+        getAllTestsUseCase: appInjector.get<GetAllTestsUseCase>(),
+      )..add(GetEvent(widget.minor.minorId)),
       child: Scaffold(
         backgroundColor: Color.fromARGB(255, 167, 168, 213),
         appBar: AppBar(
           title: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Text(
-              _currentIndex == 0 ? 'Información del Menor' : 'Lista de Tests',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+            padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _currentIndex == 0
+                      ? 'Información del Menor'
+                      : 'Lista de Tests',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(width: 20),
+                CircularButtonWidget(
+                  iconData: Icons.edit_outlined,
+                  onPressed: () => Navigator.pushNamed(
+                    context,
+                    '/editMinor',
+                    arguments: widget.minor,
+                  ),
+                ),
+              ],
             ),
           ),
           automaticallyImplyLeading: true,
@@ -73,7 +88,7 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                     child: Text('No hay tests disponibles',
                         style: TextStyle(fontSize: 20)));
               }
-              return TestsListWidget(file: widget.file, tests: state.tests);
+              return TestsListWidget(tests: state.tests);
             } else if (state is GetTestsError) {
               return Center(child: Text('Error: ${state.error}'));
             }
@@ -107,9 +122,9 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                 onPressed: _currentIndex == 0
                     ? () {
                         setState(() => _currentIndex = 1);
-                        context
+                        /* context
                             .read<GetTestsBloc>()
-                            .add(GetEvent(widget.file, widget.minor.minorId));
+                            .add(GetEvent(widget.minor.minorId)); */
                       }
                     : null,
                 color: _currentIndex == 0
