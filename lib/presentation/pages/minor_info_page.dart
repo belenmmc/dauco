@@ -46,14 +46,21 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                 if (widget.role == 'admin' && _currentIndex == 0)
                   CircularButtonWidget(
                     iconData: Icons.edit_outlined,
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EditMinorPage(minor: widget.minor),
-                      ),
-                    ),
-                  ),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditMinorPage(minor: widget.minor),
+                        ),
+                      );
+
+                      if (result == true) {
+                        Navigator.pop(
+                            context, true); // ← Propaga el evento hacia atrás
+                      }
+                    },
+                  )
               ],
             ),
           ),

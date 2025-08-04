@@ -101,12 +101,6 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
   void _handleMinorSelected(Minor minor) {
     final index = widget.minors.indexOf(minor);
     widget.onItemSelected(index);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MinorInfoPage(minor: minor, role: widget.role),
-      ),
-    );
   }
 
   Widget _buildPaginationControls() {

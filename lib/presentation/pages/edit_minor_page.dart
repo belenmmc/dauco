@@ -3,9 +3,8 @@ import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/domain/usecases/delete_minor_use_case.dart';
 import 'package:dauco/domain/usecases/update_minor_use_case.dart';
 import 'package:dauco/presentation/blocs/delete_minor_bloc.dart';
-import 'package:dauco/presentation/blocs/get_all_minors_bloc.dart';
 import 'package:dauco/presentation/blocs/update_minor_bloc.dart';
-import 'package:dauco/presentation/widgets/edit_minor_form.dart';
+import 'package:dauco/presentation/widgets/edit_minor_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,9 +30,7 @@ class EditMinorPage extends StatelessWidget {
       ],
       child: BlocListener<DeleteMinorBloc, DeleteMinorState>(
         listener: (context, state) {
-          if (state is DeleteMinorSuccess) {
-            Navigator.of(context).popUntil((route) => route.isFirst);
-          } else if (state is DeleteMinorError) {
+          if (state is DeleteMinorError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error al eliminar: ${state.error}')),
             );
@@ -42,11 +39,11 @@ class EditMinorPage extends StatelessWidget {
         child: Scaffold(
           backgroundColor: const Color.fromARGB(255, 167, 168, 213),
           appBar: AppBar(
-            title: Padding(
-              padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+            title: const Padding(
+              padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     'Editar Menor',
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
@@ -56,7 +53,7 @@ class EditMinorPage extends StatelessWidget {
               ),
             ),
             automaticallyImplyLeading: true,
-            backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+            backgroundColor: Color.fromARGB(255, 167, 168, 213),
           ),
           body: EditMinorWidget(
             minor: minor,
