@@ -38,11 +38,10 @@ class _AdminSearchBarWidgetState extends State<AdminSearchBarWidget> {
       elevation: 0,
       toolbarHeight: kToolbarHeight + 20.0,
       flexibleSpace: Padding(
-        padding: const EdgeInsets.only(top: 20.0), // Para dejar espacio arriba
+        padding: const EdgeInsets.only(top: 20.0),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Back button (a la izquierda)
             Positioned(
               left: 16,
               top: 0,
@@ -53,8 +52,6 @@ class _AdminSearchBarWidgetState extends State<AdminSearchBarWidget> {
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-
-            // Search bar + Register button (centrado)
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [

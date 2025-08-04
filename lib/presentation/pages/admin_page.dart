@@ -27,8 +27,6 @@ class AdminPageState extends State<AdminPage> {
   bool _hasPreviousPage = false;
   String _searchQuery = '';
 
-  // Dentro de AdminPageState (reemplaza el build)
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;

@@ -112,28 +112,41 @@ class HomePageState extends State<HomePage> {
                                   if (_isLoading) {
                                     return _buildProgressIndicator();
                                   } else if (state is GetMinorsSuccess) {
-                                    return ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxHeight: constraints.maxHeight - 20,
-                                        minHeight: 40,
-                                      ),
-                                      child: MinorsListWidget(
-                                        minors: state.minors,
-                                        screenWidth: screenWidth,
-                                        selectedIndex: _selectedIndex,
-                                        onItemSelected: (index) {
-                                          setState(() {
-                                            _selectedIndex = index;
-                                          });
-                                        },
-                                        onNextPage: () =>
-                                            _goToNextPage(context),
-                                        onPreviousPage: () =>
-                                            _goToPreviousPage(context),
-                                        hasNextPage: _hasNextPage,
-                                        hasPreviousPage: _hasPreviousPage,
-                                        searchQuery: _searchQuery,
-                                      ),
+                                    return BlocBuilder<GetCurrentUserBloc,
+                                        GetCurrentUserState>(
+                                      builder: (context, userState) {
+                                        String userRole = '';
+                                        if (userState
+                                            is GetCurrentUserSuccess) {
+                                          userRole = userState.currentUser.role;
+                                        }
+
+                                        return ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight:
+                                                constraints.maxHeight - 20,
+                                            minHeight: 40,
+                                          ),
+                                          child: MinorsListWidget(
+                                            minors: state.minors,
+                                            screenWidth: screenWidth,
+                                            selectedIndex: _selectedIndex,
+                                            onItemSelected: (index) {
+                                              setState(() {
+                                                _selectedIndex = index;
+                                              });
+                                            },
+                                            onNextPage: () =>
+                                                _goToNextPage(context),
+                                            onPreviousPage: () =>
+                                                _goToPreviousPage(context),
+                                            hasNextPage: _hasNextPage,
+                                            hasPreviousPage: _hasPreviousPage,
+                                            searchQuery: _searchQuery,
+                                            role: userRole,
+                                          ),
+                                        );
+                                      },
                                     );
                                   } else if (state is GetAllMinorsError) {
                                     return Text('Error: ${state.error}');

@@ -8,6 +8,7 @@ import 'package:dauco/data/services/item_service.dart';
 import 'package:dauco/data/services/minor_service.dart';
 import 'package:dauco/data/services/test_service.dart';
 import 'package:dauco/data/services/user_service.dart';
+import 'package:dauco/domain/usecases/delete_minor_use_case.dart';
 import 'package:dauco/domain/usecases/delete_user_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_users_use_case.dart';
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
@@ -19,6 +20,7 @@ import 'package:dauco/domain/usecases/login_use_case.dart';
 import 'package:dauco/domain/usecases/logout_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
 import 'package:dauco/domain/usecases/register_use_case.dart';
+import 'package:dauco/domain/usecases/update_minor_use_case.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
 import 'package:injector/injector.dart';
 
@@ -79,6 +81,12 @@ void initInjection() {
 
   appInjector.registerSingleton<GetAllMinorsUseCase>(() =>
       GetAllMinorsUseCase(minorRepository: appInjector.get<MinorRepository>()));
+
+  appInjector.registerSingleton<UpdateMinorUseCase>(() =>
+      UpdateMinorUseCase(minorRepository: appInjector.get<MinorRepository>()));
+
+  appInjector.registerSingleton<DeleteMinorUseCase>(() =>
+      DeleteMinorUseCase(minorRepository: appInjector.get<MinorRepository>()));
 
   appInjector.registerSingleton<GetAllTestsUseCase>(() =>
       GetAllTestsUseCase(testRepository: appInjector.get<TestRepository>()));

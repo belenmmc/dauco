@@ -29,11 +29,11 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 167, 168, 213),
         appBar: AppBar(
-          automaticallyImplyLeading: true, // ✅ Esto pone la flecha
+          automaticallyImplyLeading: true,
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: const IconThemeData(
-            color: Colors.black87, // Color de la flecha
+            color: Colors.black87,
           ),
         ),
         body: Center(

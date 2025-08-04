@@ -12,6 +12,7 @@ class MinorsListWidget extends StatefulWidget {
   final bool hasNextPage;
   final bool hasPreviousPage;
   final String searchQuery;
+  final String role;
 
   const MinorsListWidget({
     super.key,
@@ -24,6 +25,7 @@ class MinorsListWidget extends StatefulWidget {
     required this.hasNextPage,
     required this.hasPreviousPage,
     required this.searchQuery,
+    required this.role,
   });
 
   @override
@@ -102,7 +104,7 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MinorInfoPage(minor: minor),
+        builder: (context) => MinorInfoPage(minor: minor, role: widget.role),
       ),
     );
   }

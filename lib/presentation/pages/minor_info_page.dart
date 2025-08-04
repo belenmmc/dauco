@@ -1,4 +1,5 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
+import 'package:dauco/presentation/pages/edit_minor_page.dart';
 import 'package:dauco/presentation/widgets/circular_button_widget.dart';
 import 'package:dauco/presentation/widgets/minor_info_widget.dart';
 import 'package:dauco/presentation/widgets/tests_list_widget.dart';
@@ -10,8 +11,9 @@ import 'package:dauco/presentation/blocs/get_all_tests_bloc.dart';
 
 class MinorInfoPage extends StatefulWidget {
   final Minor minor;
+  final String role;
 
-  const MinorInfoPage({super.key, required this.minor});
+  const MinorInfoPage({super.key, required this.minor, required this.role});
 
   @override
   _MinorInfoPageState createState() => _MinorInfoPageState();
@@ -41,14 +43,17 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(width: 20),
-                CircularButtonWidget(
-                  iconData: Icons.edit_outlined,
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    '/editMinor',
-                    arguments: widget.minor,
+                if (widget.role == 'admin' && _currentIndex == 0)
+                  CircularButtonWidget(
+                    iconData: Icons.edit_outlined,
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditMinorPage(minor: widget.minor),
+                      ),
+                    ),
                   ),
-                ),
               ],
             ),
           ),

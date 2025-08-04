@@ -237,20 +237,17 @@ class ImportService {
     final totalSteps = 3.0;
     double currentStep = 0.0;
 
-    // Upload users
     final users = await uploadUsers(file);
     await uploadInBatches("Usuarios", users.map((u) => u.toJson()).toList());
     currentStep++;
     onProgress(currentStep / totalSteps);
 
-    // Upload minors
     final minors = await uploadMinors(file);
     await uploadInBatches(
         "Menores", minors.map((m) => MinorMapper.toJson(m)).toList());
     currentStep++;
     onProgress(currentStep / totalSteps);
 
-    // Upload tests and items
     final tests = await uploadTests(file);
     final items = await uploadItems(file);
     await uploadInBatches(

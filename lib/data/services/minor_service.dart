@@ -45,4 +45,18 @@ class MinorService {
 
     return res;
   }
+
+  Future<void> updateMinor(Minor minor) async {
+    await Supabase.instance.client
+        .from('Menores')
+        .update(MinorMapper.toJson(minor))
+        .eq('menor_id', minor.minorId);
+  }
+
+  Future<void> deleteMinor(String minorId) async {
+    await Supabase.instance.client
+        .from('Menores')
+        .delete()
+        .eq('menor_id', minorId);
+  }
 }

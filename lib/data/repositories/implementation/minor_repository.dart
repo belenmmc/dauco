@@ -11,4 +11,14 @@ class MinorRepository implements MinorRepositoryInterface {
   Future<List<Minor>> getAllMinors(int page) {
     return minorService.getMinorsPage(page);
   }
+
+  @override
+  Future<void> updateMinor(Minor minor) {
+    return minorService.updateMinor(minor);
+  }
+
+  @override
+  Future<void> deleteMinor(String minorId) {
+    return minorService.deleteMinor(minorId);
+  }
 }
