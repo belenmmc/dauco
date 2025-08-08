@@ -1,6 +1,7 @@
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
+import 'package:dauco/presentation/pages/minor_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -112,28 +113,58 @@ class HomePageState extends State<HomePage> {
                                   if (_isLoading) {
                                     return _buildProgressIndicator();
                                   } else if (state is GetMinorsSuccess) {
-                                    return ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxHeight: constraints.maxHeight - 20,
-                                        minHeight: 40,
-                                      ),
-                                      child: MinorsListWidget(
-                                        minors: state.minors,
-                                        screenWidth: screenWidth,
-                                        selectedIndex: _selectedIndex,
-                                        onItemSelected: (index) {
-                                          setState(() {
-                                            _selectedIndex = index;
-                                          });
-                                        },
-                                        onNextPage: () =>
-                                            _goToNextPage(context),
-                                        onPreviousPage: () =>
-                                            _goToPreviousPage(context),
-                                        hasNextPage: _hasNextPage,
-                                        hasPreviousPage: _hasPreviousPage,
-                                        searchQuery: _searchQuery,
-                                      ),
+                                    return BlocBuilder<GetCurrentUserBloc,
+                                        GetCurrentUserState>(
+                                      builder: (context, userState) {
+                                        String userRole = '';
+                                        if (userState
+                                            is GetCurrentUserSuccess) {
+                                          userRole = userState.currentUser.role;
+                                        }
+
+                                        return ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight:
+                                                constraints.maxHeight - 20,
+                                            minHeight: 40,
+                                          ),
+                                          child: MinorsListWidget(
+                                            minors: state.minors,
+                                            screenWidth: screenWidth,
+                                            selectedIndex: _selectedIndex,
+                                            onItemSelected: (index) async {
+                                              setState(() {
+                                                _selectedIndex = index;
+                                              });
+                                              final result =
+                                                  await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      MinorInfoPage(
+                                                    minor: state.minors[index],
+                                                    role: userRole,
+                                                  ),
+                                                ),
+                                              );
+
+                                              if (result == true) {
+                                                context
+                                                    .read<GetAllMinorsBloc>()
+                                                    .add(GetEvent());
+                                              }
+                                            },
+                                            onNextPage: () =>
+                                                _goToNextPage(context),
+                                            onPreviousPage: () =>
+                                                _goToPreviousPage(context),
+                                            hasNextPage: _hasNextPage,
+                                            hasPreviousPage: _hasPreviousPage,
+                                            searchQuery: _searchQuery,
+                                            role: userRole,
+                                          ),
+                                        );
+                                      },
                                     );
                                   } else if (state is GetAllMinorsError) {
                                     return Text('Error: ${state.error}');

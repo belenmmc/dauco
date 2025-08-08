@@ -1,4 +1,5 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
+import 'package:dauco/presentation/pages/edit_minor_page.dart';
 import 'package:dauco/presentation/widgets/circular_button_widget.dart';
 import 'package:dauco/presentation/widgets/minor_info_widget.dart';
 import 'package:dauco/presentation/widgets/tests_list_widget.dart';
@@ -10,8 +11,9 @@ import 'package:dauco/presentation/blocs/get_all_tests_bloc.dart';
 
 class MinorInfoPage extends StatefulWidget {
   final Minor minor;
+  final String role;
 
-  const MinorInfoPage({super.key, required this.minor});
+  const MinorInfoPage({super.key, required this.minor, required this.role});
 
   @override
   _MinorInfoPageState createState() => _MinorInfoPageState();
@@ -19,15 +21,22 @@ class MinorInfoPage extends StatefulWidget {
 
 class _MinorInfoPageState extends State<MinorInfoPage> {
   int _currentIndex = 0;
+  late Minor currentMinor;
+
+  @override
+  void initState() {
+    super.initState();
+    currentMinor = widget.minor;
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => GetTestsBloc(
         getAllTestsUseCase: appInjector.get<GetAllTestsUseCase>(),
-      )..add(GetEvent(widget.minor.minorId)),
+      )..add(GetEvent(currentMinor.minorId)),
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: const Color.fromARGB(255, 167, 168, 213),
         appBar: AppBar(
           title: Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
@@ -38,22 +47,35 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                   _currentIndex == 0
                       ? 'Información del Menor'
                       : 'Lista de Tests',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 32, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(width: 20),
-                CircularButtonWidget(
-                  iconData: Icons.edit_outlined,
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    '/editMinor',
-                    arguments: widget.minor,
-                  ),
-                ),
+                const SizedBox(width: 20),
+                if (widget.role == 'admin' && _currentIndex == 0)
+                  CircularButtonWidget(
+                    iconData: Icons.edit_outlined,
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditMinorPage(minor: currentMinor),
+                        ),
+                      );
+
+                      if (result != null && result is Minor) {
+                        setState(() {
+                          currentMinor = result;
+                        });
+                      }
+                      Navigator.pop(context, true);
+                    },
+                  )
               ],
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Color.fromARGB(255, 167, 168, 213),
+          backgroundColor: const Color.fromARGB(255, 167, 168, 213),
         ),
         body: BlocListener<GetTestsBloc, GetTestsState>(
           listener: (context, state) {
@@ -61,7 +83,7 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Error: ${state.error}'),
-                  duration: Duration(seconds: 2),
+                  duration: const Duration(seconds: 2),
                 ),
               );
             }
@@ -77,22 +99,23 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
     return IndexedStack(
       index: _currentIndex,
       children: [
-        MinorInfoWidget(minor: widget.minor),
+        MinorInfoWidget(minor: currentMinor),
         BlocBuilder<GetTestsBloc, GetTestsState>(
           builder: (context, state) {
             if (state is GetTestsLoading) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (state is GetTestsSuccess) {
               if (state.tests.isEmpty) {
-                return Center(
-                    child: Text('No hay tests disponibles',
-                        style: TextStyle(fontSize: 20)));
+                return const Center(
+                  child: Text('No hay tests disponibles',
+                      style: TextStyle(fontSize: 20)),
+                );
               }
               return TestsListWidget(tests: state.tests);
             } else if (state is GetTestsError) {
               return Center(child: Text('Error: ${state.error}'));
             }
-            return Center(child: Text('No tests available'));
+            return const Center(child: Text('No tests available'));
           },
         ),
       ],
@@ -100,41 +123,32 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
   }
 
   Widget _buildPaginationControls(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.only(bottom: 8.0, top: 6.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _PaginationButton(
-                icon: Icons.arrow_back_ios_rounded,
-                onPressed: _currentIndex == 1
-                    ? () => setState(() => _currentIndex = 0)
-                    : null,
-                color: _currentIndex == 1
-                    ? Color.fromARGB(255, 104, 106, 195)
-                    : Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
-              ),
-              const SizedBox(width: 20),
-              _PaginationButton(
-                icon: Icons.arrow_forward_ios_rounded,
-                onPressed: _currentIndex == 0
-                    ? () {
-                        setState(() => _currentIndex = 1);
-                        /* context
-                            .read<GetTestsBloc>()
-                            .add(GetEvent(widget.minor.minorId)); */
-                      }
-                    : null,
-                color: _currentIndex == 0
-                    ? Color.fromARGB(255, 104, 106, 195)
-                    : Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.only(bottom: 8.0, top: 6.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _PaginationButton(
+            icon: Icons.arrow_back_ios_rounded,
+            onPressed: _currentIndex == 1
+                ? () => setState(() => _currentIndex = 0)
+                : null,
+            color: _currentIndex == 1
+                ? const Color.fromARGB(255, 104, 106, 195)
+                : const Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
           ),
-        );
-      },
+          const SizedBox(width: 20),
+          _PaginationButton(
+            icon: Icons.arrow_forward_ios_rounded,
+            onPressed: _currentIndex == 0
+                ? () => setState(() => _currentIndex = 1)
+                : null,
+            color: _currentIndex == 0
+                ? const Color.fromARGB(255, 104, 106, 195)
+                : const Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
+          ),
+        ],
+      ),
     );
   }
 }

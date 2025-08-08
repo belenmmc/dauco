@@ -1,5 +1,4 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
-import 'package:dauco/presentation/pages/minor_info_page.dart';
 import 'package:flutter/material.dart';
 
 class MinorsListWidget extends StatefulWidget {
@@ -12,6 +11,7 @@ class MinorsListWidget extends StatefulWidget {
   final bool hasNextPage;
   final bool hasPreviousPage;
   final String searchQuery;
+  final String role;
 
   const MinorsListWidget({
     super.key,
@@ -24,6 +24,7 @@ class MinorsListWidget extends StatefulWidget {
     required this.hasNextPage,
     required this.hasPreviousPage,
     required this.searchQuery,
+    required this.role,
   });
 
   @override
@@ -99,12 +100,6 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
   void _handleMinorSelected(Minor minor) {
     final index = widget.minors.indexOf(minor);
     widget.onItemSelected(index);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MinorInfoPage(minor: minor),
-      ),
-    );
   }
 
   Widget _buildPaginationControls() {
@@ -113,7 +108,6 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Always show previous button
           _PaginationButton(
             icon: Icons.arrow_back_ios_rounded,
             onPressed: widget.hasPreviousPage ? widget.onPreviousPage : null,
@@ -121,8 +115,7 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
                 ? _buttonColor
                 : _buttonColor.withOpacity(0.5),
           ),
-          const SizedBox(width: 20), // Consistent spacing between buttons
-          // Always show next button
+          const SizedBox(width: 20),
           _PaginationButton(
             icon: Icons.arrow_forward_ios_rounded,
             onPressed: widget.hasNextPage ? widget.onNextPage : null,
@@ -204,7 +197,7 @@ class _MinorItem extends StatelessWidget {
 
 class _PaginationButton extends StatelessWidget {
   final IconData icon;
-  final Function()? onPressed; // Make nullable
+  final Function()? onPressed;
   final Color color;
 
   const _PaginationButton({

@@ -12,26 +12,23 @@ class MinorInfoWidget extends StatelessWidget {
       child: Card(
         margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: const Color.fromARGB(255, 206, 206, 237),
+        color: const Color.fromARGB(255, 120, 120, 175),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Main content row
               LayoutBuilder(
                 builder: (context, constraints) {
                   return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Left column (minor info) - 40% width
                       SizedBox(
-                        width: constraints.maxWidth * 0.5,
+                        width: constraints.maxWidth * 0.495,
                         child: _buildMinorInfoCard(),
                       ),
                       const SizedBox(width: 16),
-                      // Right column (family + birth info) - remaining width
                       Expanded(
                         child: Column(
                           children: [
