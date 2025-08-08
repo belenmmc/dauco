@@ -1,8 +1,10 @@
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/domain/usecases/delete_minor_use_case.dart';
+import 'package:dauco/domain/usecases/get_all_users_use_case.dart';
 import 'package:dauco/domain/usecases/update_minor_use_case.dart';
 import 'package:dauco/presentation/blocs/delete_minor_bloc.dart';
+import 'package:dauco/presentation/blocs/get_all_users_bloc.dart' as users_bloc;
 import 'package:dauco/presentation/blocs/update_minor_bloc.dart';
 import 'package:dauco/presentation/widgets/edit_minor_widget.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +28,11 @@ class EditMinorPage extends StatelessWidget {
           create: (_) => DeleteMinorBloc(
             deleteMinorUseCase: appInjector.get<DeleteMinorUseCase>(),
           ),
+        ),
+        BlocProvider(
+          create: (_) => users_bloc.GetAllUsersBloc(
+            getAllUsersUseCase: appInjector.get<GetAllUsersUseCase>(),
+          )..add(users_bloc.GetEvent()),
         ),
       ],
       child: BlocListener<DeleteMinorBloc, DeleteMinorState>(
