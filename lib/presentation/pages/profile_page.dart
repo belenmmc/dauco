@@ -227,6 +227,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ? null
                                           : () => _confirmAndUpdate(context),
                                       style: ElevatedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 18.0),
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 97, 135, 174),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(30),
@@ -239,7 +243,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                               child: CircularProgressIndicator(
                                                   strokeWidth: 2),
                                             )
-                                          : const Text("Editar perfil"),
+                                          : const Text("Editar perfil",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white)),
                                     ),
                                   );
                                 },

@@ -9,40 +9,46 @@ class MinorInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Card(
-        margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: const Color.fromARGB(255, 111, 145, 179),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: constraints.maxWidth * 0.495,
-                        child: _buildMinorInfoCard(),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            _buildFamilyInfoCard(),
-                            const SizedBox(height: 16),
-                            _buildBirthInfoCard(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1500),
+          child: Card(
+            margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            color: const Color.fromARGB(255, 111, 145, 179),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: constraints.maxWidth * 0.495,
+                            child: _buildMinorInfoCard(),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                _buildFamilyInfoCard(),
+                                const SizedBox(height: 16),
+                                _buildBirthInfoCard(),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -141,7 +147,7 @@ class MinorInfoWidget extends StatelessWidget {
 
   Widget _buildSingleInfoLine(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

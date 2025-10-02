@@ -147,13 +147,19 @@ class _EditUserPageState extends State<EditUserPage> {
                                   ? null
                                   : () => _onUpdatePressed(context),
                               style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18.0),
+                                backgroundColor:
+                                    const Color.fromARGB(255, 97, 135, 174),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                               child: isLoading
                                   ? const CircularProgressIndicator()
-                                  : const Text('Guardar cambios'),
+                                  : const Text('Guardar cambios',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.white)),
                             ),
                           ),
                         ],

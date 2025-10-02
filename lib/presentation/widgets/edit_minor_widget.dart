@@ -205,278 +205,295 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
         key: _formKey,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            return Card(
-              margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              color: const Color.fromARGB(255, 111, 145, 179),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: constraints.maxWidth * 0.478,
-                        child: _buildCard(
-                            'Información del menor', _buildMinorInfoColumn()),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _buildCard('Información de la familia',
-                                _buildFamilyInfoColumn()),
-                            const SizedBox(height: 20),
-                            _buildCard('Información del parto',
-                                _buildBirthInfoColumn()),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 50,
-                        width: 250,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(237, 247, 238, 255),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1500),
+                child: Card(
+                  margin:
+                      const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  color: const Color.fromARGB(255, 111, 145, 179),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: constraints.maxWidth * 0.414,
+                            child: _buildCard('Información del menor',
+                                _buildMinorInfoColumn()),
                           ),
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              final bool? confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Confirmar cambios'),
-                                    content: const Text(
-                                        '¿Está seguro de que desea guardar los cambios realizados?'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: const Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        child: const Text('Guardar'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-
-                              if (confirm == true) {
-                                Minor updatedMinor = Minor(
-                                  minorId:
-                                      int.tryParse(minorIdController.text) ??
-                                          widget.minor.minorId,
-                                  reference:
-                                      int.tryParse(referenceController.text) ??
-                                          widget.minor.reference,
-                                  managerId:
-                                      int.tryParse(managerIdController.text) ??
-                                          widget.minor.managerId,
-                                  birthdate: selectedBirthdate ??
-                                      widget.minor.birthdate,
-                                  ageRange: ageRangeController.text,
-                                  registeredAt: selectedRegisteredAt ??
-                                      widget.minor.registeredAt,
-                                  testsNum:
-                                      int.tryParse(testsNumController.text) ??
-                                          widget.minor.testsNum,
-                                  completedTests: int.tryParse(
-                                          completedTestsController.text) ??
-                                      widget.minor.completedTests,
-                                  sex: sexController.text,
-                                  zipCode:
-                                      int.tryParse(zipCodeController.text) ??
-                                          widget.minor.zipCode,
-                                  fatherAge:
-                                      int.tryParse(fatherAgeController.text) ??
-                                          widget.minor.fatherAge,
-                                  motherAge:
-                                      int.tryParse(motherAgeController.text) ??
-                                          widget.minor.motherAge,
-                                  fatherJob: fatherJobController.text,
-                                  motherJob: motherJobController.text,
-                                  fatherStudies: fatherStudiesController.text,
-                                  motherStudies: motherStudiesController.text,
-                                  parentsCivilStatus:
-                                      parentsCivilStatusController.text,
-                                  siblings:
-                                      int.tryParse(siblingsController.text) ??
-                                          widget.minor.siblings,
-                                  siblingsPosition: int.tryParse(
-                                          siblingsPositionController.text) ??
-                                      widget.minor.siblingsPosition,
-                                  birthType: birthTypeController.text,
-                                  gestationWeeks: int.tryParse(
-                                          gestationWeeksController.text) ??
-                                      widget.minor.gestationWeeks,
-                                  birthIncidents: birthIncidentsController.text,
-                                  birthWeight: int.tryParse(
-                                          birthWeightController.text) ??
-                                      widget.minor.birthWeight,
-                                  socioeconomicSituation:
-                                      socioeconomicSituationController.text,
-                                  familyBackground:
-                                      familyBackgroundController.text,
-                                  familyMembers: int.tryParse(
-                                          familyMembersController.text) ??
-                                      widget.minor.familyMembers,
-                                  familyDisabilities:
-                                      familyDisabilitiesController.text,
-                                  schoolingLevel: schoolingLevelController.text,
-                                  schoolingObservations:
-                                      schoolingObservationsController.text,
-                                  relevantDiseases:
-                                      relevantDiseasesController.text,
-                                  evaluationReason:
-                                      evaluationReasonController.text,
-                                  apgarTest:
-                                      int.tryParse(apgarTestController.text) ??
-                                          widget.minor.apgarTest,
-                                  adoption:
-                                      adoptionController.text.toLowerCase() ==
-                                              'true'
-                                          ? 1
-                                          : 0,
-                                  clinicalJudgement:
-                                      clinicalJudgementController.text,
-                                );
-                                context
-                                    .read<UpdateMinorBloc>()
-                                    .add(UpdateMinorEvent(minor: updatedMinor));
-                                widget.onSave(updatedMinor);
-                              }
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      'Por favor, corrija los errores en el formulario antes de guardar'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('Guardar cambios',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
-                                    color:
-                                        const Color.fromARGB(255, 55, 57, 82),
-                                  )),
-                              const SizedBox(width: 10),
-                              const Icon(Icons.save,
-                                  size: 28,
-                                  color: Color.fromARGB(255, 55, 67, 82)),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      SizedBox(
-                        height: 50,
-                        width: 250,
-                        child: BlocListener<DeleteMinorBloc, DeleteMinorState>(
-                          listener: (context, state) {
-                            if (state is DeleteMinorSuccess) {
-                              if (Navigator.canPop(context)) {
-                                Navigator.pop(context, true);
-                              }
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Menor eliminado correctamente')),
-                              );
-
-                              context.read<GetAllMinorsBloc>().add(GetEvent());
-                            } else if (state is DeleteMinorError) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(
-                                        'Error al eliminar: ${state.error}')),
-                              );
-                            }
-                          },
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 57, 64, 87),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                              ),
-                            ),
-                            onPressed: () async {
-                              final bool? confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Confirmar eliminación'),
-                                    content: const Text(
-                                        '¿Está seguro de que desea eliminar este menor? Esta acción no se puede deshacer.'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: const Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        style: TextButton.styleFrom(
-                                          foregroundColor: Colors.red,
-                                        ),
-                                        child: const Text('Eliminar'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-
-                              if (confirm == true) {
-                                context.read<DeleteMinorBloc>().add(
-                                      DeleteMinorEvent(
-                                          minorId:
-                                              widget.minor.minorId.toString()),
-                                    );
-                              }
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Text('Eliminar menor',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 16,
-                                      color: const Color.fromARGB(
-                                          237, 247, 238, 255),
-                                    )),
-                                const SizedBox(width: 10),
-                                const Icon(Icons.delete,
-                                    size: 28,
-                                    color: Color.fromARGB(237, 247, 238, 255)),
+                                _buildCard('Información de la familia',
+                                    _buildFamilyInfoColumn()),
+                                const SizedBox(height: 20),
+                                _buildCard('Información del parto',
+                                    _buildBirthInfoColumn()),
                               ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 50,
+                            width: 250,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(237, 247, 238, 255),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                              ),
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  final bool? confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Confirmar cambios'),
+                                        content: const Text(
+                                            '¿Está seguro de que desea guardar los cambios realizados?'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context)
+                                                    .pop(false),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(true),
+                                            child: const Text('Guardar'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+
+                                  if (confirm == true) {
+                                    Minor updatedMinor = Minor(
+                                      minorId: int.tryParse(
+                                              minorIdController.text) ??
+                                          widget.minor.minorId,
+                                      reference: int.tryParse(
+                                              referenceController.text) ??
+                                          widget.minor.reference,
+                                      managerId: int.tryParse(
+                                              managerIdController.text) ??
+                                          widget.minor.managerId,
+                                      birthdate: selectedBirthdate ??
+                                          widget.minor.birthdate,
+                                      ageRange: ageRangeController.text,
+                                      registeredAt: selectedRegisteredAt ??
+                                          widget.minor.registeredAt,
+                                      testsNum: int.tryParse(
+                                              testsNumController.text) ??
+                                          widget.minor.testsNum,
+                                      completedTests: int.tryParse(
+                                              completedTestsController.text) ??
+                                          widget.minor.completedTests,
+                                      sex: sexController.text,
+                                      zipCode: int.tryParse(
+                                              zipCodeController.text) ??
+                                          widget.minor.zipCode,
+                                      fatherAge: int.tryParse(
+                                              fatherAgeController.text) ??
+                                          widget.minor.fatherAge,
+                                      motherAge: int.tryParse(
+                                              motherAgeController.text) ??
+                                          widget.minor.motherAge,
+                                      fatherJob: fatherJobController.text,
+                                      motherJob: motherJobController.text,
+                                      fatherStudies:
+                                          fatherStudiesController.text,
+                                      motherStudies:
+                                          motherStudiesController.text,
+                                      parentsCivilStatus:
+                                          parentsCivilStatusController.text,
+                                      siblings: int.tryParse(
+                                              siblingsController.text) ??
+                                          widget.minor.siblings,
+                                      siblingsPosition: int.tryParse(
+                                              siblingsPositionController
+                                                  .text) ??
+                                          widget.minor.siblingsPosition,
+                                      birthType: birthTypeController.text,
+                                      gestationWeeks: int.tryParse(
+                                              gestationWeeksController.text) ??
+                                          widget.minor.gestationWeeks,
+                                      birthIncidents:
+                                          birthIncidentsController.text,
+                                      birthWeight: int.tryParse(
+                                              birthWeightController.text) ??
+                                          widget.minor.birthWeight,
+                                      socioeconomicSituation:
+                                          socioeconomicSituationController.text,
+                                      familyBackground:
+                                          familyBackgroundController.text,
+                                      familyMembers: int.tryParse(
+                                              familyMembersController.text) ??
+                                          widget.minor.familyMembers,
+                                      familyDisabilities:
+                                          familyDisabilitiesController.text,
+                                      schoolingLevel:
+                                          schoolingLevelController.text,
+                                      schoolingObservations:
+                                          schoolingObservationsController.text,
+                                      relevantDiseases:
+                                          relevantDiseasesController.text,
+                                      evaluationReason:
+                                          evaluationReasonController.text,
+                                      apgarTest: int.tryParse(
+                                              apgarTestController.text) ??
+                                          widget.minor.apgarTest,
+                                      adoption: adoptionController.text
+                                                  .toLowerCase() ==
+                                              'true'
+                                          ? 1
+                                          : 0,
+                                      clinicalJudgement:
+                                          clinicalJudgementController.text,
+                                    );
+                                    context.read<UpdateMinorBloc>().add(
+                                        UpdateMinorEvent(minor: updatedMinor));
+                                    widget.onSave(updatedMinor);
+                                  }
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Por favor, corrija los errores en el formulario antes de guardar'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('Guardar cambios',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        color: const Color.fromARGB(
+                                            255, 55, 57, 82),
+                                      )),
+                                  const SizedBox(width: 10),
+                                  const Icon(Icons.save,
+                                      size: 28,
+                                      color: Color.fromARGB(255, 55, 67, 82)),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          SizedBox(
+                            height: 50,
+                            width: 250,
+                            child:
+                                BlocListener<DeleteMinorBloc, DeleteMinorState>(
+                              listener: (context, state) {
+                                if (state is DeleteMinorSuccess) {
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.pop(context, true);
+                                  }
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Menor eliminado correctamente')),
+                                  );
+
+                                  context
+                                      .read<GetAllMinorsBloc>()
+                                      .add(GetEvent());
+                                } else if (state is DeleteMinorError) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Error al eliminar: ${state.error}')),
+                                  );
+                                }
+                              },
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 57, 64, 87),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  final bool? confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title:
+                                            const Text('Confirmar eliminación'),
+                                        content: const Text(
+                                            '¿Está seguro de que desea eliminar este menor? Esta acción no se puede deshacer.'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context)
+                                                    .pop(false),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(true),
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.red,
+                                            ),
+                                            child: const Text('Eliminar'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+
+                                  if (confirm == true) {
+                                    context.read<DeleteMinorBloc>().add(
+                                          DeleteMinorEvent(
+                                              minorId: widget.minor.minorId
+                                                  .toString()),
+                                        );
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('Eliminar menor',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 16,
+                                          color: const Color.fromARGB(
+                                              237, 247, 238, 255),
+                                        )),
+                                    const SizedBox(width: 10),
+                                    const Icon(Icons.delete,
+                                        size: 28,
+                                        color:
+                                            Color.fromARGB(237, 247, 238, 255)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]),
                   ),
-                ]),
+                ),
               ),
             );
           },
