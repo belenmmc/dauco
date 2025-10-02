@@ -68,7 +68,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                           style: const TextStyle(fontSize: 16),
                           decoration: InputDecoration(
                             isCollapsed: true,
-                            hintText: 'Search',
+                            hintText: 'Buscar...',
                             border: InputBorder.none,
                             contentPadding:
                                 const EdgeInsets.symmetric(vertical: 14),
