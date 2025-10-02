@@ -36,8 +36,9 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
         getAllTestsUseCase: appInjector.get<GetAllTestsUseCase>(),
       )..add(GetEvent(currentMinor.minorId)),
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
         appBar: AppBar(
+          toolbarHeight: 65,
           title: Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
             child: Row(
@@ -75,7 +76,7 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+          backgroundColor: const Color.fromARGB(255, 167, 190, 213),
         ),
         body: BlocListener<GetTestsBloc, GetTestsState>(
           listener: (context, state) {
@@ -134,8 +135,8 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                 ? () => setState(() => _currentIndex = 0)
                 : null,
             color: _currentIndex == 1
-                ? const Color.fromARGB(255, 104, 106, 195)
-                : const Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
+                ? const Color.fromARGB(255, 97, 135, 174)
+                : const Color.fromARGB(255, 97, 135, 174).withOpacity(0.5),
           ),
           const SizedBox(width: 20),
           _PaginationButton(
@@ -144,8 +145,8 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                 ? () => setState(() => _currentIndex = 1)
                 : null,
             color: _currentIndex == 0
-                ? const Color.fromARGB(255, 104, 106, 195)
-                : const Color.fromARGB(255, 104, 106, 195).withOpacity(0.5),
+                ? const Color.fromARGB(255, 97, 135, 174)
+                : const Color.fromARGB(255, 97, 135, 174).withOpacity(0.5),
           ),
         ],
       ),

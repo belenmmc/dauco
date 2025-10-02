@@ -12,7 +12,7 @@ class MinorInfoWidget extends StatelessWidget {
       child: Card(
         margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: const Color.fromARGB(255, 120, 120, 175),
+        color: const Color.fromARGB(255, 111, 145, 179),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -129,7 +129,7 @@ class MinorInfoWidget extends StatelessWidget {
               style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 104, 106, 195)),
+                  color: Color.fromARGB(255, 69, 100, 131)),
             ),
             const SizedBox(height: 12),
             ...children,
@@ -150,7 +150,7 @@ class MinorInfoWidget extends StatelessWidget {
             child: Text(
               label,
               style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87),
             ),
@@ -160,7 +160,7 @@ class MinorInfoWidget extends StatelessWidget {
             flex: 3,
             child: Text(
               value.isNotEmpty ? value : '-',
-              style: const TextStyle(fontSize: 18, color: Colors.black54),
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
         ],

@@ -209,7 +209,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
               margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
-              color: const Color.fromARGB(255, 120, 120, 175),
+              color: const Color.fromARGB(255, 111, 145, 179),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(children: [
@@ -217,7 +217,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width: constraints.maxWidth * 0.495,
+                        width: constraints.maxWidth * 0.478,
                         child: _buildCard(
                             'Información del menor', _buildMinorInfoColumn()),
                       ),
@@ -382,7 +382,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                               const SizedBox(width: 10),
                               const Icon(Icons.save,
                                   size: 28,
-                                  color: Color.fromARGB(255, 55, 57, 82)),
+                                  color: Color.fromARGB(255, 55, 67, 82)),
                             ],
                           ),
                         ),
@@ -416,7 +416,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  const Color.fromARGB(255, 55, 57, 82),
+                                  const Color.fromARGB(255, 57, 64, 87),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30.0),
                               ),
@@ -734,7 +734,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                 style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 104, 106, 195))),
+                    color: Color.fromARGB(255, 97, 135, 174))),
             const SizedBox(height: 12),
             child,
           ],

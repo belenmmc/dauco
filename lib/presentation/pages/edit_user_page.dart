@@ -53,10 +53,10 @@ class _EditUserPageState extends State<EditUserPage> {
         updateUserUseCase: appInjector.get<UpdateUserUseCase>(),
       ),
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
         appBar: AppBar(
           title: const Text('Editar Usuario'),
-          backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+          backgroundColor: const Color.fromARGB(255, 167, 190, 213),
           centerTitle: true,
         ),
         body: Center(

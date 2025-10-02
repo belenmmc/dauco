@@ -54,7 +54,7 @@ class HomePageState extends State<HomePage> {
       child: BlocBuilder<GetCurrentUserBloc, GetCurrentUserState>(
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: Color.fromARGB(255, 167, 168, 213),
+            backgroundColor: Color.fromARGB(255, 167, 190, 213),
             appBar: SearchBarWidget(
               onChanged: (query) {
                 setState(() {

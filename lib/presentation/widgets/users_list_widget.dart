@@ -36,7 +36,7 @@ class UsersListWidget extends StatefulWidget {
 
 class _UsersListWidgetState extends State<UsersListWidget> {
   static const _cardColor = Color.fromARGB(255, 247, 238, 255);
-  static const _buttonColor = Color.fromARGB(255, 104, 106, 195);
+  static const _buttonColor = Color.fromARGB(255, 97, 135, 174);
   static const _animationDuration = Duration(milliseconds: 200);
 
   @override
@@ -192,7 +192,8 @@ class _UserItem extends StatelessWidget {
         Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.edit, color: Colors.blueAccent),
+              icon: const Icon(Icons.edit,
+                  color: Color.fromARGB(255, 97, 135, 174)),
               tooltip: 'Editar usuario',
               onPressed: () async {
                 final updated = await Navigator.push(
@@ -208,7 +209,8 @@ class _UserItem extends StatelessWidget {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.delete, color: Colors.redAccent),
+              icon: const Icon(Icons.delete,
+                  color: Color.fromARGB(255, 56, 78, 100)),
               tooltip: 'Eliminar usuario',
               onPressed: () {
                 showDialog(

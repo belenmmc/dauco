@@ -96,8 +96,9 @@ class _ProfilePageState extends State<ProfilePage> {
         )
       ],
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
         appBar: AppBar(
+          toolbarHeight: 80,
           title: Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
             child: Row(
@@ -113,7 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Color.fromARGB(255, 167, 168, 213),
+          backgroundColor: Color.fromARGB(255, 167, 190, 213),
         ),
         body: BlocListener<UpdateUserBloc, UpdateUserState>(
           listener: (context, state) {

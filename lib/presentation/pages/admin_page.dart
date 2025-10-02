@@ -65,7 +65,7 @@ class AdminPageState extends State<AdminPage> {
               }
             },
             child: Scaffold(
-              backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+              backgroundColor: const Color.fromARGB(255, 167, 190, 213),
               appBar: AdminSearchBarWidget(
                 onChanged: (query) {
                   setState(() {

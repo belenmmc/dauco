@@ -44,6 +44,7 @@ dependencies:
   path_provider: ^2.0.15
   google_fonts: ^4.0.3
   percent_indicator: ^4.2.2
+  window_manager: ^0.3.7
 
 dev_dependencies:
   flutter_test:

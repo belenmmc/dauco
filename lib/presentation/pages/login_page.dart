@@ -28,7 +28,7 @@ class LoginUserPageState extends State<LoginPage> {
       create: (context) =>
           LoginBloc(loginUseCase: appInjector.get<LoginUseCase>()),
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: Color.fromARGB(255, 167, 190, 213),
         body: Stack(
           children: [
             Center(

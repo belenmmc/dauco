@@ -33,7 +33,7 @@ class MinorsListWidget extends StatefulWidget {
 
 class _MinorsListWidgetState extends State<MinorsListWidget> {
   static const _cardColor = Color.fromARGB(255, 247, 238, 255);
-  static const _buttonColor = Color.fromARGB(255, 104, 106, 195);
+  static const _buttonColor = Color.fromARGB(255, 97, 135, 174);
   static const _animationDuration = Duration(milliseconds: 200);
 
   @override

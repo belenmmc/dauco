@@ -27,7 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
       create: (context) =>
           RegisterBloc(registerUseCase: appInjector.get<RegisterUseCase>()),
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
         appBar: AppBar(
           automaticallyImplyLeading: true,
           backgroundColor: Colors.transparent,

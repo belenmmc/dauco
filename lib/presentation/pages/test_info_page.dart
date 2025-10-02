@@ -23,7 +23,7 @@ class _TestInfoPageState extends State<TestInfoPage> {
         getItemsUseCase: appInjector.get<GetAllItemsUseCase>(),
       )..add(GetEvent(widget.test.testId)),
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: Color.fromARGB(255, 167, 190, 213),
         appBar: AppBar(
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -33,7 +33,7 @@ class _TestInfoPageState extends State<TestInfoPage> {
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Color.fromARGB(255, 167, 168, 213),
+          backgroundColor: Color.fromARGB(255, 167, 190, 213),
         ),
         body: BlocListener<GetItemsBloc, GetItemsState>(
           listener: (context, state) {

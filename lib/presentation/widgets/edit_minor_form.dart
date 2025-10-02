@@ -539,7 +539,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                 style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 104, 106, 195))),
+                    color: Color.fromARGB(255, 97, 135, 174))),
             const SizedBox(height: 12),
             child,
           ],
