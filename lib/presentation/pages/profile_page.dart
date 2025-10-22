@@ -3,6 +3,7 @@ import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/user_model.entity.dart';
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
 import 'package:dauco/domain/usecases/logout_use_case.dart';
+import 'package:dauco/domain/usecases/update_password_use_case.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
 import 'package:dauco/presentation/blocs/logout_bloc.dart';
 import 'package:dauco/presentation/blocs/update_user_bloc.dart';
@@ -25,6 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final _emailController = TextEditingController();
   final _managerIdController = TextEditingController();
   final _roleController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   UserModel? _currentUser;
 
@@ -59,12 +62,12 @@ class _ProfilePageState extends State<ProfilePage> {
       if (confirm == true) {
         final updatedUser = UserModel(
           name: _nameController.text,
-          email: _emailController.text,
+          email: _currentUser?.email ?? '',
           managerId: int.tryParse(_managerIdController.text) ?? 0,
-          role: _roleController.text,
+          role: _currentUser?.role ?? '',
         );
 
-        if (updatedUser == _currentUser) {
+        if (updatedUser == _currentUser && _passwordController.text.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("No se detectaron cambios.")),
           );
@@ -72,6 +75,23 @@ class _ProfilePageState extends State<ProfilePage> {
         }
 
         context.read<UpdateUserBloc>().add(UpdateUserEvent(user: updatedUser));
+
+        if (_passwordController.text.isNotEmpty) {
+          try {
+            final updatePasswordUseCase =
+                appInjector.get<UpdatePasswordUseCase>();
+            await updatePasswordUseCase.execute(_passwordController.text);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text("Contraseña actualizada exitosamente")),
+            );
+            _passwordController.clear();
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Error al actualizar contraseña: $e")),
+            );
+          }
+        }
       }
     }
   }
@@ -142,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 return Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 500),
+                    constraints: const BoxConstraints(maxWidth: 480),
                     child: Card(
                       elevation: 8,
                       shape: RoundedRectangleBorder(
@@ -176,19 +196,15 @@ class _ProfilePageState extends State<ProfilePage> {
                               const SizedBox(height: 16),
                               TextFormField(
                                 controller: _emailController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Email'),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingresa un email';
-                                  }
-                                  final emailRegex = RegExp(
-                                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                                  if (!emailRegex.hasMatch(value)) {
-                                    return 'Email inválido';
-                                  }
-                                  return null;
-                                },
+                                enabled: false, // Campo deshabilitado
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                  hintText: 'El email no se puede modificar',
+                                ),
+                                style: TextStyle(
+                                  color: Colors.grey[
+                                      600], // Color gris para indicar que está deshabilitado
+                                ),
                               ),
                               const SizedBox(height: 16),
                               TextFormField(
@@ -209,12 +225,46 @@ class _ProfilePageState extends State<ProfilePage> {
                               const SizedBox(height: 16),
                               TextFormField(
                                 controller: _roleController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Rol'),
-                                validator: (value) =>
-                                    value == null || value.isEmpty
-                                        ? 'Ingresa un rol'
-                                        : null,
+                                enabled: false, // Campo deshabilitado
+                                decoration: const InputDecoration(
+                                  labelText: 'Rol',
+                                  hintText: 'El rol no se puede modificar',
+                                ),
+                                style: TextStyle(
+                                  color: Colors.grey[
+                                      600], // Color gris para indicar que está deshabilitado
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: !_isPasswordVisible,
+                                decoration: InputDecoration(
+                                  labelText: 'Nueva contraseña',
+                                  hintText: 'Nueva contraseña',
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _isPasswordVisible
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isPasswordVisible =
+                                            !_isPasswordVisible;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                validator: (value) {
+                                  // Solo validar si se ha ingresado algo
+                                  if (value != null &&
+                                      value.isNotEmpty &&
+                                      value.length < 6) {
+                                    return 'La contraseña debe tener al menos 6 caracteres';
+                                  }
+                                  return null;
+                                },
                               ),
                               const SizedBox(height: 32),
                               BlocBuilder<UpdateUserBloc, UpdateUserState>(

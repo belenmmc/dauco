@@ -64,6 +64,7 @@ class HomePageState extends State<HomePage> {
               role: state is GetCurrentUserSuccess
                   ? state.getCurrentUser.role
                   : '',
+              showBackButton: false,
             ),
             body: LayoutBuilder(
               builder: (context, constraints) {

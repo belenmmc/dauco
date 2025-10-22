@@ -3,6 +3,7 @@ import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/presentation/blocs/login_bloc.dart';
 import 'package:dauco/domain/usecases/login_use_case.dart';
 import 'package:dauco/presentation/pages/home_page.dart';
+import 'package:dauco/presentation/pages/reset_password_page.dart';
 import 'package:dauco/presentation/widgets/custom_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -127,6 +128,10 @@ class LoginUserPageState extends State<LoginPage> {
                                   width: double.infinity,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 18.0),
+                                      backgroundColor: const Color.fromARGB(
+                                          255, 97, 135, 174),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(30),
                                       ),
@@ -136,7 +141,31 @@ class LoginUserPageState extends State<LoginPage> {
                                           email: _emailController.text,
                                           password: _passwordController.text));
                                     },
-                                    child: const Text('Login'),
+                                    child: const Text('Iniciar sesión',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white)),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Center(
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ResetPasswordPage()),
+                                      );
+                                    },
+                                    child: const Text(
+                                      '¿Olvidaste tu contraseña?',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color:
+                                            Color.fromARGB(255, 97, 135, 174),
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

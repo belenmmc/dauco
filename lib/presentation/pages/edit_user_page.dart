@@ -3,7 +3,6 @@ import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/user_model.entity.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
 import 'package:dauco/presentation/blocs/update_user_bloc.dart';
-import 'package:dauco/presentation/widgets/custom_text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,7 +37,7 @@ class _EditUserPageState extends State<EditUserPage> {
 
     final updatedUser = UserModel(
       name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
+      email: widget.user.email, // Usar el email original, no editable
       managerId: int.tryParse(_managerIdController.text) ?? 0,
       role: _selectedRole ?? 'user',
     );
@@ -61,7 +60,7 @@ class _EditUserPageState extends State<EditUserPage> {
         ),
         body: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
+            constraints: const BoxConstraints(maxWidth: 480),
             child: Card(
               elevation: 8,
               shape: RoundedRectangleBorder(
@@ -101,43 +100,66 @@ class _EditUserPageState extends State<EditUserPage> {
                             minFontSize: 12,
                           ),
                           const SizedBox(height: 20),
-                          const CustomText(text: 'Nombre', color: Colors.black),
                           TextFormField(
                             controller: _nameController,
-                            decoration: const InputDecoration(
-                              hintText: 'Nombre completo',
-                              border: OutlineInputBorder(),
-                            ),
+                            decoration:
+                                const InputDecoration(labelText: 'Nombre'),
                             validator: (value) => value == null || value.isEmpty
-                                ? 'Requerido'
+                                ? 'Ingresa un nombre'
                                 : null,
                           ),
                           const SizedBox(height: 16),
-                          const CustomText(text: 'Email', color: Colors.black),
                           TextFormField(
                             controller: _emailController,
+                            enabled: false,
                             decoration: const InputDecoration(
-                              hintText: 'usuario@ejemplo.com',
-                              border: OutlineInputBorder(),
+                              labelText: 'Email',
+                              hintText: 'El email no se puede modificar',
                             ),
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Requerido'
-                                : null,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                            ),
                           ),
                           const SizedBox(height: 16),
-                          const CustomText(
-                              text: 'ID del Manager', color: Colors.black),
                           TextFormField(
                             controller: _managerIdController,
-                            keyboardType: TextInputType.number,
                             decoration: const InputDecoration(
-                              hintText: 'Ej: 123',
-                              border: OutlineInputBorder(),
+                                labelText: 'ID del responsable'),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Ingresa un ID';
+                              }
+                              if (int.tryParse(value) == null) {
+                                return 'ID inválido';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          DropdownButtonFormField<String>(
+                            value: _selectedRole,
+                            decoration: const InputDecoration(
+                              labelText: 'Rol',
                             ),
-                            validator: (value) =>
-                                value == null || int.tryParse(value) == null
-                                    ? 'Debe ser un número'
-                                    : null,
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'admin',
+                                child: Text('Administrador'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'manager',
+                                child: Text('Responsable'),
+                              ),
+                            ],
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedRole = newValue;
+                              });
+                            },
+                            validator: (value) => value == null || value.isEmpty
+                                ? 'Selecciona un rol'
+                                : null,
                           ),
                           const SizedBox(height: 24),
                           SizedBox(
@@ -157,7 +179,7 @@ class _EditUserPageState extends State<EditUserPage> {
                               ),
                               child: isLoading
                                   ? const CircularProgressIndicator()
-                                  : const Text('Guardar cambios',
+                                  : const Text("Editar perfil",
                                       style: TextStyle(
                                           fontSize: 16, color: Colors.white)),
                             ),

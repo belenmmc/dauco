@@ -7,9 +7,14 @@ import 'package:flutter/material.dart';
 class SearchBarWidget extends StatefulWidget implements PreferredSizeWidget {
   final ValueChanged<String> onChanged;
   final String role;
+  final bool showBackButton;
 
-  const SearchBarWidget(
-      {super.key, required this.onChanged, required this.role});
+  const SearchBarWidget({
+    super.key,
+    required this.onChanged,
+    required this.role,
+    this.showBackButton = true,
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 20.0);
@@ -28,6 +33,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
+      automaticallyImplyLeading: widget.showBackButton,
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(2.0),
         child: Padding(

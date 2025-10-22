@@ -40,8 +40,27 @@ class UpdateUserBloc extends Bloc<UpdateEvent, UpdateUserState> {
       try {
         await updateUserUseCase.execute(event.user);
         emit(UpdateUserSuccess());
+      } on PostgrestException catch (e) {
+        if (e.code == '23505' ||
+            e.message.contains('duplicate') ||
+            e.message.contains('unique')) {
+          emit(UpdateUserError(
+              error:
+                  'Ya existe otro usuario con el ID de responsable: ${event.user.managerId}'));
+        } else {
+          emit(UpdateUserError(error: 'Error de base de datos: ${e.message}'));
+        }
       } on AuthException catch (e) {
-        emit(UpdateUserError(error: e.toString()));
+        emit(UpdateUserError(error: 'Error de autenticación: ${e.message}'));
+      } catch (e) {
+        String errorMessage = e.toString();
+        if (errorMessage
+            .contains('Ya existe otro usuario con el ID de responsable:')) {
+          emit(UpdateUserError(error: errorMessage));
+        } else {
+          emit(UpdateUserError(
+              error: 'Error actualizando usuario: $errorMessage'));
+        }
       }
     });
   }
