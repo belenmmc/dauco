@@ -1,4 +1,5 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
+import 'package:dauco/presentation/widgets/search_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 class MinorsListWidget extends StatefulWidget {
@@ -10,7 +11,7 @@ class MinorsListWidget extends StatefulWidget {
   final Function() onPreviousPage;
   final bool hasNextPage;
   final bool hasPreviousPage;
-  final String searchQuery;
+  final SearchFilters searchFilters;
   final String role;
 
   const MinorsListWidget({
@@ -23,7 +24,7 @@ class MinorsListWidget extends StatefulWidget {
     required this.onPreviousPage,
     required this.hasNextPage,
     required this.hasPreviousPage,
-    required this.searchQuery,
+    required this.searchFilters,
     required this.role,
   });
 
@@ -32,9 +33,70 @@ class MinorsListWidget extends StatefulWidget {
 }
 
 class _MinorsListWidgetState extends State<MinorsListWidget> {
-  static const _cardColor = Color.fromARGB(255, 247, 238, 255);
+  static const _cardColor = Color.fromARGB(255, 252, 254, 255);
   static const _buttonColor = Color.fromARGB(255, 97, 135, 174);
   static const _animationDuration = Duration(milliseconds: 200);
+
+  bool _matchesAllFilters(Minor minor, SearchFilters filters) {
+    if (filters.isEmpty) return true;
+
+    return filters.filters.entries.every((entry) {
+      final field = entry.key;
+      final value = entry.value;
+
+      switch (field) {
+        case SearchField.name:
+          return minor.minorId
+              .toString()
+              .toLowerCase()
+              .contains(value.toString().toLowerCase());
+        case SearchField.birthdate:
+          if (value is Map<String, DateTime>) {
+            final minorDate = DateTime(minor.birthdate.year,
+                minor.birthdate.month, minor.birthdate.day);
+
+            final dateFrom = value['from'];
+            final dateTo = value['to'];
+
+            // Check if the minor's birthdate is within the range
+            bool isAfterFrom = dateFrom == null ||
+                minorDate.isAfter(dateFrom) ||
+                minorDate.isAtSameMomentAs(dateFrom);
+
+            bool isBeforeTo = dateTo == null ||
+                minorDate.isBefore(dateTo) ||
+                minorDate.isAtSameMomentAs(dateTo);
+
+            return isAfterFrom && isBeforeTo;
+          } else if (value is DateTime) {
+            // Fallback for single date (backward compatibility)
+            final filterDate = DateTime(value.year, value.month, value.day);
+            final minorDate = DateTime(minor.birthdate.year,
+                minor.birthdate.month, minor.birthdate.day);
+            return minorDate.isAtSameMomentAs(filterDate);
+          }
+          return false;
+        case SearchField.sex:
+          String filterValue = value.toString().toUpperCase();
+          String minorSex = minor.sex.toUpperCase();
+
+          // Handle different sex value formats in the database
+          if (minorSex == 'MASCULINO' || minorSex == 'MALE') {
+            minorSex = 'M';
+          } else if (minorSex == 'FEMENINO' || minorSex == 'FEMALE') {
+            minorSex = 'F';
+          }
+
+          return minorSex == filterValue;
+
+        case SearchField.zipCode:
+          return minor.zipCode
+              .toString()
+              .toLowerCase()
+              .contains(value.toString().toLowerCase());
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +112,9 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
   }
 
   Widget _buildMinorsList() {
-    final query = widget.searchQuery.toLowerCase();
-
-    final filteredMinors = query.isEmpty
-        ? widget.minors
-        : widget.minors.where((minor) {
-            return minor.minorId.toString() == query;
-          }).toList();
+    final filteredMinors = widget.minors.where((minor) {
+      return _matchesAllFilters(minor, widget.searchFilters);
+    }).toList();
 
     return Expanded(
       child: filteredMinors.isEmpty
@@ -83,7 +141,7 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
             child: AnimatedContainer(
               duration: _animationDuration,
               margin:
-                  const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+                  const EdgeInsets.symmetric(vertical: 6.0, horizontal: 150.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: isHovered ? _cardColor.withOpacity(0.8) : _cardColor,
@@ -181,7 +239,7 @@ class _MinorItem extends StatelessWidget {
                 ),
               ),
               Text(
-                'Fecha de nacimiento: ${minor.birthdate}',
+                'Fecha de nacimiento: ${minor.birthdate.day.toString().padLeft(2, '0')}/${minor.birthdate.month.toString().padLeft(2, '0')}/${minor.birthdate.year}',
                 style: TextStyle(
                   fontSize: 14,
                 ),

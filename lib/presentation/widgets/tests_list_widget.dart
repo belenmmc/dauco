@@ -39,7 +39,7 @@ class TestsListWidget extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 1200),
             child: Card(
               margin: const EdgeInsets.symmetric(vertical: 8.0),
-              color: Color.fromARGB(255, 247, 238, 255),
+              color: Color.fromARGB(255, 248, 251, 255),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                     vertical: 16.0, horizontal: 32.0),

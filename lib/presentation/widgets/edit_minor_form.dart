@@ -230,7 +230,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                                const Color.fromARGB(237, 247, 238, 255),
+                                const Color.fromARGB(255, 248, 251, 255),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
@@ -383,7 +383,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                                 const SizedBox(width: 10),
                                 const Icon(Icons.delete,
                                     size: 28,
-                                    color: Color.fromARGB(237, 247, 238, 255)),
+                                    color: Color.fromARGB(255, 248, 251, 255)),
                               ],
                             ),
                           ),
@@ -529,7 +529,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
-      color: const Color.fromARGB(255, 247, 238, 255),
+      color: const Color.fromARGB(255, 248, 251, 255),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

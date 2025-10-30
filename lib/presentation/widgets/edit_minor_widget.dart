@@ -182,6 +182,21 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
           : selectedRegisteredAt ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      locale: const Locale('es', 'ES'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: const Color.fromARGB(255, 97, 135, 174),
+              onPrimary: Colors.white,
+              surface: const Color.fromARGB(255, 248, 251, 255),
+              onSurface: const Color.fromARGB(255, 43, 45, 66),
+            ),
+            dialogBackgroundColor: const Color.fromARGB(255, 248, 251, 255),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -250,7 +265,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    const Color.fromARGB(237, 247, 238, 255),
+                                    const Color.fromARGB(255, 248, 251, 255),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30.0),
                                 ),
@@ -483,7 +498,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                                     const Icon(Icons.delete,
                                         size: 28,
                                         color:
-                                            Color.fromARGB(237, 247, 238, 255)),
+                                            Color.fromARGB(255, 248, 251, 255)),
                                   ],
                                 ),
                               ),
@@ -741,7 +756,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
-      color: const Color.fromARGB(255, 247, 238, 255),
+      color: const Color.fromARGB(255, 248, 251, 255),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -1540,7 +1555,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
           labelText: label,
           border: const OutlineInputBorder(),
           filled: isReadOnly,
-          fillColor: isReadOnly ? Color.fromARGB(255, 221, 213, 228) : null,
+          fillColor: isReadOnly ? Color.fromARGB(255, 210, 220, 230) : null,
         ),
         validator: (value) {
           if (isRequired && (value == null || value.isEmpty)) {

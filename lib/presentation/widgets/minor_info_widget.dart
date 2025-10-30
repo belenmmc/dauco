@@ -124,7 +124,7 @@ class MinorInfoWidget extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
-      color: const Color.fromARGB(255, 247, 238, 255),
+      color: const Color.fromARGB(255, 248, 251, 255),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

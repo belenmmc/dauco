@@ -2,6 +2,7 @@ import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -41,6 +42,16 @@ class Dauco extends StatelessWidget {
     return MaterialApp(
       title: 'Dauco',
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es', 'ES'), // Spanish
+        Locale('en', 'US'), // English
+      ],
+      locale: const Locale('es', 'ES'), // Set Spanish as default
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,

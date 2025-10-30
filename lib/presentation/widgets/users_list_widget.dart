@@ -1,6 +1,7 @@
 import 'package:dauco/domain/entities/user_model.entity.dart';
 import 'package:dauco/presentation/blocs/delete_user_bloc.dart';
 import 'package:dauco/presentation/pages/edit_user_page.dart';
+import 'package:dauco/presentation/widgets/admin_search_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,7 +14,7 @@ class UsersListWidget extends StatefulWidget {
   final Function() onPreviousPage;
   final bool hasNextPage;
   final bool hasPreviousPage;
-  final String searchQuery;
+  final UserSearchFilters searchFilters;
   final VoidCallback onRefreshUsers;
 
   const UsersListWidget({
@@ -26,7 +27,7 @@ class UsersListWidget extends StatefulWidget {
     required this.onPreviousPage,
     required this.hasNextPage,
     required this.hasPreviousPage,
-    required this.searchQuery,
+    required this.searchFilters,
     required this.onRefreshUsers,
   });
 
@@ -35,9 +36,29 @@ class UsersListWidget extends StatefulWidget {
 }
 
 class _UsersListWidgetState extends State<UsersListWidget> {
-  static const _cardColor = Color.fromARGB(255, 247, 238, 255);
+  static const _cardColor = Color.fromARGB(255, 248, 251, 255);
   static const _buttonColor = Color.fromARGB(255, 97, 135, 174);
   static const _animationDuration = Duration(milliseconds: 200);
+
+  bool _matchesAllFilters(UserModel user, UserSearchFilters filters) {
+    if (filters.isEmpty) return true;
+
+    return filters.filters.entries.every((entry) {
+      final field = entry.key;
+      final query = entry.value.toLowerCase();
+
+      switch (field) {
+        case UserSearchField.name:
+          return user.name.toLowerCase().contains(query);
+        case UserSearchField.email:
+          return user.email.toLowerCase().contains(query);
+        case UserSearchField.role:
+          return user.role.toLowerCase().contains(query);
+        case UserSearchField.managerId:
+          return user.managerId.toString().toLowerCase().contains(query);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,15 +74,9 @@ class _UsersListWidgetState extends State<UsersListWidget> {
   }
 
   Widget _buildUsersList() {
-    final query = widget.searchQuery.toLowerCase();
-
-    final filteredUsers = query.isEmpty
-        ? widget.users
-        : widget.users.where((user) {
-            return user.email.toLowerCase().contains(query) ||
-                user.name.toLowerCase().contains(query) ||
-                user.managerId.toString().toLowerCase().contains(query);
-          }).toList();
+    final filteredUsers = widget.users.where((user) {
+      return _matchesAllFilters(user, widget.searchFilters);
+    }).toList();
 
     return Expanded(
       child: filteredUsers.isEmpty
