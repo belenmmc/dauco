@@ -8,8 +8,10 @@ import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/entities/item.entity.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
+import 'package:dauco/presentation/widgets/duplicate_conflict_dialog.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ImportService {
@@ -233,41 +235,146 @@ class ImportService {
     return items.where((item) => item.testId == testId).toList();
   } */
 
-  Future<void> loadFile(Excel file, Function(double) onProgress) async {
+  Future<Map<String, Map<String, int>>> loadFile(
+      Excel file, Function(double) onProgress, BuildContext context) async {
     final totalSteps = 3.0;
     double currentStep = 0.0;
+    Map<String, Map<String, int>> importResults = {};
 
     final users = await uploadUsers(file);
-    await uploadInBatches("Usuarios", users.map((u) => u.toJson()).toList());
+    final userStats = await uploadInBatches(
+        "Usuarios", users.map((u) => u.toJson()).toList(), context,
+        primaryKey: "responsable_id");
+    importResults['users'] = userStats;
     currentStep++;
     onProgress(currentStep / totalSteps);
 
     final minors = await uploadMinors(file);
-    await uploadInBatches(
-        "Menores", minors.map((m) => MinorMapper.toJson(m)).toList());
+    final minorStats = await uploadInBatches(
+        "Menores", minors.map((m) => MinorMapper.toJson(m)).toList(), context,
+        primaryKey: "menor_id");
+    importResults['minors'] = minorStats;
     currentStep++;
     onProgress(currentStep / totalSteps);
 
     final tests = await uploadTests(file);
     final items = await uploadItems(file);
-    await uploadInBatches(
-        "Tests", tests.map((t) => TestMapper.toJson(t)).toList());
-    await uploadInBatches(
-        "Items", items.map((i) => ItemMapper.toJson(i)).toList());
+    final testStats = await uploadInBatches(
+        "Tests", tests.map((t) => TestMapper.toJson(t)).toList(), context,
+        primaryKey: "test_id");
+    final itemStats = await uploadInBatches(
+        "Items", items.map((i) => ItemMapper.toJson(i)).toList(), context,
+        primaryKey: "respuesta_id");
+    importResults['tests'] = testStats;
+    importResults['items'] = itemStats;
     currentStep++;
     onProgress(currentStep / totalSteps);
+
+    return importResults;
   }
 
-  Future<void> uploadInBatches(String table, List<Map<String, dynamic>> data,
-      {int batchSize = 1000}) async {
+  Future<Map<String, int>> uploadInBatches(
+      String table, List<Map<String, dynamic>> data, BuildContext context,
+      {int batchSize = 1000,
+      String? primaryKey,
+      bool allowDuplicates = false}) async {
+    int insertedCount = 0;
+    int updatedCount = 0;
+    int skippedCount = 0;
+
     for (int i = 0; i < data.length; i += batchSize) {
       try {
         final end = (i + batchSize > data.length) ? data.length : i + batchSize;
         final batch = data.sublist(i, end);
-        await Supabase.instance.client.from(table).insert(batch);
+
+        if (allowDuplicates || primaryKey == null) {
+          // Insert without duplicate checking
+          await Supabase.instance.client.from(table).insert(batch);
+          insertedCount += batch.length;
+        } else {
+          // Check for duplicates and handle accordingly
+          for (var record in batch) {
+            try {
+              final primaryKeyValue = record[primaryKey];
+
+              // Check if record exists
+              final existingRecord = await Supabase.instance.client
+                  .from(table)
+                  .select('*')
+                  .eq(primaryKey, primaryKeyValue)
+                  .maybeSingle();
+
+              if (existingRecord == null) {
+                // Record doesn't exist, insert it
+                await Supabase.instance.client.from(table).insert(record);
+                insertedCount++;
+              } else {
+                // Record exists, show conflict dialog
+                final resolution = await showDialog<ConflictResolution>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext dialogContext) {
+                    return DuplicateConflictDialog(
+                      recordType: _getRecordTypeName(table),
+                      primaryKey: primaryKey,
+                      primaryKeyValue: primaryKeyValue,
+                      existingRecord: existingRecord,
+                      newRecord: record,
+                    );
+                  },
+                );
+
+                switch (resolution) {
+                  case ConflictResolution.keepExisting:
+                    skippedCount++;
+                    break;
+                  case ConflictResolution.replaceWithNew:
+                    await Supabase.instance.client
+                        .from(table)
+                        .update(record)
+                        .eq(primaryKey, primaryKeyValue);
+                    updatedCount++;
+                    break;
+                  case ConflictResolution.skipRecord:
+                  case null:
+                    skippedCount++;
+                    break;
+                }
+              }
+            } catch (e) {
+              print(
+                  "Error processing record with ${primaryKey}: ${record[primaryKey]} - ${e.toString()}");
+              skippedCount++;
+            }
+          }
+        }
       } catch (e) {
-        Exception("Error uploading to $table: ${e.toString()}");
+        print("Error uploading batch to $table: ${e.toString()}");
+        final currentBatch = data.sublist(
+            i, (i + batchSize > data.length) ? data.length : i + batchSize);
+        skippedCount += currentBatch.length;
       }
+    }
+
+    return {
+      'inserted': insertedCount,
+      'updated': updatedCount,
+      'skipped': skippedCount,
+    };
+  }
+
+  String _getRecordTypeName(String table) {
+    switch (table.toLowerCase()) {
+      case 'usuarios':
+        return 'Usuario';
+      case 'menores':
+        return 'Menor';
+      case 'tests':
+        return 'Test';
+      case 'items':
+        return 'Item';
+      default:
+        return table;
     }
   }
 

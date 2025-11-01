@@ -16,7 +16,7 @@ class SelectFileWidget extends StatelessWidget {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.0))),
         onPressed: () {
-          context.read<LoadFileBloc>().add(LoadFileEvent());
+          context.read<LoadFileBloc>().add(LoadFileEvent(context));
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

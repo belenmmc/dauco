@@ -4,6 +4,7 @@ import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/entities/item.entity.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:excel/excel.dart';
+import 'package:flutter/material.dart';
 
 class ImportRepository implements ImportRepositoryInterface {
   ImportService importService = ImportService();
@@ -16,8 +17,9 @@ class ImportRepository implements ImportRepositoryInterface {
   }
 
   @override
-  Future<void> loadFile(Excel file, Function(double p1) onProgress) {
-    return importService.loadFile(file, onProgress);
+  Future<Map<String, Map<String, int>>> loadFile(
+      Excel file, Function(double p1) onProgress, BuildContext context) {
+    return importService.loadFile(file, onProgress, context);
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
 import 'package:dauco/presentation/pages/minor_info_page.dart';
+import 'package:dauco/presentation/widgets/import_results_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -88,12 +89,24 @@ class HomePageState extends State<HomePage> {
                             child: BlocListener<LoadFileBloc, LoadFileState>(
                               listener: (context, state) {
                                 if (state is LoadFileSuccess) {
+                                  print('LoadFileSuccess triggered');
                                   _showLoading();
                                   BlocProvider.of<GetAllMinorsBloc>(context)
                                       .add(GetEvent());
+                                } else if (state is LoadFileCompleted) {
+                                  print(
+                                      'LoadFileCompleted triggered with results: ${state.getImportResults}');
+                                  _hideLoading();
+                                  _showImportResultsDialog(
+                                      context, state.getImportResults);
+                                  BlocProvider.of<GetAllMinorsBloc>(context)
+                                      .add(GetEvent());
                                 } else if (state is LoadFileLoading) {
+                                  print('LoadFileLoading triggered');
                                   _showLoading();
                                 } else if (state is LoadFileError) {
+                                  print(
+                                      'LoadFileError triggered: ${state.error}');
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(const SnackBar(
                                     content: Text('File picker cancelled'),
@@ -234,5 +247,17 @@ class HomePageState extends State<HomePage> {
 
       _hideLoading();
     }
+  }
+
+  void _showImportResultsDialog(
+      BuildContext context, Map<String, Map<String, int>> importResults) {
+    print('_showImportResultsDialog called with results: $importResults');
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ImportResultsDialog(importResults: importResults);
+      },
+    );
   }
 }
