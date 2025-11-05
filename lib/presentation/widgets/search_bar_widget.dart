@@ -1,4 +1,5 @@
 import 'package:dauco/presentation/pages/admin_page.dart';
+import 'package:dauco/presentation/pages/analytics_page.dart';
 import 'package:dauco/presentation/widgets/circular_button_widget.dart';
 import 'package:dauco/presentation/widgets/profile_button_widget.dart';
 import 'package:dauco/presentation/widgets/select_file_widget.dart';
@@ -427,99 +428,121 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (widget.role == 'admin')
-                        Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: CircularButtonWidget(
-                            iconData: Icons.manage_accounts,
-                            onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AdminPage(),
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: CircularButtonWidget(
+                              iconData: Icons.manage_accounts,
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AdminPage(),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: 450,
-                          minWidth: 300,
-                        ),
-                        child: Container(
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 248, 251, 255),
-                            borderRadius: BorderRadius.circular(30.0),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                      if (widget.role == 'admin')
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: CircularButtonWidget(
+                              iconData: Icons.analytics,
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AnalyticsPage(),
+                                ),
                               ),
-                            ],
+                            ),
                           ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 12),
-                              const Icon(Icons.search,
-                                  color: Color.fromARGB(255, 43, 45, 66)),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: TextField(
-                                  controller: _mainController,
-                                  onChanged: (value) => _updateFilters(),
-                                  style: const TextStyle(fontSize: 16),
-                                  decoration: InputDecoration(
-                                    isCollapsed: true,
-                                    hintText:
-                                        'Buscar por ${SearchField.name.displayName.toLowerCase()} o Id',
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 14),
-                                    suffixIcon: _mainController.text.isNotEmpty
-                                        ? IconButton(
-                                            icon: const Icon(Icons.clear,
-                                                color: Color.fromARGB(
-                                                    255, 43, 45, 66)),
-                                            padding:
-                                                const EdgeInsets.only(right: 8),
-                                            onPressed: () {
-                                              _mainController.clear();
-                                              _updateFilters();
-                                              setState(() {});
-                                            },
-                                          )
-                                        : null,
+                        ),
+                      Expanded(
+                        flex: 3,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: 450,
+                            minWidth: 300,
+                          ),
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 248, 251, 255),
+                              borderRadius: BorderRadius.circular(30.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 12),
+                                const Icon(Icons.search,
+                                    color: Color.fromARGB(255, 43, 45, 66)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _mainController,
+                                    onChanged: (value) => _updateFilters(),
+                                    style: const TextStyle(fontSize: 16),
+                                    decoration: InputDecoration(
+                                      isCollapsed: true,
+                                      hintText:
+                                          'Buscar por ${SearchField.name.displayName.toLowerCase()} o Id',
+                                      border: InputBorder.none,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 14),
+                                      suffixIcon: _mainController
+                                              .text.isNotEmpty
+                                          ? IconButton(
+                                              icon: const Icon(Icons.clear,
+                                                  color: Color.fromARGB(
+                                                      255, 43, 45, 66)),
+                                              padding: const EdgeInsets.only(
+                                                  right: 8),
+                                              onPressed: () {
+                                                _mainController.clear();
+                                                _updateFilters();
+                                                setState(() {});
+                                              },
+                                            )
+                                          : null,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: IconButton(
-                                  icon: Icon(
-                                    _showAdvancedFilters
-                                        ? Icons.expand_less
-                                        : Icons.expand_more,
-                                    color:
-                                        const Color.fromARGB(255, 43, 45, 66),
+                                Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      _showAdvancedFilters
+                                          ? Icons.expand_less
+                                          : Icons.expand_more,
+                                      color:
+                                          const Color.fromARGB(255, 43, 45, 66),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _showAdvancedFilters =
+                                            !_showAdvancedFilters;
+                                      });
+                                      widget.onAdvancedFiltersToggle
+                                          ?.call(_showAdvancedFilters);
+                                    },
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _showAdvancedFilters =
-                                          !_showAdvancedFilters;
-                                    });
-                                    widget.onAdvancedFiltersToggle
-                                        ?.call(_showAdvancedFilters);
-                                  },
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 8),
                       SelectFileWidget(),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       ProfileButtonWidget(),
                     ],
                   ),
