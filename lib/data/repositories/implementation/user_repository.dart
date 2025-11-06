@@ -23,9 +23,19 @@ class UserRepository implements UserRepositoryInterface {
   }
 
   @override
-  Future<void> register(
-      String email, String password, int managerId, String name) async {
-    await userService.register(email, password, managerId, name);
+  Future<void> register(String email, String password, int managerId,
+      String name, String role) async {
+    await userService.register(email, password, managerId, name, role);
+  }
+
+  @override
+  Future<void> resetPassword(String email) async {
+    await userService.resetPassword(email);
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    await userService.updatePassword(newPassword);
   }
 
   @override

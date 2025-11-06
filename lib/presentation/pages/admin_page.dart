@@ -25,7 +25,7 @@ class AdminPageState extends State<AdminPage> {
   bool _isLoading = false;
   bool _hasNextPage = true;
   bool _hasPreviousPage = false;
-  String _searchQuery = '';
+  UserSearchFilters _searchFilters = UserSearchFilters();
 
   @override
   Widget build(BuildContext context) {
@@ -65,32 +65,35 @@ class AdminPageState extends State<AdminPage> {
               }
             },
             child: Scaffold(
-              backgroundColor: const Color.fromARGB(255, 167, 168, 213),
-              appBar: AdminSearchBarWidget(
-                onChanged: (query) {
-                  setState(() {
-                    _searchQuery = query;
-                  });
-                },
-                role: state is GetCurrentUserSuccess
-                    ? state.getCurrentUser.role
-                    : '',
-              ),
+              backgroundColor: const Color.fromARGB(255, 167, 190, 213),
               body: LayoutBuilder(
                 builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(minHeight: constraints.maxHeight),
-                      child: Center(
-                        child: Container(
-                          constraints: const BoxConstraints(
-                              maxWidth: 1200, minWidth: 600),
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              BlocListener<GetAllUsersBloc, GetAllUsersState>(
+                  return Center(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: 1200,
+                        minWidth: 600,
+                      ),
+                      height: constraints.maxHeight,
+                      child: Column(
+                        children: [
+                          SafeArea(
+                            child: AdminSearchBarWidget(
+                              onChanged: (filters) {
+                                setState(() {
+                                  _searchFilters = filters;
+                                });
+                              },
+                              role: state is GetCurrentUserSuccess
+                                  ? state.getCurrentUser.role
+                                  : '',
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              child: BlocListener<GetAllUsersBloc,
+                                  GetAllUsersState>(
                                 listener: (context, state) {
                                   if (state is GetUsersLoading) {
                                     _showLoading();
@@ -105,33 +108,27 @@ class AdminPageState extends State<AdminPage> {
                                       return _buildProgressIndicator();
 
                                     if (state is GetUsersSuccess) {
-                                      return ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxHeight: constraints.maxHeight - 20,
-                                          minHeight: 40,
-                                        ),
-                                        child: UsersListWidget(
-                                          users: state.users,
-                                          screenWidth: screenWidth,
-                                          selectedIndex: _selectedIndex,
-                                          onItemSelected: (index) {
-                                            setState(() {
-                                              _selectedIndex = index;
-                                            });
-                                          },
-                                          onNextPage: () =>
-                                              _goToNextPage(context),
-                                          onPreviousPage: () =>
-                                              _goToPreviousPage(context),
-                                          hasNextPage: _hasNextPage,
-                                          hasPreviousPage: _hasPreviousPage,
-                                          searchQuery: _searchQuery,
-                                          onRefreshUsers: () {
-                                            BlocProvider.of<GetAllUsersBloc>(
-                                                    context)
-                                                .add(GetEvent());
-                                          },
-                                        ),
+                                      return UsersListWidget(
+                                        users: state.users,
+                                        screenWidth: screenWidth,
+                                        selectedIndex: _selectedIndex,
+                                        onItemSelected: (index) {
+                                          setState(() {
+                                            _selectedIndex = index;
+                                          });
+                                        },
+                                        onNextPage: () =>
+                                            _goToNextPage(context),
+                                        onPreviousPage: () =>
+                                            _goToPreviousPage(context),
+                                        hasNextPage: _hasNextPage,
+                                        hasPreviousPage: _hasPreviousPage,
+                                        searchFilters: _searchFilters,
+                                        onRefreshUsers: () {
+                                          BlocProvider.of<GetAllUsersBloc>(
+                                                  context)
+                                              .add(GetEvent());
+                                        },
                                       );
                                     } else if (state is GetAllUsersError) {
                                       return Text('Error: ${state.error}');
@@ -146,9 +143,9 @@ class AdminPageState extends State<AdminPage> {
                                   },
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   );

@@ -44,7 +44,7 @@ class EditMinorPage extends StatelessWidget {
           }
         },
         child: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+          backgroundColor: const Color.fromARGB(255, 167, 190, 213),
           appBar: AppBar(
             title: const Padding(
               padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
@@ -60,7 +60,7 @@ class EditMinorPage extends StatelessWidget {
               ),
             ),
             automaticallyImplyLeading: true,
-            backgroundColor: Color.fromARGB(255, 167, 168, 213),
+            backgroundColor: Color.fromARGB(255, 167, 190, 213),
           ),
           body: EditMinorWidget(
             minor: minor,

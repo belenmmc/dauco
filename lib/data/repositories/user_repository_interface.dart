@@ -8,7 +8,11 @@ abstract class UserRepositoryInterface {
   Future<UserModel> getCurrentUser();
 
   Future<void> register(
-      String email, String password, int managerId, String name);
+      String email, String password, int managerId, String name, String role);
+
+  Future<void> resetPassword(String email);
+
+  Future<void> updatePassword(String newPassword);
 
   Future<void> updateUser(UserModel user);
 

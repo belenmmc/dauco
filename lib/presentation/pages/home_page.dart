@@ -2,6 +2,7 @@ import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
 import 'package:dauco/presentation/pages/minor_info_page.dart';
+import 'package:dauco/presentation/widgets/import_results_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,12 +23,12 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  int? _selectedIndex;
-  int _page = 1;
+  int _selectedIndex = -1;
   bool _isLoading = false;
+  int _page = 0;
   bool _hasNextPage = true;
   bool _hasPreviousPage = false;
-  String _searchQuery = '';
+  SearchFilters _searchFilters = SearchFilters();
 
   @override
   Widget build(BuildContext context) {
@@ -54,43 +55,58 @@ class HomePageState extends State<HomePage> {
       child: BlocBuilder<GetCurrentUserBloc, GetCurrentUserState>(
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: Color.fromARGB(255, 167, 168, 213),
-            appBar: SearchBarWidget(
-              onChanged: (query) {
-                setState(() {
-                  _searchQuery = query;
-                });
-              },
-              role: state is GetCurrentUserSuccess
-                  ? state.getCurrentUser.role
-                  : '',
-            ),
+            backgroundColor: Color.fromARGB(255, 167, 190, 213),
             body: LayoutBuilder(
               builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
+                return Center(
+                  child: Container(
                     constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
+                      maxWidth: 1200,
+                      minWidth: 600,
                     ),
-                    child: Center(
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxWidth: 1200,
-                          minWidth: 600,
+                    height: constraints.maxHeight,
+                    child: Column(
+                      children: [
+                        SafeArea(
+                          child: SearchBarWidget(
+                            onChanged: (filters) {
+                              setState(() {
+                                _searchFilters = filters;
+                              });
+                            },
+                            onAdvancedFiltersToggle: (isExpanded) {
+                              // El espacio ahora se maneja automáticamente con Expanded
+                            },
+                            role: state is GetCurrentUserSuccess
+                                ? state.getCurrentUser.role
+                                : '',
+                            showBackButton: false,
+                          ),
                         ),
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            BlocListener<LoadFileBloc, LoadFileState>(
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            child: BlocListener<LoadFileBloc, LoadFileState>(
                               listener: (context, state) {
                                 if (state is LoadFileSuccess) {
+                                  print('LoadFileSuccess triggered');
                                   _showLoading();
                                   BlocProvider.of<GetAllMinorsBloc>(context)
                                       .add(GetEvent());
+                                } else if (state is LoadFileCompleted) {
+                                  print(
+                                      'LoadFileCompleted triggered with results: ${state.getImportResults}');
+                                  _hideLoading();
+                                  _showImportResultsDialog(
+                                      context, state.getImportResults);
+                                  BlocProvider.of<GetAllMinorsBloc>(context)
+                                      .add(GetEvent());
                                 } else if (state is LoadFileLoading) {
+                                  print('LoadFileLoading triggered');
                                   _showLoading();
                                 } else if (state is LoadFileError) {
+                                  print(
+                                      'LoadFileError triggered: ${state.error}');
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(const SnackBar(
                                     content: Text('File picker cancelled'),
@@ -122,47 +138,39 @@ class HomePageState extends State<HomePage> {
                                           userRole = userState.currentUser.role;
                                         }
 
-                                        return ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxHeight:
-                                                constraints.maxHeight - 20,
-                                            minHeight: 40,
-                                          ),
-                                          child: MinorsListWidget(
-                                            minors: state.minors,
-                                            screenWidth: screenWidth,
-                                            selectedIndex: _selectedIndex,
-                                            onItemSelected: (index) async {
-                                              setState(() {
-                                                _selectedIndex = index;
-                                              });
-                                              final result =
-                                                  await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      MinorInfoPage(
-                                                    minor: state.minors[index],
-                                                    role: userRole,
-                                                  ),
+                                        return MinorsListWidget(
+                                          minors: state.minors,
+                                          screenWidth: screenWidth,
+                                          selectedIndex: _selectedIndex,
+                                          onItemSelected: (index) async {
+                                            setState(() {
+                                              _selectedIndex = index;
+                                            });
+                                            final result = await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    MinorInfoPage(
+                                                  minor: state.minors[index],
+                                                  role: userRole,
                                                 ),
-                                              );
+                                              ),
+                                            );
 
-                                              if (result == true) {
-                                                context
-                                                    .read<GetAllMinorsBloc>()
-                                                    .add(GetEvent());
-                                              }
-                                            },
-                                            onNextPage: () =>
-                                                _goToNextPage(context),
-                                            onPreviousPage: () =>
-                                                _goToPreviousPage(context),
-                                            hasNextPage: _hasNextPage,
-                                            hasPreviousPage: _hasPreviousPage,
-                                            searchQuery: _searchQuery,
-                                            role: userRole,
-                                          ),
+                                            if (result == true) {
+                                              context
+                                                  .read<GetAllMinorsBloc>()
+                                                  .add(GetEvent());
+                                            }
+                                          },
+                                          onNextPage: () =>
+                                              _goToNextPage(context),
+                                          onPreviousPage: () =>
+                                              _goToPreviousPage(context),
+                                          hasNextPage: _hasNextPage,
+                                          hasPreviousPage: _hasPreviousPage,
+                                          searchFilters: _searchFilters,
+                                          role: userRole,
                                         );
                                       },
                                     );
@@ -178,9 +186,9 @@ class HomePageState extends State<HomePage> {
                                 },
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 );
@@ -239,5 +247,17 @@ class HomePageState extends State<HomePage> {
 
       _hideLoading();
     }
+  }
+
+  void _showImportResultsDialog(
+      BuildContext context, Map<String, Map<String, int>> importResults) {
+    print('_showImportResultsDialog called with results: $importResults');
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ImportResultsDialog(importResults: importResults);
+      },
+    );
   }
 }

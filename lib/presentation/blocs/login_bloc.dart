@@ -40,7 +40,8 @@ class LoginBloc extends Bloc<UserLoginEvent, LoginState> {
         await loginUseCase.execute(event.email, event.password);
         emit(LoginSuccess());
       } on AuthException catch (e) {
-        emit(LoginError(error: e.toString()));
+        emit(
+            LoginError(error: "Credenciales incorrectas. Inténtelo de nuevo."));
       }
     });
   }

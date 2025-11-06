@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/usecases/register_use_case.dart';
 import 'package:dauco/presentation/blocs/register_bloc.dart';
-import 'package:dauco/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,6 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _managerIdController = TextEditingController();
   final _passwordController = TextEditingController();
   bool isObscure = true;
+  String? _selectedRole;
 
   @override
   Widget build(BuildContext context) {
@@ -27,18 +27,27 @@ class _RegisterPageState extends State<RegisterPage> {
       create: (context) =>
           RegisterBloc(registerUseCase: appInjector.get<RegisterUseCase>()),
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 168, 213),
+        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
         appBar: AppBar(
-          automaticallyImplyLeading: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: const IconThemeData(
-            color: Colors.black87,
+          toolbarHeight: 80,
+          title: Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Crear cuenta',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
+          automaticallyImplyLeading: true,
+          backgroundColor: Color.fromARGB(255, 167, 190, 213),
         ),
         body: Center(
             child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
+                constraints: const BoxConstraints(maxWidth: 480),
                 child: Card(
                   elevation: 8,
                   shape: RoundedRectangleBorder(
@@ -52,7 +61,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const AutoSizeText(
-                            "Crea tu cuenta",
+                            "Crea una cuenta",
                             style: TextStyle(
                               fontSize: 22,
                               color: Colors.black87,
@@ -66,14 +75,12 @@ class _RegisterPageState extends State<RegisterPage> {
                           BlocListener<RegisterBloc, RegisterState>(
                             listener: (context, state) {
                               if (state is RegisterSuccess) {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const LoginPage()),
-                                );
+                                Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Registro exitoso'),
+                                    content:
+                                        Text('Usuario creado exitosamente'),
+                                    duration: Duration(seconds: 3),
                                   ),
                                 );
                               } else if (state is RegisterError) {
@@ -96,7 +103,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                       controller: _nameController,
                                       decoration: const InputDecoration(
                                         labelText: 'Nombre',
-                                        border: OutlineInputBorder(),
                                       ),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -110,7 +116,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                       controller: _emailController,
                                       decoration: const InputDecoration(
                                         labelText: 'Email',
-                                        border: OutlineInputBorder(),
                                       ),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -128,15 +133,44 @@ class _RegisterPageState extends State<RegisterPage> {
                                     TextFormField(
                                       controller: _managerIdController,
                                       decoration: const InputDecoration(
-                                        labelText: 'Id del responsable',
-                                        border: OutlineInputBorder(),
+                                        labelText: 'ID del responsable',
                                       ),
+                                      keyboardType: TextInputType.number,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Ingresa un id';
+                                          return 'Ingresa un ID';
+                                        }
+                                        if (int.tryParse(value) == null) {
+                                          return 'ID inválido';
                                         }
                                         return null;
                                       },
+                                    ),
+                                    const SizedBox(height: 16),
+                                    DropdownButtonFormField<String>(
+                                      value: _selectedRole,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Rol',
+                                      ),
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: 'admin',
+                                          child: Text('Administrador'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'manager',
+                                          child: Text('Responsable'),
+                                        ),
+                                      ],
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          _selectedRole = newValue;
+                                        });
+                                      },
+                                      validator: (value) =>
+                                          value == null || value.isEmpty
+                                              ? 'Selecciona un rol'
+                                              : null,
                                     ),
                                     const SizedBox(height: 16),
                                     TextFormField(
@@ -144,7 +178,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                       obscureText: isObscure,
                                       decoration: InputDecoration(
                                         labelText: 'Contraseña',
-                                        border: const OutlineInputBorder(),
                                         suffixIcon: IconButton(
                                           icon: Icon(
                                             isObscure
@@ -172,6 +205,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                       width: double.infinity,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 18.0),
+                                          backgroundColor: const Color.fromARGB(
+                                              255, 97, 135, 174),
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
                                                 BorderRadius.circular(30),
@@ -190,18 +227,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                                             .text),
                                                     password:
                                                         _passwordController
-                                                            .text));
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    'Registro correctamente realizado'),
-                                              ),
-                                            );
-                                            Navigator.pop(context);
+                                                            .text,
+                                                    role: _selectedRole ?? ''));
                                           }
                                         },
-                                        child: const Text('Registrarse'),
+                                        child: const Text('Registrarse',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white)),
                                       ),
                                     ),
                                   ],

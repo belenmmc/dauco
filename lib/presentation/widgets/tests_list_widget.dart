@@ -26,48 +26,56 @@ class TestsListWidget extends StatelessWidget {
 
   Widget _buildTestCard(BuildContext context, Test test) {
     return GestureDetector(
-      onTap: () => {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TestInfoPage(test: test),
-          ),
-        ),
-      },
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 8.0),
-        color: Color.fromARGB(255, 247, 238, 255),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Test ${test.testId.toString()}',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TestInfoPage(test: test),
+                ),
               ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            },
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Card(
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              color: Color.fromARGB(255, 248, 251, 255),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16.0, horizontal: 32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Test ${test.testId.toString()}',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
                       children: [
-                        _buildInfoRow(
-                            'Fecha de alta', test.registeredAt.toString()),
-                        _buildInfoRow('Edad cronológica', test.cronologicalAge),
-                        _buildInfoRow('Edad evolutiva', test.evolutionaryAge),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildInfoRow('Fecha de alta',
+                                  test.registeredAt.toString()),
+                              _buildInfoRow(
+                                  'Edad cronológica', test.cronologicalAge),
+                              _buildInfoRow(
+                                  'Edad evolutiva', test.evolutionaryAge),
+                            ],
+                          ),
+                        ),
+                        TestProgressIndicatorWidget(progress: test.progress),
                       ],
                     ),
-                  ),
-                  TestProgressIndicatorWidget(progress: test.progress),
-                ],
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Widget _buildInfoRow(String label, String value) {

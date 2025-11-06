@@ -20,7 +20,9 @@ import 'package:dauco/domain/usecases/login_use_case.dart';
 import 'package:dauco/domain/usecases/logout_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
 import 'package:dauco/domain/usecases/register_use_case.dart';
+import 'package:dauco/domain/usecases/reset_password_use_case.dart';
 import 'package:dauco/domain/usecases/update_minor_use_case.dart';
+import 'package:dauco/domain/usecases/update_password_use_case.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
 import 'package:injector/injector.dart';
 
@@ -72,6 +74,12 @@ void initInjection() {
 
   appInjector.registerSingleton<RegisterUseCase>(
       () => RegisterUseCase(userRepository: appInjector.get<UserRepository>()));
+
+  appInjector.registerSingleton<ResetPasswordUseCase>(() =>
+      ResetPasswordUseCase(userRepository: appInjector.get<UserRepository>()));
+
+  appInjector.registerSingleton<UpdatePasswordUseCase>(() =>
+      UpdatePasswordUseCase(userRepository: appInjector.get<UserRepository>()));
 
   appInjector.registerSingleton<PickFileUseCase>(() =>
       PickFileUseCase(importRepository: appInjector.get<ImportRepository>()));

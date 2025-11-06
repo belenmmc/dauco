@@ -14,7 +14,7 @@ class TestProgressIndicatorWidget extends StatelessWidget {
       percent: double.tryParse(progress)!,
       center: Text("${(double.tryParse(progress)! * 100).round()}%",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-      progressColor: Color.fromARGB(255, 104, 106, 195),
+      progressColor: Color.fromARGB(255, 97, 135, 174),
       backgroundColor: Color.fromARGB(255, 181, 181, 229),
       circularStrokeCap: CircularStrokeCap.round,
       animation: true,

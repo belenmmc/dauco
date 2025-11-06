@@ -9,40 +9,46 @@ class MinorInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Card(
-        margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: const Color.fromARGB(255, 120, 120, 175),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: constraints.maxWidth * 0.495,
-                        child: _buildMinorInfoCard(),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            _buildFamilyInfoCard(),
-                            const SizedBox(height: 16),
-                            _buildBirthInfoCard(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1500),
+          child: Card(
+            margin: const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            color: const Color.fromARGB(255, 111, 145, 179),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: constraints.maxWidth * 0.495,
+                            child: _buildMinorInfoCard(),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                _buildFamilyInfoCard(),
+                                const SizedBox(height: 16),
+                                _buildBirthInfoCard(),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -118,7 +124,7 @@ class MinorInfoWidget extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 3,
-      color: const Color.fromARGB(255, 247, 238, 255),
+      color: const Color.fromARGB(255, 248, 251, 255),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -129,7 +135,7 @@ class MinorInfoWidget extends StatelessWidget {
               style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 104, 106, 195)),
+                  color: Color.fromARGB(255, 69, 100, 131)),
             ),
             const SizedBox(height: 12),
             ...children,
@@ -141,7 +147,7 @@ class MinorInfoWidget extends StatelessWidget {
 
   Widget _buildSingleInfoLine(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -150,7 +156,7 @@ class MinorInfoWidget extends StatelessWidget {
             child: Text(
               label,
               style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87),
             ),
@@ -160,7 +166,7 @@ class MinorInfoWidget extends StatelessWidget {
             flex: 3,
             child: Text(
               value.isNotEmpty ? value : '-',
-              style: const TextStyle(fontSize: 18, color: Colors.black54),
+              style: const TextStyle(fontSize: 16, color: Colors.black54),
             ),
           ),
         ],

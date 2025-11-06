@@ -14,7 +14,7 @@ class TestInfoWidget extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.all(16.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Color.fromARGB(255, 206, 206, 237),
+      color: Color.fromARGB(255, 206, 219, 237),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -157,7 +157,7 @@ class TestInfoWidget extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 76, 77, 176)),
+                      color: Color.fromARGB(255, 97, 135, 174)),
                   textAlign: TextAlign.center,
                 ),
               ),

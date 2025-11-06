@@ -16,7 +16,7 @@ class CircularButtonWidget extends StatelessWidget {
       height: 50,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(237, 247, 238, 255),
+          backgroundColor: const Color.fromARGB(255, 248, 251, 255),
           shape: const CircleBorder(),
         ),
         onPressed: onPressed,
