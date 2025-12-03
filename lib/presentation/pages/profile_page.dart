@@ -8,9 +8,11 @@ import 'package:dauco/domain/usecases/update_user_use_case.dart';
 import 'package:dauco/presentation/blocs/logout_bloc.dart';
 import 'package:dauco/presentation/blocs/update_user_bloc.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/logout_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -115,8 +117,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ..add(LogoutEvent()),
         )
       ],
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+      child: AppScaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           toolbarHeight: 80,
           title: Padding(
@@ -126,7 +128,10 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 Text(
                   'Mi perfil',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.inter(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 55, 57, 82)),
                 ),
                 SizedBox(width: 20),
                 LogoutWidget(context: this.context),
@@ -134,7 +139,8 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Color.fromARGB(255, 167, 190, 213),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: BlocListener<UpdateUserBloc, UpdateUserState>(
           listener: (context, state) {
@@ -164,6 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 480),
                     child: Card(
+                      color: Color.fromARGB(255, 252, 254, 255),
                       elevation: 8,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -180,6 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
+                                  color: Color.fromARGB(255, 55, 57, 82),
                                 ),
                                 textAlign: TextAlign.center,
                               ),

@@ -5,6 +5,7 @@ import 'package:dauco/presentation/blocs/delete_user_bloc.dart';
 import 'package:dauco/presentation/blocs/get_all_users_bloc.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
 import 'package:dauco/presentation/widgets/admin_search_bar_widget.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/users_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -64,8 +65,7 @@ class AdminPageState extends State<AdminPage> {
                 );
               }
             },
-            child: Scaffold(
-              backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+            child: AppScaffold(
               body: LayoutBuilder(
                 builder: (context, constraints) {
                   return Center(

@@ -33,25 +33,30 @@ class ImportResultsDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'La importación se ha completado exitosamente. Aquí tienes un resumen:',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color.fromARGB(255, 43, 45, 66),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 500, // Constrain height to prevent overflow
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'La importación se ha completado exitosamente. Aquí tienes un resumen:',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color.fromARGB(255, 43, 45, 66),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ...importResults.entries
-                .map((entry) => _buildCategorySection(entry.key, entry.value)),
-            const SizedBox(height: 16),
-            _buildTotalSummary(),
-          ],
+              const SizedBox(height: 20),
+              ...importResults.entries.map(
+                  (entry) => _buildCategorySection(entry.key, entry.value)),
+              const SizedBox(height: 16),
+              _buildTotalSummary(),
+            ],
+          ),
         ),
       ),
       actions: [
@@ -84,11 +89,18 @@ class ImportResultsDialog extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: const Color.fromARGB(255, 213, 222, 233),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,8 +165,15 @@ class ImportResultsDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 97, 135, 174).withOpacity(0.1),
+        color: const Color.fromARGB(255, 97, 135, 174).withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

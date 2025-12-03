@@ -2,8 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/usecases/register_use_case.dart';
 import 'package:dauco/presentation/blocs/register_bloc.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -26,8 +28,8 @@ class _RegisterPageState extends State<RegisterPage> {
     return BlocProvider(
       create: (context) =>
           RegisterBloc(registerUseCase: appInjector.get<RegisterUseCase>()),
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+      child: AppScaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           toolbarHeight: 80,
           title: Padding(
@@ -37,13 +39,17 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 Text(
                   'Crear cuenta',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.inter(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 55, 57, 82)),
                 ),
               ],
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Color.fromARGB(255, 167, 190, 213),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: Center(
             child: ConstrainedBox(
@@ -53,6 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
+                  color: const Color.fromARGB(255, 252, 254, 255),
                   child: Padding(
                     padding: const EdgeInsets.all(32),
                     child: Form(

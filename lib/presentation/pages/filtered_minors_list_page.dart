@@ -1,6 +1,7 @@
 import 'package:dauco/data/services/analytics_service.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/presentation/pages/minor_info_page.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/minors_list_widget.dart';
 import 'package:dauco/presentation/widgets/search_bar_widget.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _FilteredMinorsListPageState extends State<FilteredMinorsListPage> {
   String _getFilterTypeInSpanish(String filterType) {
     switch (filterType) {
       case 'gender':
-        return 'Género';
+        return 'Sexo';
       case 'education':
         return 'Escolarización';
       case 'geographical':
@@ -185,8 +186,7 @@ class _FilteredMinorsListPageState extends State<FilteredMinorsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+    return AppScaffold(
       body: SafeArea(
         child: Column(
           children: [

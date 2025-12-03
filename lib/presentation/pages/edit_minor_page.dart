@@ -6,9 +6,11 @@ import 'package:dauco/domain/usecases/update_minor_use_case.dart';
 import 'package:dauco/presentation/blocs/delete_minor_bloc.dart';
 import 'package:dauco/presentation/blocs/get_all_users_bloc.dart' as users_bloc;
 import 'package:dauco/presentation/blocs/update_minor_bloc.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/edit_minor_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class EditMinorPage extends StatelessWidget {
   final Minor minor;
@@ -43,24 +45,27 @@ class EditMinorPage extends StatelessWidget {
             );
           }
         },
-        child: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+        child: AppScaffold(
           appBar: AppBar(
-            title: const Padding(
-              padding: EdgeInsets.only(top: 20.0, bottom: 10.0),
+            title: Padding(
+              padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'Editar Menor',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.inter(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 55, 57, 82)),
                   ),
                   SizedBox(width: 20),
                 ],
               ),
             ),
             automaticallyImplyLeading: true,
-            backgroundColor: Color.fromARGB(255, 167, 190, 213),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
           body: EditMinorWidget(
             minor: minor,

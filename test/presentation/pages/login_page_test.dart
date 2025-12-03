@@ -25,7 +25,7 @@ class LoginPageContentState extends State<LoginPageContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+      backgroundColor: const Color.fromARGB(255, 203, 220, 238),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),

@@ -3,8 +3,10 @@ import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/user_model.entity.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
 import 'package:dauco/presentation/blocs/update_user_bloc.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class EditUserPage extends StatefulWidget {
   final UserModel user;
@@ -51,12 +53,23 @@ class _EditUserPageState extends State<EditUserPage> {
       create: (_) => UpdateUserBloc(
         updateUserUseCase: appInjector.get<UpdateUserUseCase>(),
       ),
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+      child: AppScaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
-          title: const Text('Editar Usuario'),
-          backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+          title: Padding(
+            padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+            child: Text(
+              'Editar Usuario',
+              style: GoogleFonts.inter(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 55, 57, 82),
+              ),
+            ),
+          ),
           centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: Center(
           child: ConstrainedBox(

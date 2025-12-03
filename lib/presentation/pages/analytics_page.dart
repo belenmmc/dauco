@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dauco/data/services/analytics_service.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'filtered_minors_list_page.dart';
 
 class AnalyticsPage extends StatefulWidget {
@@ -18,6 +19,26 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   // For hover tooltips
   int _touchedIndex = -1;
   String _currentTouchedChart = '';
+
+  // Consistent color palette for all charts
+  static const List<Color> _chartColors = [
+    Color(0xFFF44336), // Red
+    Color(0xFF4CAF50), // Green
+    Color(0xFF2196F3), // Blue
+    Color(0xFFFF9800), // Orange
+    Color(0xFF9C27B0), // Purple
+    Color(0xFF00BCD4), // Cyan
+    Color(0xFFFFEB3B), // Yellow
+    Color(0xFFFF5722), // Deep Orange
+    Color(0xFFE91E63), // Pink
+    Color(0xFF795548), // Brown
+    Color(0xFF607D8B), // Blue Grey
+    Color(0xFF8BC34A), // Light Green
+    Color(0xFFFFC107), // Amber
+    Color(0xFF3F51B5), // Indigo
+    Color(0xFFCDDC39), // Lime
+    Color(0xFF009688), // Teal
+  ];
 
   Map<String, int> _genderData = {};
   Map<String, double> _testCompletionData = {};
@@ -49,6 +70,37 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     _loadAnalyticsData();
   }
 
+  // Helper function to create consistent text shadows for chart labels
+  List<Shadow> _getChartTextShadows() {
+    return [
+      Shadow(
+        offset: const Offset(0, 0),
+        blurRadius: 8.0,
+        color: Colors.white.withOpacity(0.8),
+      ),
+      Shadow(
+        offset: const Offset(1, 1),
+        blurRadius: 8.0,
+        color: Colors.white.withOpacity(0.8),
+      ),
+      Shadow(
+        offset: const Offset(-1, -1),
+        blurRadius: 8.0,
+        color: Colors.white.withOpacity(0.8),
+      ),
+      Shadow(
+        offset: const Offset(1, -1),
+        blurRadius: 8.0,
+        color: Colors.white.withOpacity(0.8),
+      ),
+      Shadow(
+        offset: const Offset(-1, 1),
+        blurRadius: 8.0,
+        color: Colors.white.withOpacity(0.8),
+      ),
+    ];
+  }
+
   void _navigateToFilteredList(String filterValue, String chartType) {
     String filterType;
     String chartTitle;
@@ -57,7 +109,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     switch (chartType) {
       case 'gender':
         filterType = 'gender';
-        chartTitle = 'Distribución por Género';
+        chartTitle = 'Distribución por Sexo';
         break;
       case 'testCompletion':
         filterType = 'test_status';
@@ -217,7 +269,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AppScaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Padding(
           padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
@@ -226,11 +279,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
             style: GoogleFonts.inter(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Color.fromARGB(255, 55, 57, 82),
             ),
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
@@ -240,79 +293,81 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      backgroundColor: const Color.fromARGB(255, 167, 190, 213),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Overview Cards
-                      _buildOverviewCards(),
-                      const SizedBox(height: 32),
+          : SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1000),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Overview Cards
+                        _buildOverviewCards(),
+                        const SizedBox(height: 32),
 
-                      // Section Headers and Charts
-                      _buildSectionHeader('Datos Básicos'),
-                      const SizedBox(height: 20),
-                      _buildGenderChart(),
-                      const SizedBox(height: 20),
-                      _buildTestCompletionChart(),
+                        // Section Headers and Charts
+                        _buildSectionHeader('Datos Básicos'),
+                        const SizedBox(height: 20),
+                        _buildGenderChart(),
+                        const SizedBox(height: 20),
+                        _buildTestCompletionChart(),
 
-                      const SizedBox(height: 40),
-                      _buildSectionHeader('Información del Nacimiento'),
-                      const SizedBox(height: 20),
-                      _buildBirthTypeChart(),
-                      const SizedBox(height: 20),
-                      _buildGestationWeeksChart(),
-                      const SizedBox(height: 20),
-                      _buildBirthWeightChart(),
-                      const SizedBox(height: 20),
-                      _buildApgarScoreChart(),
+                        const SizedBox(height: 40),
+                        _buildSectionHeader('Información del Nacimiento'),
+                        const SizedBox(height: 20),
+                        _buildBirthTypeChart(),
+                        const SizedBox(height: 20),
+                        _buildGestationWeeksChart(),
+                        const SizedBox(height: 20),
+                        _buildBirthWeightChart(),
+                        const SizedBox(height: 20),
+                        _buildApgarScoreChart(),
 
-                      const SizedBox(height: 40),
-                      _buildSectionHeader('Información Familiar'),
-                      const SizedBox(height: 20),
-                      _buildParentsCivilStatusChart(),
-                      const SizedBox(height: 20),
-                      _buildSiblingsChart(),
-                      const SizedBox(height: 20),
-                      _buildFamilyMembersChart(),
-                      const SizedBox(height: 20),
-                      _buildSocioeconomicChart(),
+                        const SizedBox(height: 40),
+                        _buildSectionHeader('Información Familiar'),
+                        const SizedBox(height: 20),
+                        _buildParentsCivilStatusChart(),
+                        const SizedBox(height: 20),
+                        _buildSiblingsChart(),
+                        const SizedBox(height: 20),
+                        _buildFamilyMembersChart(),
+                        const SizedBox(height: 20),
+                        _buildSocioeconomicChart(),
 
-                      const SizedBox(height: 40),
-                      _buildSectionHeader('Información de los Padres'),
-                      const SizedBox(height: 20),
-                      _buildFatherJobChart(),
-                      const SizedBox(height: 20),
-                      _buildMotherJobChart(),
-                      const SizedBox(height: 20),
-                      _buildFatherStudiesChart(),
-                      const SizedBox(height: 20),
-                      _buildMotherStudiesChart(),
+                        const SizedBox(height: 40),
+                        _buildSectionHeader('Información de los Padres'),
+                        const SizedBox(height: 20),
+                        _buildFatherJobChart(),
+                        const SizedBox(height: 20),
+                        _buildMotherJobChart(),
+                        const SizedBox(height: 20),
+                        _buildFatherStudiesChart(),
+                        const SizedBox(height: 20),
+                        _buildMotherStudiesChart(),
 
-                      const SizedBox(height: 40),
-                      _buildSectionHeader('Educación y Otras Características'),
-                      const SizedBox(height: 20),
-                      _buildSchoolingLevelChart(),
-                      const SizedBox(height: 20),
-                      _buildEvaluationReasonChart(),
-                      const SizedBox(height: 20),
-                      _buildAdoptionChart(),
+                        const SizedBox(height: 40),
+                        _buildSectionHeader(
+                            'Educación y Otras Características'),
+                        const SizedBox(height: 20),
+                        _buildSchoolingLevelChart(),
+                        const SizedBox(height: 20),
+                        _buildEvaluationReasonChart(),
+                        const SizedBox(height: 20),
+                        _buildAdoptionChart(),
 
-                      const SizedBox(height: 40),
-                      _buildSectionHeader('Distribución y Análisis'),
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 40),
+                        _buildSectionHeader('Distribución y Análisis'),
+                        const SizedBox(height: 20),
 
-                      // Full-width charts
-                      _buildParentsAgeChart(),
-                      const SizedBox(height: 20),
-                      _buildGeographicalChart(),
-                    ],
+                        // Full-width charts
+                        _buildParentsAgeChart(),
+                        const SizedBox(height: 20),
+                        _buildGeographicalChart(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -353,13 +408,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color.fromARGB(255, 252, 254, 255),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 8,
+            blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
@@ -400,13 +454,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       height: 500, // Reduced from 600px to 500px for smaller card
       padding: const EdgeInsets.all(20), // Reduced padding from 24 to 20
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color.fromARGB(255, 252, 254, 255),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 8,
+            blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
@@ -478,7 +531,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                 width: isHovered ? 14 : 12,
                 height: isHovered ? 14 : 12,
                 decoration: BoxDecoration(
-                  color: colors[index % colors.length],
+                  color: _chartColors[index % _chartColors.length],
                   shape: BoxShape.circle,
                 ),
               ),
@@ -660,20 +713,18 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   Widget _buildGenderChart() {
     if (_genderData.isEmpty)
       return _buildChartCard(
-          'Distribución por Género', const Center(child: Text('No hay datos')));
+          'Distribución por Sexo', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.blue, Colors.pink];
     final sections = _genderData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
       final data = entry.value;
-      final isM = data.key == 'M';
       final total = _genderData.values.fold(0, (sum, count) => sum + count);
       final percentage = ((data.value / total) * 100).toStringAsFixed(1);
 
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: isM ? Colors.blue : Colors.pink,
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'gender'
             ? 140 // Increased from 95 to 140
             : 150, // Increased from 85 to 130
@@ -683,14 +734,15 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(_genderData, colors, chartType: 'gender');
+    final legend = _buildLegend(_genderData, _chartColors, chartType: 'gender');
 
     return _buildChartCard(
-      'Distribución por Género',
+      'Distribución por Sexo',
       PieChart(
         PieChartData(
           sections: sections,
@@ -732,7 +784,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       'Pendientes': pending.toInt(),
     };
 
-    final colors = [Colors.green, Colors.red];
     final sections = data.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
       final dataEntry = entry.value;
@@ -743,7 +794,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: dataEntry.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius:
             _touchedIndex == index && _currentTouchedChart == 'testCompletion'
                 ? 140
@@ -755,11 +806,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(data, colors, chartType: 'testCompletion');
+    final legend =
+        _buildLegend(data, _chartColors, chartType: 'testCompletion');
 
     return _buildChartCard(
       'Estado de Tests',
@@ -797,13 +850,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Profesión del Padre', const Center(child: Text('No hay datos')));
 
-    final colors = [
-      Colors.blue,
-      Colors.indigo,
-      Colors.cyan,
-      Colors.lightBlue,
-      Colors.teal
-    ];
     final sections =
         _fatherJobData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -814,7 +860,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'fatherJob'
             ? 140 // Increased from 95 to 140
             : 150, // Increased from 85 to 130
@@ -825,11 +871,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(_fatherJobData, colors, chartType: 'fatherJob');
+    final legend =
+        _buildLegend(_fatherJobData, _chartColors, chartType: 'fatherJob');
 
     return _buildChartCard(
       'Profesión del Padre',
@@ -865,13 +913,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Profesión de la Madre', const Center(child: Text('No hay datos')));
 
-    final colors = [
-      Colors.pink,
-      Colors.purple,
-      Colors.deepPurple,
-      Colors.pinkAccent,
-      Colors.redAccent
-    ];
     final sections =
         _motherJobData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -882,7 +923,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'motherJob'
             ? 140 // Increased from 80 to 140
             : 150, // Increased from 70 to 130
@@ -892,12 +933,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   ? 18 // Increased from 12 to 16
                   : 16, // Increased from 10 to 14
           fontWeight: FontWeight.bold,
-          color: Colors.black, // Changed from white to black
+          color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(_motherJobData, colors, chartType: 'motherJob');
+    final legend =
+        _buildLegend(_motherJobData, _chartColors, chartType: 'motherJob');
 
     return _buildChartCard(
       'Profesión de la Madre',
@@ -933,13 +976,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Estudios del Padre', const Center(child: Text('No hay datos')));
 
-    final colors = [
-      Colors.green,
-      Colors.lightGreen,
-      Colors.teal,
-      Colors.greenAccent,
-      Colors.lime
-    ];
     final sections =
         _fatherStudiesData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -951,7 +987,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius:
             _touchedIndex == index && _currentTouchedChart == 'fatherStudies'
                 ? 140 // Increased from 80 to 140
@@ -962,13 +998,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   ? 18 // Increased from 12 to 16
                   : 16, // Increased from 10 to 14
           fontWeight: FontWeight.bold,
-          color: Colors.black, // Changed from white to black
+          color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend =
-        _buildLegend(_fatherStudiesData, colors, chartType: 'fatherStudies');
+    final legend = _buildLegend(_fatherStudiesData, _chartColors,
+        chartType: 'fatherStudies');
 
     return _buildChartCard(
       'Estudios del Padre',
@@ -1004,13 +1041,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Estudios de la Madre', const Center(child: Text('No hay datos')));
 
-    final colors = [
-      Colors.orange,
-      Colors.deepOrange,
-      Colors.amber,
-      Colors.orangeAccent,
-      Colors.yellow
-    ];
     final sections =
         _motherStudiesData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1022,7 +1052,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius:
             _touchedIndex == index && _currentTouchedChart == 'motherStudies'
                 ? 140 // Increased from 80 to 140
@@ -1033,13 +1063,14 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   ? 18 // Increased from 12 to 16
                   : 16, // Increased from 10 to 14
           fontWeight: FontWeight.bold,
-          color: Colors.black, // Changed from white to black
+          color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend =
-        _buildLegend(_motherStudiesData, colors, chartType: 'motherStudies');
+    final legend = _buildLegend(_motherStudiesData, _chartColors,
+        chartType: 'motherStudies');
 
     return _buildChartCard(
       'Estudios de la Madre',
@@ -1075,7 +1106,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Estado de Adopción', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.red, Colors.green];
     final sections =
         _adoptionData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1086,7 +1116,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'adoption'
             ? 140 // Increased from 80 to 140
             : 150, // Increased from 70 to 130
@@ -1096,11 +1126,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               : 16, // Increased from 10 to 14
           fontWeight: FontWeight.bold,
           color: Colors.black, // Changed to black
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(_adoptionData, colors, chartType: 'adoption');
+    final legend =
+        _buildLegend(_adoptionData, _chartColors, chartType: 'adoption');
 
     return _buildChartCard(
       'Estado de Adopción',
@@ -1243,7 +1275,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
         style: GoogleFonts.inter(
           fontSize: 22,
           fontWeight: FontWeight.bold,
-          color: Colors.black87,
+          color: Color.fromARGB(255, 55, 57, 82),
         ),
       ),
     );
@@ -1254,7 +1286,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Tipo de Parto', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.pink, Colors.blue, Colors.green, Colors.orange];
     final sections =
         _birthTypeData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1265,7 +1296,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'birthType'
             ? 140
             : 150, // Increased from 80/70 to 140/130
@@ -1276,11 +1307,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16, // Increased font size
           fontWeight: FontWeight.bold,
           color: Colors.black, // Changed to black
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(_birthTypeData, colors, chartType: 'birthType');
+    final legend =
+        _buildLegend(_birthTypeData, _chartColors, chartType: 'birthType');
 
     return _buildChartCard(
       'Tipo de Parto',
@@ -1316,7 +1349,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Semanas de Gestación', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.red, Colors.orange, Colors.green, Colors.blue];
     final sections =
         _gestationWeeksData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1328,7 +1360,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius:
             _touchedIndex == index && _currentTouchedChart == 'gestationWeeks'
                 ? 140
@@ -1340,12 +1372,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16, // Increased font size
           fontWeight: FontWeight.bold,
           color: Colors.black, // Changed to black
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend =
-        _buildLegend(_gestationWeeksData, colors, chartType: 'gestationWeeks');
+    final legend = _buildLegend(_gestationWeeksData, _chartColors,
+        chartType: 'gestationWeeks');
 
     return _buildChartCard(
       'Semanas de Gestación',
@@ -1381,7 +1414,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Peso al Nacer', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.red, Colors.orange, Colors.green, Colors.blue];
     final sections =
         _birthWeightData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1393,7 +1425,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'birthWeight'
             ? 140 // Increased from 80 to 140
             : 150, // Increased from 70 to 130
@@ -1404,12 +1436,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16, // Increased from 9 to 14
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
     final legend =
-        _buildLegend(_birthWeightData, colors, chartType: 'birthWeight');
+        _buildLegend(_birthWeightData, _chartColors, chartType: 'birthWeight');
 
     return _buildChartCard(
       'Peso al Nacer',
@@ -1453,7 +1486,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Puntuación APGAR', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.red, Colors.orange, Colors.green];
     final sections = filteredData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
       final data = entry.value;
@@ -1463,7 +1495,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'apgar'
             ? 140
             : 150,
@@ -1473,11 +1505,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(filteredData, colors, chartType: 'apgar');
+    final legend = _buildLegend(filteredData, _chartColors, chartType: 'apgar');
 
     return _buildChartCard(
       'Puntuación APGAR',
@@ -1513,7 +1546,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard('Estado Civil de los Padres',
           const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.blue, Colors.green, Colors.orange, Colors.purple];
     final sections =
         _parentsCivilStatusData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1525,7 +1557,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index &&
                 _currentTouchedChart == 'parentsCivilStatus'
             ? 140
@@ -1537,11 +1569,12 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               : 16, // Increased font size
           fontWeight: FontWeight.bold,
           color: Colors.black, // Changed to black
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(_parentsCivilStatusData, colors,
+    final legend = _buildLegend(_parentsCivilStatusData, _chartColors,
         chartType: 'parentsCivilStatus');
 
     return _buildChartCard(
@@ -1577,7 +1610,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Número de Hermanos', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.teal, Colors.cyan, Colors.indigo, Colors.purple];
     final sections =
         _siblingsData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1588,7 +1620,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'siblings'
             ? 140
             : 150,
@@ -1598,11 +1630,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(_siblingsData, colors, chartType: 'siblings');
+    final legend =
+        _buildLegend(_siblingsData, _chartColors, chartType: 'siblings');
 
     return _buildChartCard(
       'Número de Hermanos',
@@ -1646,7 +1680,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Miembros de la Familia', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.deepOrange, Colors.amber, Colors.lime, Colors.teal];
     final sections = filteredData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
       final data = entry.value;
@@ -1656,7 +1689,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius:
             _touchedIndex == index && _currentTouchedChart == 'familyMembers'
                 ? 140
@@ -1668,12 +1701,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
     final legend =
-        _buildLegend(filteredData, colors, chartType: 'familyMembers');
+        _buildLegend(filteredData, _chartColors, chartType: 'familyMembers');
 
     return _buildChartCard(
       'Miembros de la Familia',
@@ -1709,13 +1743,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard('Situación Socioeconómica',
           const Center(child: Text('No hay datos')));
 
-    final colors = [
-      Colors.red,
-      Colors.orange,
-      Colors.yellow,
-      Colors.green,
-      Colors.blue
-    ];
     final sections =
         _socioeconomicData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
@@ -1727,7 +1754,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius:
             _touchedIndex == index && _currentTouchedChart == 'socioeconomic'
                 ? 140
@@ -1739,12 +1766,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16, // Increased font size
           fontWeight: FontWeight.bold,
           color: Colors.black, // Changed to black
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend =
-        _buildLegend(_socioeconomicData, colors, chartType: 'socioeconomic');
+    final legend = _buildLegend(_socioeconomicData, _chartColors,
+        chartType: 'socioeconomic');
 
     return _buildChartCard(
       'Situación Socioeconómica',
@@ -1787,7 +1815,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Nivel de Escolarización', const Center(child: Text('No hay datos')));
 
-    final colors = [Colors.indigo, Colors.blue, Colors.cyan, Colors.teal];
     final sections = filteredData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
       final data = entry.value;
@@ -1797,7 +1824,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'schooling'
             ? 140
             : 150,
@@ -1808,11 +1835,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(filteredData, colors, chartType: 'schooling');
+    final legend =
+        _buildLegend(filteredData, _chartColors, chartType: 'schooling');
 
     return _buildChartCard(
       'Nivel de Escolarización',
@@ -1856,13 +1885,6 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return _buildChartCard(
           'Motivo de Evaluación', const Center(child: Text('No hay datos')));
 
-    final colors = [
-      Colors.deepPurple,
-      Colors.purple,
-      Colors.pink,
-      Colors.red,
-      Colors.orange
-    ];
     final sections = filteredData.entries.toList().asMap().entries.map((entry) {
       final index = entry.key;
       final data = entry.value;
@@ -1872,7 +1894,7 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       return PieChartSectionData(
         value: data.value.toDouble(),
         title: '$percentage%',
-        color: colors[index % colors.length],
+        color: _chartColors[index % _chartColors.length],
         radius: _touchedIndex == index && _currentTouchedChart == 'evaluation'
             ? 140
             : 150,
@@ -1883,11 +1905,13 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                   : 16,
           fontWeight: FontWeight.bold,
           color: Colors.black,
+          shadows: _getChartTextShadows(),
         ),
       );
     }).toList();
 
-    final legend = _buildLegend(filteredData, colors, chartType: 'evaluation');
+    final legend =
+        _buildLegend(filteredData, _chartColors, chartType: 'evaluation');
 
     return _buildChartCard(
       'Motivo de Evaluación',

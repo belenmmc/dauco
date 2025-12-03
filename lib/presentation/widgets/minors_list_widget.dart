@@ -145,6 +145,13 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: isHovered ? _cardColor.withOpacity(0.8) : _cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               padding: const EdgeInsets.all(10.0),
               child: _MinorItem(minor: minor, screenWidth: widget.screenWidth),

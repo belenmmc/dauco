@@ -2,6 +2,7 @@ import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
 import 'package:dauco/presentation/pages/minor_info_page.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/import_results_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -54,8 +55,7 @@ class HomePageState extends State<HomePage> {
       ],
       child: BlocBuilder<GetCurrentUserBloc, GetCurrentUserState>(
         builder: (context, state) {
-          return Scaffold(
-            backgroundColor: Color.fromARGB(255, 167, 190, 213),
+          return AppScaffold(
             body: LayoutBuilder(
               builder: (context, constraints) {
                 return Center(

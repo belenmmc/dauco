@@ -2,8 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/usecases/reset_password_use_case.dart';
 import 'package:dauco/presentation/blocs/reset_password_bloc.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -27,8 +29,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     return BlocProvider(
       create: (context) => ResetPasswordBloc(
           resetPasswordUseCase: appInjector.get<ResetPasswordUseCase>()),
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+      child: AppScaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           toolbarHeight: 80,
           title: Padding(
@@ -38,13 +40,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               children: [
                 Text(
                   'Restablecer contraseña',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.inter(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 55, 57, 82)),
                 ),
               ],
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Color.fromARGB(255, 167, 190, 213),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: Center(
           child: ConstrainedBox(

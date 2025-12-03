@@ -2,9 +2,11 @@ import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:dauco/domain/usecases/get_all_items_use_case.dart';
 import 'package:dauco/presentation/blocs/get_items_bloc.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/test_info_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class TestInfoPage extends StatefulWidget {
   final Test test;
@@ -22,18 +24,21 @@ class _TestInfoPageState extends State<TestInfoPage> {
       create: (context) => GetItemsBloc(
         getItemsUseCase: appInjector.get<GetAllItemsUseCase>(),
       )..add(GetEvent(widget.test.testId)),
-      child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 167, 190, 213),
+      child: AppScaffold(
         appBar: AppBar(
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               'Información del Test',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 55, 57, 82)),
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: Color.fromARGB(255, 167, 190, 213),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: BlocListener<GetItemsBloc, GetItemsState>(
           listener: (context, state) {

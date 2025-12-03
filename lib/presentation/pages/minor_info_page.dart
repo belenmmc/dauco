@@ -1,10 +1,12 @@
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/presentation/pages/edit_minor_page.dart';
+import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/circular_button_widget.dart';
 import 'package:dauco/presentation/widgets/minor_info_widget.dart';
 import 'package:dauco/presentation/widgets/tests_list_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/usecases/get_all_tests_use_case.dart';
 import 'package:dauco/presentation/blocs/get_all_tests_bloc.dart';
@@ -35,8 +37,8 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
       create: (context) => GetTestsBloc(
         getAllTestsUseCase: appInjector.get<GetAllTestsUseCase>(),
       )..add(GetEvent(currentMinor.minorId)),
-      child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+      child: AppScaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           toolbarHeight: 65,
           title: Padding(
@@ -48,8 +50,10 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                   _currentIndex == 0
                       ? 'Información del Menor'
                       : 'Lista de Tests',
-                  style: const TextStyle(
-                      fontSize: 32, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.inter(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 55, 57, 82)),
                 ),
                 const SizedBox(width: 20),
                 if (widget.role == 'admin' && _currentIndex == 0)
@@ -76,7 +80,8 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
             ),
           ),
           automaticallyImplyLeading: true,
-          backgroundColor: const Color.fromARGB(255, 167, 190, 213),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: BlocListener<GetTestsBloc, GetTestsState>(
           listener: (context, state) {
@@ -89,9 +94,15 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
               );
             }
           },
-          child: _buildBody(),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Expanded(child: _buildBody()),
+                _buildPaginationControls(context),
+              ],
+            ),
+          ),
         ),
-        bottomNavigationBar: _buildPaginationControls(context),
       ),
     );
   }
@@ -124,7 +135,7 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
   }
 
   Widget _buildPaginationControls(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.only(bottom: 8.0, top: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

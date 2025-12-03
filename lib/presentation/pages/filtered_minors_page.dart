@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/services/analytics_service.dart';
 import '../../domain/entities/minor.entity.dart';
+import '../widgets/app_background.dart';
 
 class FilteredMinorsPage extends StatefulWidget {
   final String filterType;
@@ -56,7 +57,7 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
   String _getFilterTitle() {
     switch (widget.filterType) {
       case 'gender':
-        return 'Género: ${widget.filterValue}';
+        return 'Sexo: ${widget.filterValue}';
       case 'education':
         return 'Nivel de Escolarización: ${widget.filterValue}';
       case 'diagnosis':
@@ -86,21 +87,23 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 248, 250, 252),
+    return AppScaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          'Menores Filtrados',
-          style: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+          child: Text(
+            'Menores Filtrados',
+            style: GoogleFonts.inter(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Color.fromARGB(255, 55, 57, 82),
+            ),
           ),
         ),
         centerTitle: true,
@@ -120,8 +123,7 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 6,
+                    blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -178,7 +180,8 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
                                 _error!,
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
-                                  color: const Color.fromARGB(255, 107, 114, 128),
+                                  color:
+                                      const Color.fromARGB(255, 107, 114, 128),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -193,7 +196,9 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
                                   Icon(
                                     Icons.search_off,
                                     size: 64,
-                                    color: const Color.fromARGB(255, 107, 114, 128).withOpacity(0.6),
+                                    color:
+                                        const Color.fromARGB(255, 107, 114, 128)
+                                            .withOpacity(0.6),
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
@@ -201,7 +206,8 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
                                     style: GoogleFonts.inter(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color.fromARGB(255, 107, 114, 128),
+                                      color: const Color.fromARGB(
+                                          255, 107, 114, 128),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -209,7 +215,8 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
                                     'No hay menores que coincidan con este filtro',
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
-                                      color: const Color.fromARGB(255, 107, 114, 128),
+                                      color: const Color.fromARGB(
+                                          255, 107, 114, 128),
                                     ),
                                   ),
                                 ],
@@ -238,10 +245,9 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 4,
-            offset: const Offset(0, 1),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -254,7 +260,7 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: minor.sex == 'Masculino' 
+                  color: minor.sex == 'Masculino'
                       ? Colors.blue.withOpacity(0.1)
                       : Colors.pink.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -292,7 +298,8 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 99, 102, 241).withOpacity(0.1),
+                  color:
+                      const Color.fromARGB(255, 99, 102, 241).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -350,7 +357,7 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
   String _calculateAge(DateTime birthDate) {
     final now = DateTime.now();
     final age = now.year - birthDate.year;
-    if (now.month < birthDate.month || 
+    if (now.month < birthDate.month ||
         (now.month == birthDate.month && now.day < birthDate.day)) {
       return '${age - 1} años';
     }

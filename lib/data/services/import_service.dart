@@ -282,6 +282,10 @@ class ImportService {
     int updatedCount = 0;
     int skippedCount = 0;
 
+    // Variables for "Apply to All" functionality
+    ConflictResolution? globalResolution;
+    bool useGlobalResolution = false;
+
     for (int i = 0; i < data.length; i += batchSize) {
       try {
         final end = (i + batchSize > data.length) ? data.length : i + batchSize;
@@ -309,36 +313,62 @@ class ImportService {
                 await Supabase.instance.client.from(table).insert(record);
                 insertedCount++;
               } else {
-                // Record exists, show conflict dialog
-                final resolution = await showDialog<ConflictResolution>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext dialogContext) {
-                    return DuplicateConflictDialog(
-                      recordType: _getRecordTypeName(table),
-                      primaryKey: primaryKey,
-                      primaryKeyValue: primaryKeyValue,
-                      existingRecord: existingRecord,
-                      newRecord: record,
-                    );
-                  },
-                );
+                // Record exists, check if they are identical
+                if (DuplicateConflictDialog.areRecordsIdentical(
+                    existingRecord, record)) {
+                  // Records are identical, keep existing (auto-skip)
+                  skippedCount++;
+                } else {
+                  // Records are different, handle conflict
+                  ConflictResolution? resolution;
 
-                switch (resolution) {
-                  case ConflictResolution.keepExisting:
-                    skippedCount++;
-                    break;
-                  case ConflictResolution.replaceWithNew:
-                    await Supabase.instance.client
-                        .from(table)
-                        .update(record)
-                        .eq(primaryKey, primaryKeyValue);
-                    updatedCount++;
-                    break;
-                  case ConflictResolution.skipRecord:
-                  case null:
-                    skippedCount++;
-                    break;
+                  if (useGlobalResolution && globalResolution != null) {
+                    // Use the previously selected "apply to all" resolution
+                    resolution = globalResolution;
+                  } else {
+                    // Show conflict dialog
+                    final dialogResult = await showDialog<Map<String, dynamic>>(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext dialogContext) {
+                        return DuplicateConflictDialog(
+                          recordType: _getRecordTypeName(table),
+                          primaryKey: primaryKey,
+                          primaryKeyValue: primaryKeyValue,
+                          existingRecord: existingRecord,
+                          newRecord: record,
+                        );
+                      },
+                    );
+
+                    if (dialogResult != null) {
+                      resolution =
+                          dialogResult['resolution'] as ConflictResolution?;
+                      final applyToAll =
+                          dialogResult['applyToAll'] as bool? ?? false;
+
+                      if (applyToAll && resolution != null) {
+                        globalResolution = resolution;
+                        useGlobalResolution = true;
+                      }
+                    }
+                  }
+
+                  switch (resolution) {
+                    case ConflictResolution.keepExisting:
+                      skippedCount++;
+                      break;
+                    case ConflictResolution.replaceWithNew:
+                      await Supabase.instance.client
+                          .from(table)
+                          .update(record)
+                          .eq(primaryKey, primaryKeyValue);
+                      updatedCount++;
+                      break;
+                    case null:
+                      skippedCount++;
+                      break;
+                  }
                 }
               }
             } catch (e) {
