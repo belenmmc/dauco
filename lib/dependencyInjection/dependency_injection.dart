@@ -14,6 +14,7 @@ import 'package:dauco/domain/usecases/get_all_users_use_case.dart';
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_items_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_minors_use_case.dart';
+import 'package:dauco/domain/usecases/get_all_minors_for_export_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_tests_use_case.dart';
 import 'package:dauco/domain/usecases/load_file_use_case.dart';
 import 'package:dauco/domain/usecases/login_use_case.dart';
@@ -24,6 +25,7 @@ import 'package:dauco/domain/usecases/reset_password_use_case.dart';
 import 'package:dauco/domain/usecases/update_minor_use_case.dart';
 import 'package:dauco/domain/usecases/update_password_use_case.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
+import 'package:dauco/domain/usecases/export_minor_use_case.dart';
 import 'package:injector/injector.dart';
 
 final appInjector = Injector.appInstance;
@@ -90,6 +92,10 @@ void initInjection() {
   appInjector.registerSingleton<GetAllMinorsUseCase>(() =>
       GetAllMinorsUseCase(minorRepository: appInjector.get<MinorRepository>()));
 
+  appInjector.registerSingleton<GetAllMinorsForExportUseCase>(() =>
+      GetAllMinorsForExportUseCase(
+          minorRepository: appInjector.get<MinorRepository>()));
+
   appInjector.registerSingleton<UpdateMinorUseCase>(() =>
       UpdateMinorUseCase(minorRepository: appInjector.get<MinorRepository>()));
 
@@ -101,4 +107,6 @@ void initInjection() {
 
   appInjector.registerSingleton<GetAllItemsUseCase>(() =>
       GetAllItemsUseCase(itemRepository: appInjector.get<ItemRepository>()));
+
+  appInjector.registerSingleton<ExportMinorUseCase>(() => ExportMinorUseCase());
 }

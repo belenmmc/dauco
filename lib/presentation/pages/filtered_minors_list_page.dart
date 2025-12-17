@@ -4,7 +4,13 @@ import 'package:dauco/presentation/pages/minor_info_page.dart';
 import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/minors_list_widget.dart';
 import 'package:dauco/presentation/widgets/search_bar_widget.dart';
+import 'package:dauco/presentation/widgets/export_dialog.dart';
+import 'package:dauco/presentation/blocs/export_bloc.dart';
+import 'package:dauco/domain/usecases/export_minor_use_case.dart';
+import 'package:dauco/domain/usecases/get_all_minors_for_export_use_case.dart';
+import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FilteredMinorsListPage extends StatefulWidget {
   final String filterType;
@@ -246,6 +252,16 @@ class _FilteredMinorsListPageState extends State<FilteredMinorsListPage> {
               ],
             ),
           ),
+          // Add Export Button
+          if (_minors.isNotEmpty)
+            IconButton(
+              icon: const Icon(
+                Icons.download,
+                color: Color.fromARGB(255, 43, 45, 66),
+              ),
+              onPressed: () => _showExportDialog(),
+              tooltip: 'Exportar menores y tests',
+            ),
         ],
       ),
     );
@@ -350,6 +366,24 @@ class _FilteredMinorsListPageState extends State<FilteredMinorsListPage> {
       searchFilters:
           SearchFilters(), // Empty filters since we're already filtered
       role: 'admin', // Pass the role parameter
+    );
+  }
+
+  void _showExportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => ExportBloc(
+          exportMinorUseCase: appInjector.get<ExportMinorUseCase>(),
+          getAllMinorsForExportUseCase: appInjector.get<GetAllMinorsForExportUseCase>(),
+        ),
+        child: ExportDialog(
+          minors: _minors,
+          filterType: widget.filterType,
+          filterValue: widget.filterValue,
+          title: 'Exportar ${widget.chartTitle}',
+        ),
+      ),
     );
   }
 }

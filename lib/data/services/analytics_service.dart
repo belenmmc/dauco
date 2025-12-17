@@ -604,7 +604,32 @@ class AnalyticsService {
   Future<List<Minor>> getFilteredMinors(
       String filterType, String filterValue) async {
     try {
+      print('🔍 ANALYTICS SERVICE: Filtering by $filterType = $filterValue');
+
+      // Get current user's session and role
+      final session = _supabase.auth.currentSession;
+      if (session == null) {
+        throw Exception('No hay sesión activa');
+      }
+
+      // Get current user's role and manager_id
+      final userData = await _supabase
+          .from('usuarios')
+          .select('role, manager_id')
+          .eq('email', session.user.email.toString())
+          .single();
+
+      final userRole = userData['role'] as String;
+      final userManagerId = userData['manager_id'] as int;
+
       PostgrestFilterBuilder query = _supabase.from('Menores').select('*');
+
+      // Apply role-based filtering first
+      if (userRole == 'manager') {
+        // Managers can only see minors they manage
+        query = query.eq('responsable_id', userManagerId);
+      }
+      // Admins can see all minors (no additional filter needed)
 
       switch (filterType) {
         case 'gender':
@@ -614,7 +639,10 @@ class AnalyticsService {
           query = query.eq('nivel_escolarizacion', filterValue);
           break;
         case 'geographical':
-          query = query.eq('cp', filterValue);
+          // Use ilike for partial matching, just like the visual search bar
+          query = query.ilike('cp', '%$filterValue%');
+          print(
+              '🔍 ANALYTICS SERVICE: Using geographical filter: cp ILIKE %$filterValue%');
           break;
         case 'test_status':
           // Handle test status filtering
@@ -753,6 +781,10 @@ class AnalyticsService {
       for (final row in response) {
         minors.add(MinorMapper.toDomain(row));
       }
+
+      print('🔍 ANALYTICS SERVICE: Query returned ${minors.length} minors');
+      print(
+          '🔍 FILTERED MINOR IDS: ${minors.map((m) => m.minorId).take(10).toList()}...');
 
       return minors;
     } catch (e) {

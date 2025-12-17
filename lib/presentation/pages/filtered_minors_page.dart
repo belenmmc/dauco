@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/services/analytics_service.dart';
 import '../../domain/entities/minor.entity.dart';
 import '../widgets/app_background.dart';
+import '../widgets/export_dialog.dart';
+import '../blocs/export_bloc.dart';
+import '../../domain/usecases/export_minor_use_case.dart';
+import '../../domain/usecases/get_all_minors_for_export_use_case.dart';
+import '../../dependencyInjection/dependency_injection.dart';
 
 class FilteredMinorsPage extends StatefulWidget {
   final String filterType;
@@ -107,6 +113,15 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          if (_filteredMinors.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.download, color: Colors.black),
+              onPressed: _showExportDialog,
+              tooltip: 'Exportar menores y tests',
+            ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -362,5 +377,23 @@ class _FilteredMinorsPageState extends State<FilteredMinorsPage> {
       return '${age - 1} años';
     }
     return '$age años';
+  }
+
+  void _showExportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => ExportBloc(
+          exportMinorUseCase: appInjector.get<ExportMinorUseCase>(),
+          getAllMinorsForExportUseCase: appInjector.get<GetAllMinorsForExportUseCase>(),
+        ),
+        child: ExportDialog(
+          minors: _filteredMinors,
+          filterType: widget.filterType,
+          filterValue: widget.filterValue,
+          title: 'Exportar menores filtrados',
+        ),
+      ),
+    );
   }
 }

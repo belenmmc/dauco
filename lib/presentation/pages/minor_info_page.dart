@@ -10,6 +10,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/usecases/get_all_tests_use_case.dart';
 import 'package:dauco/presentation/blocs/get_all_tests_bloc.dart';
+import 'package:dauco/presentation/widgets/export_dialog.dart';
+import 'package:dauco/presentation/blocs/export_bloc.dart';
+import 'package:dauco/domain/usecases/export_minor_use_case.dart';
+import 'package:dauco/domain/usecases/get_all_minors_for_export_use_case.dart';
 
 class MinorInfoPage extends StatefulWidget {
   final Minor minor;
@@ -75,6 +79,12 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                       }
                       Navigator.pop(context, true);
                     },
+                  ),
+                if (_currentIndex == 0) const SizedBox(width: 10),
+                if (_currentIndex == 0)
+                  CircularButtonWidget(
+                    iconData: Icons.download_outlined,
+                    onPressed: _showExportDialog,
                   )
               ],
             ),
@@ -160,6 +170,21 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                 : const Color.fromARGB(255, 97, 135, 174).withOpacity(0.5),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showExportDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => ExportBloc(
+          exportMinorUseCase: appInjector.get<ExportMinorUseCase>(),
+          getAllMinorsForExportUseCase: appInjector.get<GetAllMinorsForExportUseCase>(),
+        ),
+        child: ExportDialog(
+          minor: currentMinor,
+        ),
       ),
     );
   }

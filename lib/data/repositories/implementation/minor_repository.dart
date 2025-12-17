@@ -13,6 +13,11 @@ class MinorRepository implements MinorRepositoryInterface {
   }
 
   @override
+  Future<List<Minor>> getAllMinorsForExport() {
+    return minorService.getAllMinorsForExport();
+  }
+
+  @override
   Future<void> updateMinor(Minor minor) {
     return minorService.updateMinor(minor);
   }

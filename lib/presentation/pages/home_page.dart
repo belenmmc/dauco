@@ -1,9 +1,14 @@
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
 import 'package:dauco/domain/usecases/pick_file_use_case.dart';
+import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/presentation/blocs/get_current_user_bloc.dart';
 import 'package:dauco/presentation/pages/minor_info_page.dart';
 import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:dauco/presentation/widgets/import_results_dialog.dart';
+import 'package:dauco/presentation/widgets/export_dialog.dart';
+import 'package:dauco/presentation/blocs/export_bloc.dart';
+import 'package:dauco/domain/usecases/export_minor_use_case.dart';
+import 'package:dauco/domain/usecases/get_all_minors_for_export_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -56,6 +61,46 @@ class HomePageState extends State<HomePage> {
       child: BlocBuilder<GetCurrentUserBloc, GetCurrentUserState>(
         builder: (context, state) {
           return AppScaffold(
+            floatingActionButton:
+                BlocBuilder<GetAllMinorsBloc, GetAllMinorsState>(
+              builder: (context, minorsState) {
+                if (minorsState is GetMinorsSuccess &&
+                    minorsState.minors.isNotEmpty) {
+                  // Check if admin needs filters applied
+                  bool isAdmin = state is GetCurrentUserSuccess &&
+                      state.getCurrentUser.role == 'admin';
+                  bool hasFilters = !_searchFilters.isEmpty;
+                  bool canExport = !isAdmin || hasFilters;
+
+                  return FloatingActionButton.extended(
+                    onPressed: canExport
+                        ? () => _showExportDialog(minorsState.minors)
+                        : null,
+                    icon: Icon(
+                      Icons.download,
+                      color: canExport
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.5),
+                    ),
+                    label: Text(
+                      isAdmin && !hasFilters
+                          ? 'Aplicar filtros para exportar'
+                          : 'Exportar Menores',
+                      style: TextStyle(
+                        color: canExport
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.5),
+                      ),
+                    ),
+                    backgroundColor: canExport
+                        ? const Color.fromARGB(255, 97, 135, 174)
+                        : const Color.fromARGB(255, 97, 135, 174)
+                            .withOpacity(0.5),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
             body: LayoutBuilder(
               builder: (context, constraints) {
                 return Center(
@@ -259,5 +304,57 @@ class HomePageState extends State<HomePage> {
         return ImportResultsDialog(importResults: importResults);
       },
     );
+  }
+
+  void _showExportDialog(List<Minor> allMinors) {
+    // Apply the same filtering logic as MinorsListWidget
+    List<Minor> minorsToExport = _getFilteredMinors(allMinors);
+
+    print('🔍 HOME PAGE: Total minors: ${allMinors.length}');
+    print('🔍 HOME PAGE: Filtered minors: ${minorsToExport.length}');
+    print(
+        '🔍 HOME PAGE: Filter applied: zipCode=${_searchFilters.filters[SearchField.zipCode]}');
+
+    showDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => ExportBloc(
+          exportMinorUseCase: appInjector.get<ExportMinorUseCase>(),
+          getAllMinorsForExportUseCase:
+              appInjector.get<GetAllMinorsForExportUseCase>(),
+        ),
+        child: ExportDialog(
+          minors: minorsToExport, // Use filtered minors instead of all minors
+          title: 'Exportar Todos los Menores',
+          filterType: _searchFilters.filters[SearchField.zipCode] != null
+              ? 'geographical'
+              : null,
+          filterValue: _searchFilters.filters[SearchField.zipCode]?.toString(),
+        ),
+      ),
+    );
+  }
+
+  // Copy the same filtering logic from MinorsListWidget
+  List<Minor> _getFilteredMinors(List<Minor> allMinors) {
+    if (_searchFilters.isEmpty) {
+      return allMinors;
+    }
+
+    return allMinors.where((minor) {
+      // Apply zipCode filter (exact same logic as MinorsListWidget)
+      final zipCodeFilter = _searchFilters.filters[SearchField.zipCode];
+      if (zipCodeFilter != null && zipCodeFilter.toString().isNotEmpty) {
+        if (!minor.zipCode
+            .toString()
+            .toLowerCase()
+            .contains(zipCodeFilter.toString().toLowerCase())) {
+          return false;
+        }
+      }
+
+      // Add other filters as needed...
+      return true;
+    }).toList();
   }
 }
