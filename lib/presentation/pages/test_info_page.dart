@@ -25,6 +25,7 @@ class _TestInfoPageState extends State<TestInfoPage> {
         getItemsUseCase: appInjector.get<GetAllItemsUseCase>(),
       )..add(GetEvent(widget.test.testId)),
       child: AppScaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           title: Padding(
             padding: const EdgeInsets.only(top: 8.0),

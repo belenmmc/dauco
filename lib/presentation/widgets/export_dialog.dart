@@ -5,6 +5,7 @@ import 'package:dauco/presentation/blocs/export_bloc.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
 import 'package:dauco/domain/entities/test.entity.dart';
 import 'package:dauco/data/services/export_service.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ExportDialog extends StatefulWidget {
   final Minor? minor;
@@ -34,6 +35,7 @@ class _ExportDialogState extends State<ExportDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: const Color.fromARGB(255, 248, 251, 255),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
@@ -284,7 +286,14 @@ class _ExportDialogState extends State<ExportDialog> {
     );
   }
 
-  void _exportAction() {
+  void _exportAction() async {
+    String? outputDir = await FilePicker.platform.getDirectoryPath();
+
+    if (outputDir == null) {
+      // User canceled the picker
+      return;
+    }
+
     List<Minor> minorsToExport = widget.minors ?? [];
 
     print('🔍 EXPORT DIALOG: Exporting ${minorsToExport.length} minors');
@@ -299,6 +308,7 @@ class _ExportDialogState extends State<ExportDialog> {
               format: _selectedFormat,
               filterType: widget.filterType,
               filterValue: widget.filterValue,
+              path: outputDir,
             ),
           );
     } else if (widget.minor != null) {
@@ -308,6 +318,7 @@ class _ExportDialogState extends State<ExportDialog> {
               minor: widget.minor!,
               tests: widget.tests,
               format: _selectedFormat,
+              path: outputDir,
             ),
           );
     }

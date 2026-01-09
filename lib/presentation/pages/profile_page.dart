@@ -1,7 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/user_model.entity.dart';
+import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
+import 'package:dauco/domain/usecases/get_imported_user_use_case.dart';
+import 'package:dauco/domain/usecases/update_imported_user_use_case.dart';
 import 'package:dauco/domain/usecases/logout_use_case.dart';
 import 'package:dauco/domain/usecases/update_password_use_case.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
@@ -13,6 +16,7 @@ import 'package:dauco/presentation/widgets/logout_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dauco/data/services/imported_user_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -29,9 +33,16 @@ class _ProfilePageState extends State<ProfilePage> {
   final _managerIdController = TextEditingController();
   final _roleController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  // Campos adicionales de tabla Usuarios
+  final _surnameController = TextEditingController();
+  final _zoneController = TextEditingController();
+
   bool _isPasswordVisible = false;
 
   UserModel? _currentUser;
+  ImportedUser? _importedUser;
+  bool _loadingImportedUser = false;
 
   void _setUserData(UserModel user) {
     _nameController.text = user.name;
@@ -39,6 +50,44 @@ class _ProfilePageState extends State<ProfilePage> {
     _managerIdController.text = user.managerId.toString();
     _roleController.text = user.role;
     _currentUser = user;
+
+    // Cargar datos de tabla Usuarios si es profesional (tiene managerId)
+    if (user.managerId > 0 && user.role != 'admin' && _importedUser == null) {
+      // Usar addPostFrameCallback para evitar setState durante build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadImportedUserData(user.managerId);
+      });
+    }
+  }
+
+  Future<void> _loadImportedUserData(int managerId) async {
+    setState(() {
+      _loadingImportedUser = true;
+    });
+
+    try {
+      final importedUserService = ImportedUserService();
+      final importedUser =
+          await importedUserService.getUserByManagerId(managerId);
+
+      if (importedUser != null) {
+        setState(() {
+          _importedUser = importedUser;
+          _surnameController.text = importedUser.surname;
+          _zoneController.text = importedUser.zone;
+          _loadingImportedUser = false;
+        });
+      } else {
+        setState(() {
+          _loadingImportedUser = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading imported user data: $e');
+      setState(() {
+        _loadingImportedUser = false;
+      });
+    }
   }
 
   Future<void> _confirmAndUpdate(BuildContext context) async {
@@ -46,6 +95,10 @@ class _ProfilePageState extends State<ProfilePage> {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 248, 251, 255),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text("Confirmar cambios"),
           content: const Text("¿Deseas actualizar tu perfil?"),
           actions: [
@@ -62,21 +115,56 @@ class _ProfilePageState extends State<ProfilePage> {
       );
 
       if (confirm == true) {
+        bool hasChanges = false;
+
         final updatedUser = UserModel(
           name: _nameController.text,
           email: _currentUser?.email ?? '',
-          managerId: int.tryParse(_managerIdController.text) ?? 0,
+          managerId: _currentUser?.managerId ?? 0,
           role: _currentUser?.role ?? '',
         );
 
-        if (updatedUser == _currentUser && _passwordController.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("No se detectaron cambios.")),
-          );
-          return;
+        if (updatedUser.name != _currentUser?.name) {
+          context
+              .read<UpdateUserBloc>()
+              .add(UpdateUserEvent(user: updatedUser));
+          hasChanges = true;
         }
 
-        context.read<UpdateUserBloc>().add(UpdateUserEvent(user: updatedUser));
+        // Actualizar apellidos en la tabla Usuarios si cambiaron
+        if (_importedUser != null && _currentUser?.role != 'admin') {
+          if (_surnameController.text != _importedUser!.surname) {
+            try {
+              final importedUserService = ImportedUserService();
+              final updatedImportedUser = ImportedUser(
+                managerId: _importedUser!.managerId,
+                name: _nameController.text,
+                surname: _surnameController.text,
+                yes: _importedUser!.yes,
+                registeredAt: _importedUser!.registeredAt,
+                zone: _importedUser!.zone,
+                minorsNum: _importedUser!.minorsNum,
+              );
+
+              await importedUserService.updateUser(updatedImportedUser);
+
+              setState(() {
+                _importedUser = updatedImportedUser;
+              });
+
+              hasChanges = true;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Apellidos actualizados exitosamente")),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Error al actualizar apellidos: $e")),
+              );
+            }
+          }
+        }
 
         if (_passwordController.text.isNotEmpty) {
           try {
@@ -88,11 +176,18 @@ class _ProfilePageState extends State<ProfilePage> {
                   content: Text("Contraseña actualizada exitosamente")),
             );
             _passwordController.clear();
+            hasChanges = true;
           } catch (e) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Error al actualizar contraseña: $e")),
             );
           }
+        }
+
+        if (!hasChanges) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("No se detectaron cambios.")),
+          );
         }
       }
     }
@@ -179,137 +274,199 @@ class _ProfilePageState extends State<ProfilePage> {
                         padding: const EdgeInsets.all(32),
                         child: Form(
                           key: _formKey,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const AutoSizeText(
-                                "Editar perfil",
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 55, 57, 82),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const AutoSizeText(
+                                  "Editar perfil",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 55, 57, 82),
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 20),
-                              TextFormField(
-                                controller: _nameController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Nombre'),
-                                validator: (value) =>
-                                    value == null || value.isEmpty
-                                        ? 'Ingresa un nombre'
-                                        : null,
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _emailController,
-                                enabled: false, // Campo deshabilitado
-                                decoration: const InputDecoration(
-                                  labelText: 'Email',
-                                  hintText: 'El email no se puede modificar',
+                                const SizedBox(height: 20),
+                                TextFormField(
+                                  controller: _nameController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Nombre'),
+                                  validator: (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Ingresa un nombre'
+                                          : null,
                                 ),
-                                style: TextStyle(
-                                  color: Colors.grey[
-                                      600], // Color gris para indicar que está deshabilitado
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _managerIdController,
-                                decoration: const InputDecoration(
-                                    labelText: 'ID del responsable'),
-                                keyboardType: TextInputType.number,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Ingresa un ID';
-                                  }
-                                  if (int.tryParse(value) == null) {
-                                    return 'ID inválido';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _roleController,
-                                enabled: false, // Campo deshabilitado
-                                decoration: const InputDecoration(
-                                  labelText: 'Rol',
-                                  hintText: 'El rol no se puede modificar',
-                                ),
-                                style: TextStyle(
-                                  color: Colors.grey[
-                                      600], // Color gris para indicar que está deshabilitado
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              TextFormField(
-                                controller: _passwordController,
-                                obscureText: !_isPasswordVisible,
-                                decoration: InputDecoration(
-                                  labelText: 'Nueva contraseña',
-                                  hintText: 'Nueva contraseña',
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _isPasswordVisible
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isPasswordVisible =
-                                            !_isPasswordVisible;
-                                      });
-                                    },
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: _emailController,
+                                  enabled: false, // Campo deshabilitado
+                                  decoration: const InputDecoration(
+                                    labelText: 'Email',
+                                    hintText: 'El email no se puede modificar',
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.grey[
+                                        600], // Color gris para indicar que está deshabilitado
                                   ),
                                 ),
-                                validator: (value) {
-                                  // Solo validar si se ha ingresado algo
-                                  if (value != null &&
-                                      value.isNotEmpty &&
-                                      value.length < 6) {
-                                    return 'La contraseña debe tener al menos 6 caracteres';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 32),
-                              BlocBuilder<UpdateUserBloc, UpdateUserState>(
-                                builder: (context, state) {
-                                  final isLoading = state is UpdateUserLoading;
-                                  return SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton(
-                                      onPressed: isLoading
-                                          ? null
-                                          : () => _confirmAndUpdate(context),
-                                      style: ElevatedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 18.0),
-                                        backgroundColor: const Color.fromARGB(
-                                            255, 97, 135, 174),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                        ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: _managerIdController,
+                                  enabled: false,
+                                  decoration: const InputDecoration(
+                                    labelText: 'ID del responsable',
+                                    hintText: 'El ID no se puede modificar',
+                                  ),
+                                  style: TextStyle(color: Colors.grey[600]),
+                                ),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: _roleController,
+                                  enabled: false, // Campo deshabilitado
+                                  decoration: const InputDecoration(
+                                    labelText: 'Rol',
+                                    hintText: 'El rol no se puede modificar',
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.grey[
+                                        600], // Color gris para indicar que está deshabilitado
+                                  ),
+                                ),
+
+                                // Campos adicionales para profesionales (integrados sin separador)
+                                if (_currentUser?.role != 'admin' &&
+                                    _currentUser?.managerId != 0) ...[
+                                  if (_loadingImportedUser) ...[
+                                    const SizedBox(height: 16),
+                                    const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: CircularProgressIndicator(),
                                       ),
-                                      child: isLoading
-                                          ? const SizedBox(
-                                              width: 24,
-                                              height: 24,
-                                              child: CircularProgressIndicator(
-                                                  strokeWidth: 2),
-                                            )
-                                          : const Text("Editar perfil",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.white)),
                                     ),
-                                  );
-                                },
-                              ),
-                            ],
+                                  ] else if (_importedUser != null) ...[
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _surnameController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Apellidos',
+                                      ),
+                                      validator: (value) =>
+                                          value == null || value.isEmpty
+                                              ? 'Ingresa los apellidos'
+                                              : null,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _zoneController,
+                                      enabled: false,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Zona',
+                                        hintText:
+                                            'La zona no se puede modificar',
+                                      ),
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      initialValue:
+                                          '${_importedUser!.registeredAt.day.toString().padLeft(2, '0')}/${_importedUser!.registeredAt.month.toString().padLeft(2, '0')}/${_importedUser!.registeredAt.year}',
+                                      enabled: false,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Fecha de Alta',
+                                        hintText:
+                                            'Fecha de registro en el sistema',
+                                      ),
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      initialValue:
+                                          '${_importedUser!.minorsNum} menores',
+                                      enabled: false,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Menores Asignados',
+                                        hintText:
+                                            'Número de menores bajo su responsabilidad',
+                                      ),
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                  ],
+                                ],
+
+                                const SizedBox(height: 24),
+                                const Divider(),
+                                const SizedBox(height: 16),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  obscureText: !_isPasswordVisible,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nueva contraseña',
+                                    hintText: 'Nueva contraseña',
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isPasswordVisible
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isPasswordVisible =
+                                              !_isPasswordVisible;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    // Solo validar si se ha ingresado algo
+                                    if (value != null &&
+                                        value.isNotEmpty &&
+                                        value.length < 6) {
+                                      return 'La contraseña debe tener al menos 6 caracteres';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 32),
+                                BlocBuilder<UpdateUserBloc, UpdateUserState>(
+                                  builder: (context, state) {
+                                    final isLoading =
+                                        state is UpdateUserLoading;
+                                    return SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: isLoading
+                                            ? null
+                                            : () => _confirmAndUpdate(context),
+                                        style: ElevatedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 18.0),
+                                          backgroundColor: const Color.fromARGB(
+                                              255, 97, 135, 174),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                          ),
+                                        ),
+                                        child: isLoading
+                                            ? const SizedBox(
+                                                width: 24,
+                                                height: 24,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                        strokeWidth: 2),
+                                              )
+                                            : const Text("Editar perfil",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.white)),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

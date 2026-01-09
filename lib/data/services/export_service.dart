@@ -31,7 +31,8 @@ class ExportService {
       {ExportFormat format = ExportFormat.excel,
       String? filterType,
       String? filterValue,
-      bool includeTests = true}) async {
+      bool includeTests = true,
+      required String path}) async {
     // Get current user's role
     final session = _supabase.auth.currentSession;
     if (session == null) {
@@ -63,10 +64,10 @@ class ExportService {
     String content;
     if (minors.length == 1) {
       content = await _exportSingleMinorWithTests(
-          minors.first, minorTests[minors.first.minorId] ?? [], format);
+          minors.first, minorTests[minors.first.minorId] ?? [], format, path);
     } else {
       content = await _exportMultipleMinorsWithTests(
-          minors, minorTests, format, filterType, filterValue);
+          minors, minorTests, format, filterType, filterValue, path);
     }
 
     return content;
@@ -74,7 +75,9 @@ class ExportService {
 
   /// Export a single minor's complete information
   Future<String> exportSingleMinor(Minor minor,
-      {List<Test>? tests, ExportFormat format = ExportFormat.excel}) async {
+      {List<Test>? tests,
+      ExportFormat format = ExportFormat.excel,
+      required String path}) async {
     // If tests not provided, fetch them automatically
     List<Test>? testsToUse = tests;
     if (testsToUse == null) {
@@ -89,39 +92,44 @@ class ExportService {
 
     switch (format) {
       case ExportFormat.csv:
-        return await _exportSingleMinorToCsv(minor, tests: testsToUse);
+        return await _exportSingleMinorToCsv(minor,
+            tests: testsToUse, path: path);
       case ExportFormat.json:
-        return await _exportSingleMinorToJson(minor, tests: testsToUse);
+        return await _exportSingleMinorToJson(minor,
+            tests: testsToUse, path: path);
       case ExportFormat.excel:
-        return await _exportSingleMinorToExcel(minor, tests: testsToUse);
+        return await _exportSingleMinorToExcel(minor,
+            tests: testsToUse, path: path);
     }
   }
 
   /// Export multiple minors
   Future<String> exportMultipleMinors(List<Minor> minors,
       {ExportFormat format = ExportFormat.excel,
-      String title = 'Reporte de Menores'}) async {
+      String title = 'Reporte de Menores',
+      required String path}) async {
     switch (format) {
       case ExportFormat.csv:
-        return await _exportMinorsToCsv(minors, title);
+        return await _exportMinorsToCsv(minors, title, path);
       case ExportFormat.json:
-        return _exportMinorsToJson(minors, title);
+        return _exportMinorsToJson(minors, title, path);
       case ExportFormat.excel:
-        return await _exportMinorsToExcel(minors, title);
+        return await _exportMinorsToExcel(minors, title, path);
     }
   }
 
   /// Export filtered minors report
   Future<String> exportFilteredReport(
       List<Minor> minors, String filterType, String filterValue,
-      {ExportFormat format = ExportFormat.excel}) async {
+      {ExportFormat format = ExportFormat.excel, required String path}) async {
     final title = 'Reporte Filtrado - $filterType: $filterValue';
-    return exportMultipleMinors(minors, format: format, title: title);
+    return exportMultipleMinors(minors,
+        format: format, title: title, path: path);
   }
 
   // CSV Export Methods
   Future<String> _exportSingleMinorToCsv(Minor minor,
-      {List<Test>? tests}) async {
+      {List<Test>? tests, required String path}) async {
     List<List<dynamic>> rows = [];
 
     // Header row with all minor fields
@@ -244,7 +252,8 @@ class ExportService {
     return const ListToCsvConverter().convert(rows);
   }
 
-  Future<String> _exportMinorsToCsv(List<Minor> minors, String title) async {
+  Future<String> _exportMinorsToCsv(
+      List<Minor> minors, String title, String path) async {
     List<List<dynamic>> rows = [];
 
     // Section 1: Minors Table (like Excel structure)
@@ -384,7 +393,7 @@ class ExportService {
 
   // JSON Export Methods
   Future<String> _exportSingleMinorToJson(Minor minor,
-      {List<Test>? tests}) async {
+      {List<Test>? tests, required String path}) async {
     final data = {
       'reporte': 'Información Individual del Menor',
       'generado_el': DateTime.now().toIso8601String(),
@@ -479,7 +488,7 @@ class ExportService {
     return const JsonEncoder.withIndent('  ').convert(data);
   }
 
-  String _exportMinorsToJson(List<Minor> minors, String title) {
+  String _exportMinorsToJson(List<Minor> minors, String title, String path) {
     final data = {
       'reporte': title,
       'generado_el': DateTime.now().toIso8601String(),
@@ -521,68 +530,23 @@ class ExportService {
   }
 
   /// Save export data - try Downloads, then show save dialog if fails
-  Future<String> saveToFile(
-      String content, String filename, ExportFormat format) async {
+  Future<String> saveToFile(String content, String filename,
+      ExportFormat format, String chosenPath) async {
     final extension = format == ExportFormat.excel ? 'xlsx' : format.name;
+    final file = File('$chosenPath/$filename.$extension');
 
     try {
-      // First attempt: Try to save directly to Downloads
-      String downloadsPath;
-      if (Platform.isMacOS) {
-        final home = Platform.environment['HOME'];
-        if (home != null) {
-          downloadsPath = '$home/Downloads';
-          final downloadsDirectory = Directory(downloadsPath);
-
-          // Ensure Downloads directory exists
-          if (!await downloadsDirectory.exists()) {
-            await downloadsDirectory.create(recursive: true);
-          }
-
-          final file = File('$downloadsPath/$filename.$extension');
-          await file.writeAsString(content, encoding: utf8);
-
-          print('✅ File saved successfully to Downloads: ${file.path}');
-          return file.path;
-        }
-      }
-      throw Exception('Could not access Downloads folder');
-    } catch (e) {
-      print('⚠️ Cannot save to Downloads: $e');
-
-      // Second attempt: Show save dialog to let user choose location
-      try {
-        String? outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Guardar archivo en Downloads o ubicación elegida',
-          fileName: '$filename.$extension',
-          type: FileType.custom,
-          allowedExtensions: [extension],
-          initialDirectory: Platform.environment['HOME'] != null
-              ? '${Platform.environment['HOME']}/Downloads'
-              : null,
-        );
-
-        if (outputFile != null) {
-          final file = File(outputFile);
-          await file.writeAsString(content, encoding: utf8);
-          print('✅ File saved to chosen location: ${file.path}');
-          return file.path;
-        } else {
-          throw Exception('El usuario canceló la descarga');
-        }
-      } catch (dialogError) {
-        print('❌ Save dialog failed: $dialogError');
-
-        // Final fallback: Documents directory
-        final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/$filename.$extension');
+      if (format == ExportFormat.excel) {
+        // For Excel, content is already bytes
+        await file.writeAsBytes(content.codeUnits);
+      } else {
         await file.writeAsString(content, encoding: utf8);
-
-        print('⚠️ Fallback: File saved to Documents folder: ${file.path}');
-        print(
-            '💡 To access: Open Finder → Go → Go to Folder → paste: ${file.path}');
-        return file.path;
       }
+      print('✅ File saved successfully to: ${file.path}');
+      return file.path;
+    } catch (e) {
+      print('❌ Failed to save file: $e');
+      throw Exception('No se pudo guardar el archivo en la ubicación elegida.');
     }
   }
 
@@ -598,14 +562,14 @@ class ExportService {
 
   // Helper methods for role-based export with tests
   Future<String> _exportSingleMinorWithTests(
-      Minor minor, List<Test> tests, ExportFormat format) async {
+      Minor minor, List<Test> tests, ExportFormat format, String path) async {
     switch (format) {
       case ExportFormat.csv:
-        return await _exportSingleMinorToCsv(minor, tests: tests);
+        return await _exportSingleMinorToCsv(minor, tests: tests, path: path);
       case ExportFormat.json:
-        return await _exportSingleMinorToJson(minor, tests: tests);
+        return await _exportSingleMinorToJson(minor, tests: tests, path: path);
       case ExportFormat.excel:
-        return await _exportSingleMinorToExcel(minor, tests: tests);
+        return await _exportSingleMinorToExcel(minor, tests: tests, path: path);
     }
   }
 
@@ -614,7 +578,8 @@ class ExportService {
       Map<int, List<Test>> minorTests,
       ExportFormat format,
       String? filterType,
-      String? filterValue) async {
+      String? filterValue,
+      String path) async {
     String title = 'Reporte Completo de Menores';
     if (filterType != null && filterValue != null) {
       title = 'Reporte Filtrado - $filterType: $filterValue';
@@ -622,16 +587,18 @@ class ExportService {
 
     switch (format) {
       case ExportFormat.csv:
-        return await _exportMinorsWithTestsToCsv(minors, minorTests, title);
+        return await _exportMinorsWithTestsToCsv(
+            minors, minorTests, title, path);
       case ExportFormat.json:
-        return _exportMinorsWithTestsToJson(minors, minorTests, title);
+        return _exportMinorsWithTestsToJson(minors, minorTests, title, path);
       case ExportFormat.excel:
-        return await _exportMinorsWithTestsToExcel(minors, minorTests, title);
+        return await _exportMinorsWithTestsToExcel(
+            minors, minorTests, title, path);
     }
   }
 
-  Future<String> _exportMinorsWithTestsToCsv(
-      List<Minor> minors, Map<int, List<Test>> minorTests, String title) async {
+  Future<String> _exportMinorsWithTestsToCsv(List<Minor> minors,
+      Map<int, List<Test>> minorTests, String title, String path) async {
     List<List<String>> rows = [];
 
     // Header
@@ -700,8 +667,8 @@ class ExportService {
     return const ListToCsvConverter().convert(rows);
   }
 
-  Future<String> _exportMinorsWithTestsToJson(
-      List<Minor> minors, Map<int, List<Test>> minorTests, String title) async {
+  Future<String> _exportMinorsWithTestsToJson(List<Minor> minors,
+      Map<int, List<Test>> minorTests, String title, String path) async {
     final data = {
       'reporte': title,
       'fecha_generacion': DateTime.now().toIso8601String(),
@@ -804,7 +771,7 @@ class ExportService {
 
   // Excel Export Methods
   Future<String> _exportSingleMinorToExcel(Minor minor,
-      {List<Test>? tests}) async {
+      {List<Test>? tests, required String path}) async {
     var excel = Excel.createExcel();
 
     // Create minor sheet
@@ -859,24 +826,21 @@ class ExportService {
     print('ExportService: Generated Excel file with ${bytes.length} bytes');
 
     // Save file
-    final directory = await getDownloadsDirectory();
-    if (directory != null) {
-      final filename =
-          '${_generateSafeFilename('dauco_info_${minor.minorId}')}.xlsx';
-      final file = File('${directory.path}/$filename');
+    final filename =
+        '${_generateSafeFilename('dauco_info_${minor.minorId}')}.xlsx';
+    final file = File('$path/$filename');
 
-      try {
-        await file.writeAsBytes(bytes);
-        print('ExportService: Successfully saved Excel file to: ${file.path}');
-        return file.path;
-      } catch (e) {
-        throw Exception('Failed to write Excel file to disk: $e');
-      }
+    try {
+      await file.writeAsBytes(bytes);
+      print('ExportService: Successfully saved Excel file to: ${file.path}');
+      return file.path;
+    } catch (e) {
+      throw Exception('Failed to write Excel file to disk: $e');
     }
-    throw Exception('Could not save file');
   }
 
-  Future<String> _exportMinorsToExcel(List<Minor> minors, String title) async {
+  Future<String> _exportMinorsToExcel(
+      List<Minor> minors, String title, String path) async {
     var excel = Excel.createExcel();
 
     // Create minors sheet
@@ -952,24 +916,20 @@ class ExportService {
     print('ExportService: Generated Excel file with ${bytes.length} bytes');
 
     // Save file
-    final directory = await getDownloadsDirectory();
-    if (directory != null) {
-      final filename = '${_generateSafeFilename('dauco_info')}.xlsx';
-      final file = File('${directory.path}/$filename');
+    final filename = '${_generateSafeFilename('dauco_info')}.xlsx';
+    final file = File('$path/$filename');
 
-      try {
-        await file.writeAsBytes(bytes);
-        print('ExportService: Successfully saved Excel file to: ${file.path}');
-        return file.path;
-      } catch (e) {
-        throw Exception('Failed to write Excel file to disk: $e');
-      }
+    try {
+      await file.writeAsBytes(bytes);
+      print('ExportService: Successfully saved Excel file to: ${file.path}');
+      return file.path;
+    } catch (e) {
+      throw Exception('Failed to write Excel file to disk: $e');
     }
-    throw Exception('Could not save file');
   }
 
-  Future<String> _exportMinorsWithTestsToExcel(
-      List<Minor> minors, Map<int, List<Test>> minorTests, String title) async {
+  Future<String> _exportMinorsWithTestsToExcel(List<Minor> minors,
+      Map<int, List<Test>> minorTests, String title, String path) async {
     var excel = Excel.createExcel();
 
     // Remove the default sheet that gets created automatically
@@ -1043,20 +1003,16 @@ class ExportService {
     print('ExportService: Generated Excel file with ${bytes.length} bytes');
 
     // Save file
-    final directory = await getDownloadsDirectory();
-    if (directory != null) {
-      final filename = '${_generateSafeFilename('dauco_info')}.xlsx';
-      final file = File('${directory.path}/$filename');
+    final filename = '${_generateSafeFilename('dauco_info')}.xlsx';
+    final file = File('$path/$filename');
 
-      try {
-        await file.writeAsBytes(bytes);
-        print('ExportService: Successfully saved Excel file to: ${file.path}');
-        return file.path;
-      } catch (e) {
-        throw Exception('Failed to write Excel file to disk: $e');
-      }
+    try {
+      await file.writeAsBytes(bytes);
+      print('ExportService: Successfully saved Excel file to: ${file.path}');
+      return file.path;
+    } catch (e) {
+      throw Exception('Failed to write Excel file to disk: $e');
     }
-    throw Exception('Could not save file');
   }
 
   // Helper methods to add data to Excel sheets

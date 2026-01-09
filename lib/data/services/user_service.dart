@@ -1,4 +1,5 @@
 import 'package:dauco/data/services/mappers/user_mapper.dart';
+import 'package:dauco/data/services/imported_user_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:dauco/domain/entities/user_model.entity.dart';
 
@@ -49,6 +50,18 @@ class UserService {
     final adminSession = Supabase.instance.client.auth.currentSession;
     if (adminSession == null) {
       throw Exception('No hay sesión de admin activa para crear usuarios');
+    }
+
+    // Validar que el managerId existe en la tabla Usuarios solo si es manager
+    if (role == 'manager' && managerId > 0) {
+      final importedUserService = ImportedUserService();
+      final managerExists =
+          await importedUserService.existsManagerId(managerId);
+      if (!managerExists) {
+        throw Exception(
+            'El ID de responsable $managerId no existe en la base de datos. '
+            'Debe importar primero los usuarios desde el archivo Excel.');
+      }
     }
 
     final existingUser = await Supabase.instance.client
@@ -160,9 +173,28 @@ class UserService {
   }
 
   Future<void> deleteUser(String email) async {
-    await Supabase.instance.client.rpc('delete_user', params: {
-      'user_email': email,
-    });
+    try {
+      // Primero obtener el managerId del usuario antes de borrarlo
+      final userData = await Supabase.instance.client
+          .from('usuarios')
+          .select('manager_id')
+          .eq('email', email)
+          .maybeSingle();
+
+      // Borrar de tabla de autenticación
+      await Supabase.instance.client.rpc('delete_user', params: {
+        'user_email': email,
+      });
+
+      // Si el usuario tenía managerId, borrar también de tabla Usuarios
+      if (userData != null && userData['manager_id'] != null) {
+        final importedUserService = ImportedUserService();
+        await importedUserService
+            .deleteUserByManagerId(userData['manager_id'] as int);
+      }
+    } catch (e) {
+      throw Exception('Error al eliminar usuario: $e');
+    }
   }
 
   Future<List<UserModel>> getAllUsers(int page) async {

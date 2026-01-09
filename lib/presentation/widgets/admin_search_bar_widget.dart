@@ -27,11 +27,13 @@ class UserSearchFilters {
 class AdminSearchBarWidget extends StatefulWidget {
   final Function(UserSearchFilters filters) onChanged;
   final String role;
+  final VoidCallback? onUserCreated;
 
   const AdminSearchBarWidget({
     super.key,
     required this.onChanged,
     required this.role,
+    this.onUserCreated,
   });
 
   @override
@@ -209,7 +211,9 @@ class _AdminSearchBarWidgetState extends State<AdminSearchBarWidget> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      RegisterUserButtonWidget(),
+                      RegisterUserButtonWidget(
+                        onUserCreated: widget.onUserCreated,
+                      ),
                     ],
                   ),
                 ],

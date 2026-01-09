@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dauco/data/services/mappers/item_mapper.dart';
 import 'package:dauco/data/services/mappers/minor_mapper.dart';
 import 'package:dauco/data/services/mappers/test_mapper.dart';
+import 'package:dauco/data/services/imported_user_service.dart';
 import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/entities/item.entity.dart';
 import 'package:dauco/domain/entities/minor.entity.dart';
@@ -237,10 +238,11 @@ class ImportService {
 
   Future<Map<String, Map<String, int>>> loadFile(
       Excel file, Function(double) onProgress, BuildContext context) async {
-    final totalSteps = 3.0;
+    final totalSteps = 4.0; // Ahora son 4 pasos (validación incluida)
     double currentStep = 0.0;
     Map<String, Map<String, int>> importResults = {};
 
+    // PASO 1: Importar usuarios PRIMERO
     final users = await uploadUsers(file);
     final userStats = await uploadInBatches(
         "Usuarios", users.map((u) => u.toJson()).toList(), context,
@@ -249,7 +251,25 @@ class ImportService {
     currentStep++;
     onProgress(currentStep / totalSteps);
 
+    // PASO 2: Validar que todos los responsable_id de los menores existen
     final minors = await uploadMinors(file);
+    final importedUserService = ImportedUserService();
+    final invalidManagerIds = <int>[];
+
+    for (var minor in minors) {
+      final exists = await importedUserService.existsManagerId(minor.managerId);
+      if (!exists && !invalidManagerIds.contains(minor.managerId)) {
+        invalidManagerIds.add(minor.managerId);
+      }
+    }
+
+    if (invalidManagerIds.isNotEmpty) {
+      throw Exception(
+          'Error: Los siguientes IDs de responsable no existen en la tabla Usuarios: ${invalidManagerIds.join(", ")}. '
+          'Por favor, asegúrese de que todos los responsables estén en la primera hoja del Excel.');
+    }
+
+    // PASO 3: Importar menores (ya validados)
     final minorStats = await uploadInBatches(
         "Menores", minors.map((m) => MinorMapper.toJson(m)).toList(), context,
         primaryKey: "menor_id");
@@ -257,6 +277,7 @@ class ImportService {
     currentStep++;
     onProgress(currentStep / totalSteps);
 
+    // PASO 4: Importar tests e items
     final tests = await uploadTests(file);
     final items = await uploadItems(file);
     final testStats = await uploadInBatches(

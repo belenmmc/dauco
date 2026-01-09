@@ -2,6 +2,8 @@ import 'package:dauco/domain/entities/user_model.entity.dart';
 import 'package:dauco/presentation/blocs/delete_user_bloc.dart';
 import 'package:dauco/presentation/pages/edit_user_page.dart';
 import 'package:dauco/presentation/widgets/admin_search_bar_widget.dart';
+import 'package:dauco/data/services/imported_user_service.dart';
+import 'package:injector/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -167,7 +169,7 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _UserItem extends StatelessWidget {
+class _UserItem extends StatefulWidget {
   final UserModel user;
   final double screenWidth;
   final VoidCallback onRefreshUsers;
@@ -177,6 +179,37 @@ class _UserItem extends StatelessWidget {
     required this.screenWidth,
     required this.onRefreshUsers,
   });
+
+  @override
+  State<_UserItem> createState() => _UserItemState();
+}
+
+class _UserItemState extends State<_UserItem> {
+  String? _surname;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSurname();
+  }
+
+  Future<void> _loadSurname() async {
+    if (widget.user.managerId > 0 && widget.user.role != 'admin') {
+      try {
+        final importedUserService =
+            Injector.appInstance.get<ImportedUserService>();
+        final importedUser =
+            await importedUserService.getUserByManagerId(widget.user.managerId);
+        if (importedUser != null && mounted) {
+          setState(() {
+            _surname = importedUser.surname;
+          });
+        }
+      } catch (e) {
+        // Si hay error, simplemente no mostramos apellidos
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +222,9 @@ class _UserItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                user.name,
+                _surname != null
+                    ? '${widget.user.name} ${_surname}'
+                    : widget.user.name,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -197,13 +232,13 @@ class _UserItem extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                'Email: ${user.email}',
+                'Email: ${widget.user.email}',
                 style: const TextStyle(
                   fontSize: 14,
                 ),
               ),
               Text(
-                'Id: ${user.managerId}',
+                'Id: ${widget.user.managerId}',
                 style: const TextStyle(
                   fontSize: 14,
                 ),
@@ -221,12 +256,12 @@ class _UserItem extends StatelessWidget {
                 final updated = await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditUserPage(user: user),
+                    builder: (context) => EditUserPage(user: widget.user),
                   ),
                 );
 
                 if (updated == true) {
-                  onRefreshUsers();
+                  widget.onRefreshUsers();
                 }
               },
             ),
@@ -238,9 +273,13 @@ class _UserItem extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (_) => AlertDialog(
+                    backgroundColor: const Color.fromARGB(255, 248, 251, 255),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     title: const Text('Confirmar eliminación'),
                     content: Text(
-                        '¿Estás seguro de que deseas eliminar a ${user.name}?'),
+                        '¿Estás seguro de que deseas eliminar a ${widget.user.name}?'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
@@ -251,7 +290,7 @@ class _UserItem extends StatelessWidget {
                           Navigator.pop(context);
                           context
                               .read<DeleteUserBloc>()
-                              .add(DeleteUserEvent(email: user.email));
+                              .add(DeleteUserEvent(email: widget.user.email));
                         },
                         child: const Text('Eliminar'),
                       ),

@@ -46,21 +46,16 @@ class EditMinorPage extends StatelessWidget {
           }
         },
         child: AppScaffold(
+          extendBodyBehindAppBar: true,
           appBar: AppBar(
             title: Padding(
-              padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Editar Menor',
-                    style: GoogleFonts.inter(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 55, 57, 82)),
-                  ),
-                  SizedBox(width: 20),
-                ],
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                'Editar Menor',
+                style: GoogleFonts.inter(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 55, 57, 82)),
               ),
             ),
             automaticallyImplyLeading: true,

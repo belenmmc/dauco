@@ -215,20 +215,19 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Form(
-        key: _formKey,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1500),
-                child: Card(
-                  margin:
-                      const EdgeInsets.only(top: 20.0, right: 16.0, left: 16.0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  color: const Color.fromARGB(255, 111, 145, 179),
+    return Form(
+      key: _formKey,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1500),
+              child: Card(
+                margin: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 0.0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                color: const Color.fromARGB(255, 111, 145, 179),
+                child: SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(children: [
@@ -510,9 +509,9 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                   ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -87,6 +87,11 @@ class AdminPageState extends State<AdminPage> {
                               role: state is GetCurrentUserSuccess
                                   ? state.getCurrentUser.role
                                   : '',
+                              onUserCreated: () {
+                                // Refrescar la lista de usuarios cuando se crea uno nuevo
+                                BlocProvider.of<GetAllUsersBloc>(context)
+                                    .add(GetEvent());
+                              },
                             ),
                           ),
                           Expanded(

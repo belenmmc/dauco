@@ -12,9 +12,9 @@ class TestInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 16.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Color.fromARGB(255, 206, 219, 237),
+      color: const Color.fromARGB(255, 231, 242, 255),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -41,6 +41,7 @@ class TestInfoWidget extends StatelessWidget {
         SizedBox(width: 16),
         Expanded(
           child: Card(
+            color: Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
@@ -103,6 +104,7 @@ class TestInfoWidget extends StatelessWidget {
 
     return Expanded(
       child: Card(
+        color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),

@@ -12,11 +12,13 @@ class ExportSingleMinorEvent extends ExportEvent {
   final Minor minor;
   final List<Test>? tests;
   final ExportFormat format;
+  final String path;
 
   ExportSingleMinorEvent({
     required this.minor,
     this.tests,
     this.format = ExportFormat.excel,
+    required this.path,
   });
 }
 
@@ -24,11 +26,13 @@ class ExportMultipleMinorsEvent extends ExportEvent {
   final List<Minor> minors;
   final ExportFormat format;
   final String title;
+  final String path;
 
   ExportMultipleMinorsEvent({
     required this.minors,
     this.format = ExportFormat.excel,
     this.title = 'Reporte de Menores',
+    required this.path,
   });
 }
 
@@ -37,12 +41,14 @@ class ExportFilteredReportEvent extends ExportEvent {
   final String filterType;
   final String filterValue;
   final ExportFormat format;
+  final String path;
 
   ExportFilteredReportEvent({
     required this.minors,
     required this.filterType,
     required this.filterValue,
     this.format = ExportFormat.excel,
+    required this.path,
   });
 }
 
@@ -51,12 +57,14 @@ class ExportWithRoleValidationEvent extends ExportEvent {
   final ExportFormat format;
   final String? filterType;
   final String? filterValue;
+  final String path;
 
   ExportWithRoleValidationEvent({
     required this.minors,
     this.format = ExportFormat.excel,
     this.filterType,
     this.filterValue,
+    required this.path,
   });
 }
 
@@ -111,6 +119,7 @@ class ExportBloc extends Bloc<ExportEvent, ExportState> {
         event.minor,
         tests: event.tests,
         format: event.format,
+        path: event.path,
       );
 
       emit(ExportSuccess(
@@ -132,6 +141,7 @@ class ExportBloc extends Bloc<ExportEvent, ExportState> {
         event.minors,
         format: event.format,
         title: event.title,
+        path: event.path,
       );
 
       emit(ExportSuccess(
@@ -155,6 +165,7 @@ class ExportBloc extends Bloc<ExportEvent, ExportState> {
         event.filterType,
         event.filterValue,
         format: event.format,
+        path: event.path,
       );
 
       emit(ExportSuccess(
@@ -187,6 +198,7 @@ class ExportBloc extends Bloc<ExportEvent, ExportState> {
         format: event.format,
         filterType: event.filterType,
         filterValue: event.filterValue,
+        path: event.path,
       );
 
       String message;

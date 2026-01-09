@@ -4,6 +4,7 @@ import 'package:dauco/data/repositories/implementation/minor_repository.dart';
 import 'package:dauco/data/repositories/implementation/test_repository.dart';
 import 'package:dauco/data/repositories/implementation/user_repository.dart';
 import 'package:dauco/data/services/import_service.dart';
+import 'package:dauco/data/services/imported_user_service.dart';
 import 'package:dauco/data/services/item_service.dart';
 import 'package:dauco/data/services/minor_service.dart';
 import 'package:dauco/data/services/test_service.dart';
@@ -12,6 +13,9 @@ import 'package:dauco/domain/usecases/delete_minor_use_case.dart';
 import 'package:dauco/domain/usecases/delete_user_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_users_use_case.dart';
 import 'package:dauco/domain/usecases/get_current_user_use_case.dart';
+import 'package:dauco/domain/usecases/get_imported_user_use_case.dart';
+import 'package:dauco/domain/usecases/update_imported_user_use_case.dart';
+import 'package:dauco/domain/usecases/validate_manager_id_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_items_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_minors_use_case.dart';
 import 'package:dauco/domain/usecases/get_all_minors_for_export_use_case.dart';
@@ -34,6 +38,9 @@ void initInjection() {
   appInjector.registerSingleton<UserService>(() => UserService());
 
   appInjector.registerSingleton<ImportService>(() => ImportService());
+
+  appInjector
+      .registerSingleton<ImportedUserService>(() => ImportedUserService());
 
   appInjector.registerSingleton<MinorService>(() => MinorService());
 
@@ -109,4 +116,17 @@ void initInjection() {
       GetAllItemsUseCase(itemRepository: appInjector.get<ItemRepository>()));
 
   appInjector.registerSingleton<ExportMinorUseCase>(() => ExportMinorUseCase());
+
+  // Imported User use cases
+  appInjector.registerSingleton<GetImportedUserUseCase>(() =>
+      GetImportedUserUseCase(
+          importedUserService: appInjector.get<ImportedUserService>()));
+
+  appInjector.registerSingleton<UpdateImportedUserUseCase>(() =>
+      UpdateImportedUserUseCase(
+          importedUserService: appInjector.get<ImportedUserService>()));
+
+  appInjector.registerSingleton<ValidateManagerIdUseCase>(() =>
+      ValidateManagerIdUseCase(
+          importedUserService: appInjector.get<ImportedUserService>()));
 }

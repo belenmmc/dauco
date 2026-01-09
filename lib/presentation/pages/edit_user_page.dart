@@ -1,12 +1,15 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dauco/dependencyInjection/dependency_injection.dart';
 import 'package:dauco/domain/entities/user_model.entity.dart';
+import 'package:dauco/domain/entities/imported_user.entity.dart';
 import 'package:dauco/domain/usecases/update_user_use_case.dart';
+import 'package:dauco/data/services/imported_user_service.dart';
 import 'package:dauco/presentation/blocs/update_user_bloc.dart';
 import 'package:dauco/presentation/widgets/app_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:injector/injector.dart';
 
 class EditUserPage extends StatefulWidget {
   final UserModel user;
@@ -22,16 +25,56 @@ class _EditUserPageState extends State<EditUserPage> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _managerIdController;
+  TextEditingController? _surnameController;
+  TextEditingController? _zoneController;
   String? _selectedRole;
+  ImportedUser? _importedUser;
+  bool _loadingImportedUser = false;
 
   @override
   void initState() {
+    super.initState();
     _nameController = TextEditingController(text: widget.user.name);
     _emailController = TextEditingController(text: widget.user.email);
     _managerIdController =
         TextEditingController(text: widget.user.managerId.toString());
     _selectedRole = widget.user.role;
-    super.initState();
+
+    // Cargar datos de tabla Usuarios si es manager (tiene managerId > 0)
+    if (widget.user.managerId > 0 && widget.user.role != 'admin') {
+      _loadImportedUserData(widget.user.managerId);
+    }
+  }
+
+  Future<void> _loadImportedUserData(int managerId) async {
+    setState(() {
+      _loadingImportedUser = true;
+    });
+
+    try {
+      final importedUserService =
+          Injector.appInstance.get<ImportedUserService>();
+      final importedUser =
+          await importedUserService.getUserByManagerId(managerId);
+
+      if (importedUser != null) {
+        setState(() {
+          _importedUser = importedUser;
+          _surnameController =
+              TextEditingController(text: importedUser.surname);
+          _zoneController = TextEditingController(text: importedUser.zone);
+          _loadingImportedUser = false;
+        });
+      } else {
+        setState(() {
+          _loadingImportedUser = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _loadingImportedUser = false;
+      });
+    }
   }
 
   void _onUpdatePressed(BuildContext context) {
@@ -45,6 +88,34 @@ class _EditUserPageState extends State<EditUserPage> {
     );
 
     context.read<UpdateUserBloc>().add(UpdateUserEvent(user: updatedUser));
+
+    // Si hay datos importados, actualizar tabla Usuarios (nombre, apellidos, zona)
+    if (_importedUser != null &&
+        _surnameController != null &&
+        _zoneController != null) {
+      final importedUserService =
+          Injector.appInstance.get<ImportedUserService>();
+      final updatedImportedUser = ImportedUser(
+        managerId: _importedUser!.managerId,
+        name: _nameController.text.trim(),
+        surname: _surnameController!.text.trim(),
+        zone: _zoneController!.text.trim(),
+        registeredAt: _importedUser!.registeredAt,
+        minorsNum: _importedUser!.minorsNum,
+        yes: _importedUser!.yes,
+      );
+      importedUserService.updateUser(updatedImportedUser);
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _managerIdController.dispose();
+    _surnameController?.dispose();
+    _zoneController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -76,6 +147,7 @@ class _EditUserPageState extends State<EditUserPage> {
             constraints: const BoxConstraints(maxWidth: 480),
             child: Card(
               elevation: 8,
+              color: const Color.fromARGB(255, 248, 251, 255),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -113,67 +185,143 @@ class _EditUserPageState extends State<EditUserPage> {
                             minFontSize: 12,
                           ),
                           const SizedBox(height: 20),
-                          TextFormField(
-                            controller: _nameController,
-                            decoration:
-                                const InputDecoration(labelText: 'Nombre'),
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Ingresa un nombre'
-                                : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _emailController,
-                            enabled: false,
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              hintText: 'El email no se puede modificar',
-                            ),
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _managerIdController,
-                            decoration: const InputDecoration(
-                                labelText: 'ID del responsable'),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Ingresa un ID';
-                              }
-                              if (int.tryParse(value) == null) {
-                                return 'ID inválido';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          DropdownButtonFormField<String>(
-                            value: _selectedRole,
-                            decoration: const InputDecoration(
-                              labelText: 'Rol',
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'admin',
-                                child: Text('Administrador'),
+                          // Datos editables en dos columnas
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      controller: _nameController,
+                                      decoration: const InputDecoration(
+                                          labelText: 'Nombre'),
+                                      validator: (value) =>
+                                          value == null || value.isEmpty
+                                              ? 'Ingresa un nombre'
+                                              : null,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _managerIdController,
+                                      enabled: false,
+                                      decoration: const InputDecoration(
+                                          labelText: 'ID del responsable'),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    if (_importedUser != null) ...[
+                                      const SizedBox(height: 16),
+                                      TextFormField(
+                                        controller: _zoneController,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Zona',
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
-                              DropdownMenuItem(
-                                value: 'manager',
-                                child: Text('Responsable'),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    if (_importedUser != null)
+                                      TextFormField(
+                                        controller: _surnameController,
+                                        decoration: const InputDecoration(
+                                            labelText: 'Apellidos'),
+                                        validator: (value) =>
+                                            value == null || value.isEmpty
+                                                ? 'Ingresa los apellidos'
+                                                : null,
+                                      )
+                                    else
+                                      TextFormField(
+                                        controller: _emailController,
+                                        enabled: false,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Email',
+                                          hintText:
+                                              'El email no se puede modificar',
+                                        ),
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      initialValue: _selectedRole == 'admin'
+                                          ? 'Administrador'
+                                          : 'Responsable',
+                                      enabled: false,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Rol',
+                                      ),
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    if (_importedUser != null) ...[
+                                      const SizedBox(height: 16),
+                                      TextFormField(
+                                        initialValue:
+                                            _importedUser!.minorsNum.toString(),
+                                        enabled: false,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Número de Menores',
+                                        ),
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ),
                             ],
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedRole = newValue;
-                              });
-                            },
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Selecciona un rol'
-                                : null,
                           ),
+                          // Campos de solo lectura en fila completa
+                          if (_importedUser != null) ...[
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _emailController,
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                labelText: 'Email',
+                                hintText: 'El email no se puede modificar',
+                              ),
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              initialValue:
+                                  '${_importedUser!.registeredAt.day.toString().padLeft(2, '0')}/${_importedUser!.registeredAt.month.toString().padLeft(2, '0')}/${_importedUser!.registeredAt.year}',
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                labelText: 'Fecha de Alta',
+                              ),
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ] else ...[
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _emailController,
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                labelText: 'Email',
+                                hintText: 'El email no se puede modificar',
+                              ),
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 24),
                           SizedBox(
                             width: double.infinity,
