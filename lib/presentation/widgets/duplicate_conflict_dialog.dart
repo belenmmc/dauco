@@ -88,6 +88,13 @@ class DuplicateConflictDialog extends StatefulWidget {
       return _normalizeDateString(stringValue);
     }
 
+    // Normalize numeric strings (remove leading zeros, handle 0 as null)
+    final numValue = num.tryParse(stringValue);
+    if (numValue != null) {
+      if (numValue == 0) return null; // Treat 0 as null
+      return numValue.toString();
+    }
+
     return stringValue;
   }
 
@@ -98,9 +105,13 @@ class DuplicateConflictDialog extends StatefulWidget {
     // 2023-12-25T10:30:00
     // 2023-12-25T10:30:00.000
     // 2023-12-25 10:30:00
+    // Also check if DateTime.tryParse can handle it
     final dateRegex =
         RegExp(r'^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}:\d{2}(\.\d{3})?)?$');
-    return dateRegex.hasMatch(value);
+    if (dateRegex.hasMatch(value)) return true;
+
+    // Try parsing as DateTime to catch other formats
+    return DateTime.tryParse(value) != null;
   }
 
   /// Normalize date strings to a common format for comparison
@@ -122,16 +133,9 @@ class DuplicateConflictDialog extends StatefulWidget {
       }
 
       if (date != null) {
-        // If time is midnight, return just the date part
-        if (date.hour == 0 &&
-            date.minute == 0 &&
-            date.second == 0 &&
-            date.millisecond == 0) {
-          return date.toIso8601String().split('T')[0];
-        } else {
-          // Return full datetime without milliseconds
-          return date.toIso8601String().split('.')[0];
-        }
+        // Always return just the date part (yyyy-mm-dd) for comparison
+        // This ignores time component completely
+        return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
       }
     } catch (e) {
       // If parsing fails, return original string
@@ -171,7 +175,20 @@ class _DuplicateConflictDialogState extends State<DuplicateConflictDialog> {
           DuplicateConflictDialog._normalizeValue(existingValue);
       final normalizedNew = DuplicateConflictDialog._normalizeValue(newValue);
 
-      if (normalizedExisting != normalizedNew) {
+      // Only mark as different if both values are not null and they differ
+      // If one is null and the other is not, only mark as different if the non-null value is meaningful
+      if (normalizedExisting == null && normalizedNew == null) {
+        // Both null, consider equal
+        continue;
+      } else if (normalizedExisting == null || normalizedNew == null) {
+        // One is null, check if the other is a meaningful value (not 0, not empty)
+        final nonNullValue = normalizedExisting ?? normalizedNew;
+        if (nonNullValue == '0' || nonNullValue?.isEmpty == true) {
+          // Treat 0 or empty as equivalent to null
+          continue;
+        }
+        _differentFields.add(key);
+      } else if (normalizedExisting != normalizedNew) {
         _differentFields.add(key);
       }
     }

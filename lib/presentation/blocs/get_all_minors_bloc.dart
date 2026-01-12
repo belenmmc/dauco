@@ -12,8 +12,22 @@ class GetEvent extends GetAllMinorsEvent {
 
 class LoadMoreMinorsEvent extends GetAllMinorsEvent {
   final int page;
+  final String? filterManagerId;
+  final String? filterName;
+  final String? filterSex;
+  final String? filterZipCode;
+  final DateTime? filterBirthdateFrom;
+  final DateTime? filterBirthdateTo;
 
-  LoadMoreMinorsEvent(this.page);
+  LoadMoreMinorsEvent(
+    this.page, {
+    this.filterManagerId,
+    this.filterName,
+    this.filterSex,
+    this.filterZipCode,
+    this.filterBirthdateFrom,
+    this.filterBirthdateTo,
+  });
 
   int get getPage => page;
 }
@@ -64,7 +78,15 @@ class GetAllMinorsBloc extends Bloc<GetAllMinorsEvent, GetAllMinorsState> {
       LoadMoreMinorsEvent event, Emitter<GetAllMinorsState> emit) async {
     emit(GetMinorsLoading());
     try {
-      final minors = await getAllMinorsUseCase.execute(event.page);
+      final minors = await getAllMinorsUseCase.execute(
+        event.page,
+        filterManagerId: event.filterManagerId,
+        filterName: event.filterName,
+        filterSex: event.filterSex,
+        filterZipCode: event.filterZipCode,
+        filterBirthdateFrom: event.filterBirthdateFrom,
+        filterBirthdateTo: event.filterBirthdateTo,
+      );
       emit(GetMinorsSuccess(minors));
     } catch (e) {
       emit(GetAllMinorsError(error: e.toString()));

@@ -36,6 +36,7 @@ class LoginUserPageState extends State<LoginPage> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
                 child: Card(
+                  color: const Color.fromARGB(255, 248, 251, 255),
                   elevation: 8,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -69,12 +70,16 @@ class LoginUserPageState extends State<LoginPage> {
                                 const SnackBar(
                                   content:
                                       Text('Sesión iniciada correctamente'),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 55, 57, 82),
                                 ),
                               );
                             } else if (state is LoginError) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(state.error),
+                                const SnackBar(
+                                  content: Text('Error al iniciar sesión'),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 55, 57, 82),
                                 ),
                               );
                             }
@@ -109,17 +114,20 @@ class LoginUserPageState extends State<LoginPage> {
                                   decoration: InputDecoration(
                                     hintText: '••••••••',
                                     border: const OutlineInputBorder(),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        isObscure
-                                            ? Icons.visibility_off
-                                            : Icons.visibility,
+                                    suffixIcon: Tooltip(
+                                      message: 'Ver contraseña',
+                                      child: IconButton(
+                                        icon: Icon(
+                                          isObscure
+                                              ? Icons.visibility_off
+                                              : Icons.visibility,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            isObscure = !isObscure;
+                                          });
+                                        },
                                       ),
-                                      onPressed: () {
-                                        setState(() {
-                                          isObscure = !isObscure;
-                                        });
-                                      },
                                     ),
                                   ),
                                 ),
@@ -146,7 +154,7 @@ class LoginUserPageState extends State<LoginPage> {
                                             fontSize: 16, color: Colors.white)),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                /* const SizedBox(height: 16),
                                 Center(
                                   child: TextButton(
                                     onPressed: () {
@@ -167,7 +175,7 @@ class LoginUserPageState extends State<LoginPage> {
                                       ),
                                     ),
                                   ),
-                                ),
+                                ), */
                               ],
                             );
                           }),

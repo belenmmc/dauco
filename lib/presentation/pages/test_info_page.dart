@@ -45,8 +45,9 @@ class _TestInfoPageState extends State<TestInfoPage> {
           listener: (context, state) {
             if (state is GetItemsError) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error: ${state.error}'),
+                const SnackBar(
+                  content: Text('Error al cargar los items'),
+                  backgroundColor: Color.fromARGB(255, 55, 57, 82),
                   duration: Duration(seconds: 2),
                 ),
               );

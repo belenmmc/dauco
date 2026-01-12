@@ -6,7 +6,19 @@ class GetAllUsersUseCase {
 
   GetAllUsersUseCase({required this.userRepository});
 
-  Future<List<UserModel>> execute(int page) async {
-    return await userRepository.getAllUsers(page);
+  Future<List<UserModel>> execute(
+    int page, {
+    String? filterName,
+    String? filterEmail,
+    String? filterRole,
+    String? filterManagerId,
+  }) async {
+    return await userRepository.getAllUsers(
+      page,
+      filterName: filterName,
+      filterEmail: filterEmail,
+      filterRole: filterRole,
+      filterManagerId: filterManagerId,
+    );
   }
 }

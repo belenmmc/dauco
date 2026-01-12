@@ -6,7 +6,8 @@ import 'package:dauco/presentation/widgets/app_background.dart';
 import 'filtered_minors_list_page.dart';
 
 class AnalyticsPage extends StatefulWidget {
-  const AnalyticsPage({super.key});
+  final String? role;
+  const AnalyticsPage({super.key, this.role});
 
   @override
   State<AnalyticsPage> createState() => _AnalyticsPageState();
@@ -102,6 +103,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
   }
 
   void _navigateToFilteredList(String filterValue, String chartType) {
+    // Only admins can navigate to filtered lists
+    if (widget.role != 'admin') {
+      return;
+    }
+
     String filterType;
     String chartTitle;
 

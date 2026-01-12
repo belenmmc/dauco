@@ -41,7 +41,10 @@ class EditMinorPage extends StatelessWidget {
         listener: (context, state) {
           if (state is DeleteMinorError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error al eliminar: ${state.error}')),
+              const SnackBar(
+                content: Text('Error al eliminar el menor'),
+                backgroundColor: Color.fromARGB(255, 55, 57, 82),
+              ),
             );
           }
         },

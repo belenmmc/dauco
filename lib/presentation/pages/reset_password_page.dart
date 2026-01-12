@@ -57,6 +57,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             constraints: const BoxConstraints(maxWidth: 480),
             child: Card(
               elevation: 8,
+              color: const Color.fromARGB(255, 248, 251, 255),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -86,15 +87,18 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               const SnackBar(
                                 content: Text(
                                     'Se ha enviado un enlace de restablecimiento a tu email'),
-                                backgroundColor: Colors.green,
+                                backgroundColor:
+                                    Color.fromARGB(255, 55, 57, 82),
                               ),
                             );
                             Navigator.pop(context);
                           } else if (state is ResetPasswordError) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(state.error),
-                                backgroundColor: Colors.red,
+                              const SnackBar(
+                                content:
+                                    Text('Error al restablecer la contraseña'),
+                                backgroundColor:
+                                    Color.fromARGB(255, 55, 57, 82),
                               ),
                             );
                           }

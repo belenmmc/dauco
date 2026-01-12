@@ -340,8 +340,11 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                                   .popUntil((route) => route.isFirst);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content:
-                                        Text('Menor eliminado correctamente')),
+                                  content:
+                                      Text('Menor eliminado correctamente'),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 55, 57, 82),
+                                ),
                               );
                               Future.delayed(Duration.zero, () {
                                 context
@@ -350,9 +353,11 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                               });
                             } else if (state is DeleteMinorError) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(
-                                        'Error al eliminar: ${state.error}')),
+                                const SnackBar(
+                                  content: Text('Error al eliminar el menor'),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 55, 57, 82),
+                                ),
                               );
                             }
                           },

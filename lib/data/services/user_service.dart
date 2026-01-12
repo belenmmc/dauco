@@ -94,10 +94,19 @@ class UserService {
         if (rpcResult != null && rpcResult['success'] == true) {
           return;
         } else {
-          throw Exception(
-              'RPC falló: ${rpcResult?['error'] ?? 'Error desconocido'}');
+          final errorMessage =
+              rpcResult?['error']?.toString() ?? 'Error desconocido';
+          if (errorMessage.contains('already') ||
+              errorMessage.contains('duplicate')) {
+            throw Exception('Ya existe un usuario con el email: $email');
+          }
+          throw Exception('RPC falló: $errorMessage');
         }
-      } catch (rpcError) {}
+      } catch (rpcError) {
+        if (rpcError.toString().contains('Ya existe un usuario')) {
+          rethrow;
+        }
+      }
 
       final response = await Supabase.instance.client.auth.signUp(
         email: email,
@@ -129,14 +138,24 @@ class UserService {
       } else {
         throw Exception('Error en signUp: No se recibió usuario');
       }
+    } on AuthException catch (authError) {
+      if (authError.message.contains('already') ||
+          authError.message.contains('duplicate') ||
+          authError.message.contains('registered')) {
+        throw Exception('Ya existe un usuario registrado con el email: $email');
+      } else {
+        throw Exception('Error de autenticación: ${authError.message}');
+      }
     } catch (error) {
-      if (error.toString().contains('User already registered')) {
+      if (error.toString().contains('Ya existe un usuario')) {
+        rethrow;
+      } else if (error.toString().contains('User already registered')) {
         throw Exception('Ya existe un usuario registrado con el email: $email');
       } else if (error.toString().contains('duplicate') ||
           error.toString().contains('unique constraint')) {
         throw Exception('Ya existe un usuario con el email: $email');
       } else {
-        throw Exception('Error creando usuario: $error');
+        rethrow;
       }
     }
   }
@@ -197,7 +216,13 @@ class UserService {
     }
   }
 
-  Future<List<UserModel>> getAllUsers(int page) async {
+  Future<List<UserModel>> getAllUsers(
+    int page, {
+    String? filterName,
+    String? filterEmail,
+    String? filterRole,
+    String? filterManagerId,
+  }) async {
     final session = Supabase.instance.client.auth.currentSession;
     String? currentUserEmail = session?.user.email;
 
@@ -206,10 +231,28 @@ class UserService {
     final from = page * limit;
     final to = from + limit - 1;
 
+    // Use usuarios table (lowercase) and filter by name field (which contains nombre + apellidos)
     var query = Supabase.instance.client.from('usuarios').select();
 
     if (currentUserEmail != null) {
       query = query.neq('email', currentUserEmail);
+    }
+
+    // Apply filters
+    if (filterName != null && filterName.isNotEmpty) {
+      query = query.ilike('name', '%$filterName%');
+    }
+
+    if (filterEmail != null && filterEmail.isNotEmpty) {
+      query = query.ilike('email', '%$filterEmail%');
+    }
+
+    if (filterRole != null && filterRole.isNotEmpty) {
+      query = query.eq('role', filterRole);
+    }
+
+    if (filterManagerId != null && filterManagerId.isNotEmpty) {
+      query = query.eq('manager_id', filterManagerId);
     }
 
     final response = await query

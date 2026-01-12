@@ -42,26 +42,6 @@ class _UsersListWidgetState extends State<UsersListWidget> {
   static const _buttonColor = Color.fromARGB(255, 97, 135, 174);
   static const _animationDuration = Duration(milliseconds: 200);
 
-  bool _matchesAllFilters(UserModel user, UserSearchFilters filters) {
-    if (filters.isEmpty) return true;
-
-    return filters.filters.entries.every((entry) {
-      final field = entry.key;
-      final query = entry.value.toLowerCase();
-
-      switch (field) {
-        case UserSearchField.name:
-          return user.name.toLowerCase().contains(query);
-        case UserSearchField.email:
-          return user.email.toLowerCase().contains(query);
-        case UserSearchField.role:
-          return user.role.toLowerCase().contains(query);
-        case UserSearchField.managerId:
-          return user.managerId.toString().toLowerCase().contains(query);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -76,9 +56,8 @@ class _UsersListWidgetState extends State<UsersListWidget> {
   }
 
   Widget _buildUsersList() {
-    final filteredUsers = widget.users.where((user) {
-      return _matchesAllFilters(user, widget.searchFilters);
-    }).toList();
+    // No client-side filtering - all filtering is done on the server
+    final filteredUsers = widget.users;
 
     return Expanded(
       child: filteredUsers.isEmpty
@@ -185,32 +164,6 @@ class _UserItem extends StatefulWidget {
 }
 
 class _UserItemState extends State<_UserItem> {
-  String? _surname;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSurname();
-  }
-
-  Future<void> _loadSurname() async {
-    if (widget.user.managerId > 0 && widget.user.role != 'admin') {
-      try {
-        final importedUserService =
-            Injector.appInstance.get<ImportedUserService>();
-        final importedUser =
-            await importedUserService.getUserByManagerId(widget.user.managerId);
-        if (importedUser != null && mounted) {
-          setState(() {
-            _surname = importedUser.surname;
-          });
-        }
-      } catch (e) {
-        // Si hay error, simplemente no mostramos apellidos
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -222,9 +175,7 @@ class _UserItemState extends State<_UserItem> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _surname != null
-                    ? '${widget.user.name} ${_surname}'
-                    : widget.user.name,
+                widget.user.name,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

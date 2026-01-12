@@ -6,7 +6,23 @@ class GetAllMinorsUseCase {
 
   GetAllMinorsUseCase({required this.minorRepository});
 
-  Future<List<Minor>> execute(int page) async {
-    return await minorRepository.getAllMinors(page);
+  Future<List<Minor>> execute(
+    int page, {
+    String? filterManagerId,
+    String? filterName,
+    String? filterSex,
+    String? filterZipCode,
+    DateTime? filterBirthdateFrom,
+    DateTime? filterBirthdateTo,
+  }) async {
+    return await minorRepository.getAllMinors(
+      page,
+      filterManagerId: filterManagerId,
+      filterName: filterName,
+      filterSex: filterSex,
+      filterZipCode: filterZipCode,
+      filterBirthdateFrom: filterBirthdateFrom,
+      filterBirthdateTo: filterBirthdateTo,
+    );
   }
 }

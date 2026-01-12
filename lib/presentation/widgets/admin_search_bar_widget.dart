@@ -339,7 +339,10 @@ class _AdminSearchBarWidgetState extends State<AdminSearchBarWidget> {
         decoration: InputDecoration(
           labelText: 'Rol',
           border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
         ),
+        dropdownColor: const Color.fromARGB(255, 248, 251, 255),
         items: ['Admin', 'Responsable']
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(

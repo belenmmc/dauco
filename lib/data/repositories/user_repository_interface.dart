@@ -18,5 +18,11 @@ abstract class UserRepositoryInterface {
 
   Future<void> deleteUser(String email);
 
-  Future<List<UserModel>> getAllUsers(int page);
+  Future<List<UserModel>> getAllUsers(
+    int page, {
+    String? filterName,
+    String? filterEmail,
+    String? filterRole,
+    String? filterManagerId,
+  });
 }

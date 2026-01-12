@@ -12,8 +12,18 @@ class GetEvent extends GetAllUsersEvent {
 
 class LoadMoreUsersEvent extends GetAllUsersEvent {
   final int page;
+  final String? filterName;
+  final String? filterEmail;
+  final String? filterRole;
+  final String? filterManagerId;
 
-  LoadMoreUsersEvent(this.page);
+  LoadMoreUsersEvent(
+    this.page, {
+    this.filterName,
+    this.filterEmail,
+    this.filterRole,
+    this.filterManagerId,
+  });
 
   int get getPage => page;
 }
@@ -65,7 +75,13 @@ class GetAllUsersBloc extends Bloc<GetAllUsersEvent, GetAllUsersState> {
       LoadMoreUsersEvent event, Emitter<GetAllUsersState> emit) async {
     emit(GetUsersLoading());
     try {
-      final users = await getAllUsersUseCase.execute(event.page);
+      final users = await getAllUsersUseCase.execute(
+        event.page,
+        filterName: event.filterName,
+        filterEmail: event.filterEmail,
+        filterRole: event.filterRole,
+        filterManagerId: event.filterManagerId,
+      );
       emit(GetUsersSuccess(users));
     } catch (e) {
       emit(GetAllUsersError(error: e.toString()));

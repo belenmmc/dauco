@@ -35,6 +35,7 @@ class HomePageState extends State<HomePage> {
   bool _hasNextPage = true;
   bool _hasPreviousPage = false;
   SearchFilters _searchFilters = SearchFilters();
+  String? _filterManagerId;
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +118,46 @@ class HomePageState extends State<HomePage> {
                             onChanged: (filters) {
                               setState(() {
                                 _searchFilters = filters;
+
+                                // Extract all filters
+                                _filterManagerId = filters
+                                    .filters[SearchField.managerId]
+                                    ?.toString();
+                                final filterName = filters
+                                    .filters[SearchField.name]
+                                    ?.toString();
+                                final filterSex = filters
+                                    .filters[SearchField.sex]
+                                    ?.toString();
+                                final filterZipCode = filters
+                                    .filters[SearchField.zipCode]
+                                    ?.toString();
+
+                                DateTime? filterBirthdateFrom;
+                                DateTime? filterBirthdateTo;
+                                if (filters.filters[SearchField.birthdate]
+                                    is Map<String, DateTime>) {
+                                  final dateRange =
+                                      filters.filters[SearchField.birthdate]
+                                          as Map<String, DateTime>;
+                                  filterBirthdateFrom = dateRange['from'];
+                                  filterBirthdateTo = dateRange['to'];
+                                }
+
+                                // Reload from page 0 when filters change
+                                _page = 0;
+                                _hasPreviousPage = false;
+                                BlocProvider.of<GetAllMinorsBloc>(context).add(
+                                  LoadMoreMinorsEvent(
+                                    _page,
+                                    filterManagerId: _filterManagerId,
+                                    filterName: filterName,
+                                    filterSex: filterSex,
+                                    filterZipCode: filterZipCode,
+                                    filterBirthdateFrom: filterBirthdateFrom,
+                                    filterBirthdateTo: filterBirthdateTo,
+                                  ),
+                                );
                               });
                             },
                             onAdvancedFiltersToggle: (isExpanded) {
@@ -154,7 +195,10 @@ class HomePageState extends State<HomePage> {
                                       'LoadFileError triggered: ${state.error}');
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(const SnackBar(
-                                    content: Text('File picker cancelled'),
+                                    content:
+                                        Text('Selección de archivo cancelada'),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 55, 57, 82),
                                     duration: Duration(seconds: 2),
                                   ));
                                   _hideLoading();
@@ -271,8 +315,7 @@ class HomePageState extends State<HomePage> {
         _hasPreviousPage = true;
       });
 
-      BlocProvider.of<GetAllMinorsBloc>(context)
-          .add(LoadMoreMinorsEvent(_page));
+      _applyFiltersAndLoadPage(context);
 
       _hideLoading();
     }
@@ -287,11 +330,39 @@ class HomePageState extends State<HomePage> {
         _hasPreviousPage = _page > 0;
       });
 
-      BlocProvider.of<GetAllMinorsBloc>(context)
-          .add(LoadMoreMinorsEvent(_page));
+      _applyFiltersAndLoadPage(context);
 
       _hideLoading();
     }
+  }
+
+  void _applyFiltersAndLoadPage(BuildContext context) {
+    final filterName = _searchFilters.filters[SearchField.name]?.toString();
+    final filterSex = _searchFilters.filters[SearchField.sex]?.toString();
+    final filterZipCode =
+        _searchFilters.filters[SearchField.zipCode]?.toString();
+
+    DateTime? filterBirthdateFrom;
+    DateTime? filterBirthdateTo;
+    if (_searchFilters.filters[SearchField.birthdate]
+        is Map<String, DateTime>) {
+      final dateRange = _searchFilters.filters[SearchField.birthdate]
+          as Map<String, DateTime>;
+      filterBirthdateFrom = dateRange['from'];
+      filterBirthdateTo = dateRange['to'];
+    }
+
+    BlocProvider.of<GetAllMinorsBloc>(context).add(
+      LoadMoreMinorsEvent(
+        _page,
+        filterManagerId: _filterManagerId,
+        filterName: filterName,
+        filterSex: filterSex,
+        filterZipCode: filterZipCode,
+        filterBirthdateFrom: filterBirthdateFrom,
+        filterBirthdateTo: filterBirthdateTo,
+      ),
+    );
   }
 
   void _showImportResultsDialog(

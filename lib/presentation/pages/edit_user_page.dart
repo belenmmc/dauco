@@ -22,11 +22,13 @@ class EditUserPage extends StatefulWidget {
 
 class _EditUserPageState extends State<EditUserPage> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _emailController;
-  late TextEditingController _managerIdController;
-  TextEditingController? _surnameController;
-  TextEditingController? _zoneController;
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _managerIdController = TextEditingController();
+  final _surnameController = TextEditingController();
+  final _zoneController = TextEditingController();
+  final _registeredAtController = TextEditingController(text: 'No disponible');
+  final _minorsNumController = TextEditingController(text: '0 menores');
   String? _selectedRole;
   ImportedUser? _importedUser;
   bool _loadingImportedUser = false;
@@ -34,14 +36,20 @@ class _EditUserPageState extends State<EditUserPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.user.name);
-    _emailController = TextEditingController(text: widget.user.email);
-    _managerIdController =
-        TextEditingController(text: widget.user.managerId.toString());
+
+    // Separar nombre y apellidos del campo name
+    final nameParts = widget.user.name.split(' ');
+    final firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+
+    _nameController.text = firstName;
+    _surnameController.text = lastName;
+    _emailController.text = widget.user.email;
+    _managerIdController.text = widget.user.managerId.toString();
     _selectedRole = widget.user.role;
 
-    // Cargar datos de tabla Usuarios si es manager (tiene managerId > 0)
-    if (widget.user.managerId > 0 && widget.user.role != 'admin') {
+    // Cargar datos adicionales de tabla Usuarios si es manager (tiene managerId > 0)
+    if (widget.user.managerId > 0) {
       _loadImportedUserData(widget.user.managerId);
     }
   }
@@ -60,9 +68,13 @@ class _EditUserPageState extends State<EditUserPage> {
       if (importedUser != null) {
         setState(() {
           _importedUser = importedUser;
-          _surnameController =
-              TextEditingController(text: importedUser.surname);
-          _zoneController = TextEditingController(text: importedUser.zone);
+          // Actualizar nombre y apellidos desde tabla Usuarios
+          _nameController.text = importedUser.name;
+          _surnameController.text = importedUser.surname;
+          _zoneController.text = importedUser.zone;
+          _registeredAtController.text =
+              '${importedUser.registeredAt.day.toString().padLeft(2, '0')}/${importedUser.registeredAt.month.toString().padLeft(2, '0')}/${importedUser.registeredAt.year}';
+          _minorsNumController.text = '${importedUser.minorsNum} menores';
           _loadingImportedUser = false;
         });
       } else {
@@ -71,6 +83,7 @@ class _EditUserPageState extends State<EditUserPage> {
         });
       }
     } catch (e) {
+      print('Error loading imported user data: $e');
       setState(() {
         _loadingImportedUser = false;
       });
@@ -80,8 +93,12 @@ class _EditUserPageState extends State<EditUserPage> {
   void _onUpdatePressed(BuildContext context) {
     if (!_formKey.currentState!.validate()) return;
 
+    // Concatenar nombre + apellidos para el campo name en usuarios
+    final String fullName =
+        '${_nameController.text.trim()} ${_surnameController.text.trim()}';
+
     final updatedUser = UserModel(
-      name: _nameController.text.trim(),
+      name: fullName,
       email: widget.user.email, // Usar el email original, no editable
       managerId: int.tryParse(_managerIdController.text) ?? 0,
       role: _selectedRole ?? 'user',
@@ -90,16 +107,14 @@ class _EditUserPageState extends State<EditUserPage> {
     context.read<UpdateUserBloc>().add(UpdateUserEvent(user: updatedUser));
 
     // Si hay datos importados, actualizar tabla Usuarios (nombre, apellidos, zona)
-    if (_importedUser != null &&
-        _surnameController != null &&
-        _zoneController != null) {
+    if (_importedUser != null) {
       final importedUserService =
           Injector.appInstance.get<ImportedUserService>();
       final updatedImportedUser = ImportedUser(
         managerId: _importedUser!.managerId,
         name: _nameController.text.trim(),
-        surname: _surnameController!.text.trim(),
-        zone: _zoneController!.text.trim(),
+        surname: _surnameController.text.trim(),
+        zone: _zoneController.text.trim(),
         registeredAt: _importedUser!.registeredAt,
         minorsNum: _importedUser!.minorsNum,
         yes: _importedUser!.yes,
@@ -113,8 +128,10 @@ class _EditUserPageState extends State<EditUserPage> {
     _nameController.dispose();
     _emailController.dispose();
     _managerIdController.dispose();
-    _surnameController?.dispose();
-    _zoneController?.dispose();
+    _surnameController.dispose();
+    _zoneController.dispose();
+    _registeredAtController.dispose();
+    _minorsNumController.dispose();
     super.dispose();
   }
 
@@ -157,12 +174,18 @@ class _EditUserPageState extends State<EditUserPage> {
                   listener: (context, state) {
                     if (state is UpdateUserSuccess) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Usuario actualizado')),
+                        const SnackBar(
+                          content: Text('Usuario actualizado correctamente'),
+                          backgroundColor: Color.fromARGB(255, 55, 57, 82),
+                        ),
                       );
                       Navigator.pop(context, true);
                     } else if (state is UpdateUserError) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: ${state.error}')),
+                        const SnackBar(
+                          content: Text('Error al actualizar el usuario'),
+                          backgroundColor: Color.fromARGB(255, 55, 57, 82),
+                        ),
                       );
                     }
                   },
@@ -211,15 +234,13 @@ class _EditUserPageState extends State<EditUserPage> {
                                         color: Colors.grey[600],
                                       ),
                                     ),
-                                    if (_importedUser != null) ...[
-                                      const SizedBox(height: 16),
-                                      TextFormField(
-                                        controller: _zoneController,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Zona',
-                                        ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _zoneController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Zona',
                                       ),
-                                    ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -227,29 +248,15 @@ class _EditUserPageState extends State<EditUserPage> {
                               Expanded(
                                 child: Column(
                                   children: [
-                                    if (_importedUser != null)
-                                      TextFormField(
-                                        controller: _surnameController,
-                                        decoration: const InputDecoration(
-                                            labelText: 'Apellidos'),
-                                        validator: (value) =>
-                                            value == null || value.isEmpty
-                                                ? 'Ingresa los apellidos'
-                                                : null,
-                                      )
-                                    else
-                                      TextFormField(
-                                        controller: _emailController,
-                                        enabled: false,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Email',
-                                          hintText:
-                                              'El email no se puede modificar',
-                                        ),
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
+                                    TextFormField(
+                                      controller: _surnameController,
+                                      decoration: const InputDecoration(
+                                          labelText: 'Apellidos'),
+                                      validator: (value) =>
+                                          value == null || value.isEmpty
+                                              ? 'Ingresa los apellidos'
+                                              : null,
+                                    ),
                                     const SizedBox(height: 16),
                                     TextFormField(
                                       initialValue: _selectedRole == 'admin'
@@ -258,70 +265,57 @@ class _EditUserPageState extends State<EditUserPage> {
                                       enabled: false,
                                       decoration: const InputDecoration(
                                         labelText: 'Rol',
+                                        hintText:
+                                            'El rol no se puede modificar',
                                       ),
                                       style: TextStyle(
                                         color: Colors.grey[600],
                                       ),
                                     ),
-                                    if (_importedUser != null) ...[
-                                      const SizedBox(height: 16),
+                                    const SizedBox(height: 16),
+                                    if (widget.user.role != 'admin')
                                       TextFormField(
-                                        initialValue:
-                                            _importedUser!.minorsNum.toString(),
+                                        controller: _minorsNumController,
                                         enabled: false,
                                         decoration: const InputDecoration(
-                                          labelText: 'Número de Menores',
+                                          labelText: 'Menores Asignados',
+                                          hintText:
+                                              'Número de menores bajo su responsabilidad',
                                         ),
                                         style: TextStyle(
                                           color: Colors.grey[600],
                                         ),
                                       ),
-                                    ],
                                   ],
                                 ),
                               ),
                             ],
                           ),
-                          // Campos de solo lectura en fila completa
-                          if (_importedUser != null) ...[
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _emailController,
-                              enabled: false,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                hintText: 'El email no se puede modificar',
-                              ),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
+                          // Email y fecha de alta en toda la fila
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _emailController,
+                            enabled: false,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              hintText: 'El email no se puede modificar',
                             ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              initialValue:
-                                  '${_importedUser!.registeredAt.day.toString().padLeft(2, '0')}/${_importedUser!.registeredAt.month.toString().padLeft(2, '0')}/${_importedUser!.registeredAt.year}',
-                              enabled: false,
-                              decoration: const InputDecoration(
-                                labelText: 'Fecha de Alta',
-                              ),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
+                            style: TextStyle(
+                              color: Colors.grey[600],
                             ),
-                          ] else ...[
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _emailController,
-                              enabled: false,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                hintText: 'El email no se puede modificar',
-                              ),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _registeredAtController,
+                            enabled: false,
+                            decoration: const InputDecoration(
+                              labelText: 'Fecha de Alta',
+                              hintText: 'Fecha de registro en el sistema',
                             ),
-                          ],
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                            ),
+                          ),
                           const SizedBox(height: 24),
                           SizedBox(
                             width: double.infinity,

@@ -9,7 +9,8 @@ enum SearchField {
   name('Nombre'),
   birthdate('Fecha de Nacimiento'),
   sex('Sexo'),
-  zipCode('Código postal');
+  zipCode('Código postal'),
+  managerId('ID Responsable');
 
   const SearchField(this.displayName);
   final String displayName;
@@ -178,7 +179,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
-                          initialDate: startDate ?? DateTime(2000),
+                          initialDate: startDate ?? DateTime(2015),
                           firstDate: DateTime(1900),
                           lastDate: endDate ?? DateTime.now(),
                           locale: const Locale('es', 'ES'),
@@ -258,7 +259,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
-                          initialDate: endDate ?? startDate ?? DateTime(2000),
+                          initialDate: endDate ?? startDate ?? DateTime(2015),
                           firstDate: startDate ?? DateTime(1900),
                           lastDate: DateTime.now(),
                           locale: const Locale('es', 'ES'),
@@ -401,7 +402,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       duration: Duration(milliseconds: 300),
       constraints: BoxConstraints(
         minHeight: 70.0,
-        maxHeight: _showAdvancedFilters ? 200.0 : 70.0,
+        maxHeight: _showAdvancedFilters ? 300.0 : 70.0,
       ),
       color: Colors.transparent,
       child: Padding(
@@ -442,7 +443,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                             ),
                           ),
                         ),
-                      if (widget.role == 'admin')
+                      if (widget.role == 'admin' || widget.role == 'manager')
                         Flexible(
                           child: Padding(
                             padding: const EdgeInsets.only(right: 4),
@@ -451,7 +452,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                               onPressed: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const AnalyticsPage(),
+                                  builder: (context) =>
+                                      AnalyticsPage(role: widget.role),
                                 ),
                               ),
                             ),
@@ -490,8 +492,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                                     style: const TextStyle(fontSize: 16),
                                     decoration: InputDecoration(
                                       isCollapsed: true,
-                                      hintText:
-                                          'Buscar por ${SearchField.name.displayName.toLowerCase()} o Id',
+                                      hintText: 'Buscar por ID',
                                       border: InputBorder.none,
                                       contentPadding:
                                           const EdgeInsets.symmetric(
@@ -559,9 +560,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   Widget _buildAdvancedFilters() {
     return Container(
       margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(16),
       width: MediaQuery.of(context).size.width * 0.7,
-      constraints: BoxConstraints(maxHeight: 160),
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 248, 251, 255),
         borderRadius: BorderRadius.circular(15),
@@ -573,70 +573,67 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
           ),
         ],
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 10),
-            Flexible(
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: SearchField.values
-                      .where((field) => field != SearchField.name)
-                      .map((field) => _buildFilterField(field))
-                      .toList(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: SearchField.values
+                .where((field) => field != SearchField.name)
+                .where((field) =>
+                    widget.role == 'admin' || field != SearchField.managerId)
+                .map((field) => Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: _buildFilterField(field),
+                      ),
+                    ))
+                .toList(),
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {
+                for (var controller in _controllers.values) {
+                  controller.clear();
+                }
+                setState(() {
+                  _selectedSex = null;
+                  _birthdateFrom = null;
+                  _birthdateTo = null;
+                });
+                _updateFilters();
+              },
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                backgroundColor: Colors.grey.withOpacity(0.1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-            ),
-            const SizedBox(height: 6),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  for (var controller in _controllers.values) {
-                    controller.clear();
-                  }
-                  setState(() {
-                    _selectedSex = null;
-                    _birthdateFrom = null;
-                    _birthdateTo = null;
-                  });
-                  _updateFilters();
-                },
-                style: TextButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  backgroundColor: Colors.grey.withOpacity(0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.clear_all,
+                    size: 12,
+                    color: Colors.grey[600],
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.clear_all,
-                      size: 12,
+                  const SizedBox(width: 6),
+                  Text(
+                    'Limpiar Filtros',
+                    style: TextStyle(
+                      fontSize: 10,
                       color: Colors.grey[600],
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Limpiar Filtros',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -654,7 +651,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   Widget _buildTextFilterField(SearchField field) {
     return Container(
-      width: 200,
       height: 40,
       child: TextFormField(
         controller: _controllers[field],
@@ -672,6 +668,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   TextInputType _getKeyboardType(SearchField field) {
     switch (field) {
       case SearchField.zipCode:
+      case SearchField.managerId:
         return TextInputType.number;
       default:
         return TextInputType.text;
@@ -686,7 +683,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
     );
 
     return Container(
-      width: 200,
       height: 40,
       child: TextFormField(
         controller: dateController,
@@ -695,7 +691,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         decoration: InputDecoration(
           labelText: SearchField.birthdate.displayName,
           border: const OutlineInputBorder(),
-          suffixIcon: const Icon(Icons.calendar_today),
+          suffixIcon: const Icon(Icons.calendar_today, size: 16),
         ),
         onTap: () async {
           final DateTimeRange? picked = await _showCustomDateRangePicker();
@@ -713,7 +709,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   Widget _buildSexDropdownField() {
     return Container(
-      width: 200,
       height: 40,
       child: DropdownButtonFormField<String>(
         value: _selectedSex,
@@ -721,7 +716,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
         decoration: InputDecoration(
           labelText: 'Sexo',
           border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
         ),
+        dropdownColor: const Color.fromARGB(255, 248, 251, 255),
         items: ['Masculino', 'Femenino']
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(

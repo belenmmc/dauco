@@ -159,11 +159,10 @@ class _RegisterPageState extends State<RegisterPage> {
       } else if (user == null && mounted) {
         // No se encontró el usuario
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'No se encontró un usuario con ID $managerId en la base de datos.'),
-            backgroundColor: Colors.orange,
-            duration: const Duration(seconds: 4),
+          const SnackBar(
+            content: Text('No se encontró el usuario en la base de datos'),
+            backgroundColor: Color.fromARGB(255, 55, 57, 82),
+            duration: Duration(seconds: 4),
           ),
         );
       }
@@ -173,9 +172,9 @@ class _RegisterPageState extends State<RegisterPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al buscar usuario: $e'),
-            backgroundColor: Colors.red,
+          const SnackBar(
+            content: Text('Error al buscar el usuario'),
+            backgroundColor: Color.fromARGB(255, 55, 57, 82),
           ),
         );
       }
@@ -275,33 +274,50 @@ class _RegisterPageState extends State<RegisterPage> {
                                       _selectedRole == 'manager') {
                                     final updatedImportedUser = ImportedUser(
                                       managerId: _foundUser!.managerId,
-                                      name: _nameController.text,
-                                      surname: _surnameController.text,
+                                      name: _nameController.text.trim(),
+                                      surname: _surnameController.text.trim(),
                                       yes: _foundUser!.yes,
                                       registeredAt: _foundUser!.registeredAt,
-                                      zone: _zoneController.text,
+                                      zone: _zoneController.text.trim(),
                                       minorsNum: _foundUser!.minorsNum,
                                     );
                                     await importedUserService
                                         .updateUser(updatedImportedUser);
-                                  } else {
-                                    // Si NO estaba vinculado, crear nuevo registro en tabla Usuarios
+                                  } else if (actualManagerId > 0) {
+                                    // Si NO estaba vinculado pero tiene managerId, crear nuevo registro en tabla Usuarios
+                                    final now = DateTime.now();
+                                    final registeredAt = DateTime(
+                                        now.year,
+                                        now.month,
+                                        now.day,
+                                        now.hour,
+                                        now.minute,
+                                        now.second);
+                                    print(
+                                        '=== CREANDO USUARIO EN TABLA USUARIOS ===');
+                                    print('managerId: $actualManagerId');
+                                    print(
+                                        'name: ${_nameController.text.trim()}');
+                                    print(
+                                        'surname: ${_surnameController.text.trim()}');
+                                    print('registeredAt: $registeredAt');
+                                    print(
+                                        'registeredAt ISO: ${registeredAt.toIso8601String()}');
                                     final newImportedUser = ImportedUser(
                                       managerId: actualManagerId,
-                                      name: _nameController.text,
-                                      surname:
-                                          _surnameController.text.isNotEmpty
-                                              ? _surnameController.text
-                                              : '',
+                                      name: _nameController.text.trim(),
+                                      surname: _surnameController.text.trim(),
                                       yes: false,
-                                      registeredAt: DateTime.now(),
+                                      registeredAt: registeredAt,
                                       zone: _zoneController.text.isNotEmpty
-                                          ? _zoneController.text
+                                          ? _zoneController.text.trim()
                                           : 'Sin asignar',
                                       minorsNum: 0,
                                     );
                                     await importedUserService
                                         .createUser(newImportedUser);
+                                    print(
+                                        'Usuario creado exitosamente en tabla Usuarios');
                                   }
                                 } catch (e) {
                                   print(
@@ -315,13 +331,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                   const SnackBar(
                                     content:
                                         Text('Usuario creado exitosamente'),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 55, 57, 82),
                                     duration: Duration(seconds: 3),
                                   ),
                                 );
                               } else if (state is RegisterError) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(state.error),
+                                  const SnackBar(
+                                    content: Text('Error al crear el usuario'),
+                                    backgroundColor:
+                                        Color.fromARGB(255, 55, 57, 82),
                                   ),
                                 );
                               }
@@ -371,7 +391,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                       value: _selectedRole,
                                       decoration: const InputDecoration(
                                         labelText: 'Rol',
+                                        filled: true,
+                                        fillColor: Colors.white,
                                       ),
+                                      dropdownColor: const Color.fromARGB(
+                                          255, 248, 251, 255),
                                       items: const [
                                         DropdownMenuItem(
                                           value: 'admin',
@@ -584,7 +608,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                             context.read<RegisterBloc>().add(
                                                 RegisterEvent(
-                                                    name: _nameController.text,
+                                                    name:
+                                                        '${_nameController.text.trim()} ${_surnameController.text.trim()}',
                                                     email:
                                                         _emailController.text,
                                                     managerId: managerId,

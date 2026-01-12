@@ -49,7 +49,19 @@ class UserRepository implements UserRepositoryInterface {
   }
 
   @override
-  Future<List<UserModel>> getAllUsers(int page) {
-    return userService.getAllUsers(page);
+  Future<List<UserModel>> getAllUsers(
+    int page, {
+    String? filterName,
+    String? filterEmail,
+    String? filterRole,
+    String? filterManagerId,
+  }) {
+    return userService.getAllUsers(
+      page,
+      filterName: filterName,
+      filterEmail: filterEmail,
+      filterRole: filterRole,
+      filterManagerId: filterManagerId,
+    );
   }
 }

@@ -211,36 +211,17 @@ class _ExportDialogState extends State<ExportDialog> {
         if (state is ExportSuccess) {
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(state.message),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Archivo guardado en: \${state.filePath}',
-                    style: const TextStyle(
-                        fontSize: 12, fontStyle: FontStyle.italic),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.green,
-              action: SnackBarAction(
-                label: 'Copiar ruta',
-                textColor: Colors.white,
-                onPressed: () {
-                  // Copy file path to clipboard
-                },
-              ),
+            const SnackBar(
+              content: Text('Archivo exportado correctamente'),
+              backgroundColor: Color.fromARGB(255, 55, 57, 82),
             ),
           );
         } else if (state is ExportError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 4),
+            const SnackBar(
+              content: Text('Error al exportar el archivo'),
+              backgroundColor: Color.fromARGB(255, 55, 57, 82),
+              duration: Duration(seconds: 4),
             ),
           );
         }

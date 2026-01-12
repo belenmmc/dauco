@@ -56,12 +56,17 @@ class AdminPageState extends State<AdminPage> {
               if (deleteState is DeleteUserSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                      content: Text('Usuario eliminado correctamente')),
+                    content: Text('Usuario eliminado correctamente'),
+                    backgroundColor: Color.fromARGB(255, 55, 57, 82),
+                  ),
                 );
                 BlocProvider.of<GetAllUsersBloc>(context).add(GetEvent());
               } else if (deleteState is DeleteUserError) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(deleteState.error)),
+                  const SnackBar(
+                    content: Text('Error al eliminar el usuario'),
+                    backgroundColor: Color.fromARGB(255, 55, 57, 82),
+                  ),
                 );
               }
             },
@@ -82,6 +87,29 @@ class AdminPageState extends State<AdminPage> {
                               onChanged: (filters) {
                                 setState(() {
                                   _searchFilters = filters;
+
+                                  // Extract all filters
+                                  final filterName =
+                                      filters.filters[UserSearchField.name];
+                                  final filterEmail =
+                                      filters.filters[UserSearchField.email];
+                                  final filterRole =
+                                      filters.filters[UserSearchField.role];
+                                  final filterManagerId = filters
+                                      .filters[UserSearchField.managerId];
+
+                                  // Reload from page 0 when filters change
+                                  _page = 0;
+                                  _hasPreviousPage = false;
+                                  BlocProvider.of<GetAllUsersBloc>(context).add(
+                                    LoadMoreUsersEvent(
+                                      _page,
+                                      filterName: filterName,
+                                      filterEmail: filterEmail,
+                                      filterRole: filterRole,
+                                      filterManagerId: filterManagerId,
+                                    ),
+                                  );
                                 });
                               },
                               role: state is GetCurrentUserSuccess
@@ -189,7 +217,7 @@ class AdminPageState extends State<AdminPage> {
         _hasPreviousPage = true;
       });
 
-      BlocProvider.of<GetAllUsersBloc>(context).add(LoadMoreUsersEvent(_page));
+      _applyFiltersAndLoadPage(context);
 
       _hideLoading();
     }
@@ -204,9 +232,26 @@ class AdminPageState extends State<AdminPage> {
         _hasPreviousPage = _page > 0;
       });
 
-      BlocProvider.of<GetAllUsersBloc>(context).add(LoadMoreUsersEvent(_page));
+      _applyFiltersAndLoadPage(context);
 
       _hideLoading();
     }
+  }
+
+  void _applyFiltersAndLoadPage(BuildContext context) {
+    final filterName = _searchFilters.filters[UserSearchField.name];
+    final filterEmail = _searchFilters.filters[UserSearchField.email];
+    final filterRole = _searchFilters.filters[UserSearchField.role];
+    final filterManagerId = _searchFilters.filters[UserSearchField.managerId];
+
+    BlocProvider.of<GetAllUsersBloc>(context).add(
+      LoadMoreUsersEvent(
+        _page,
+        filterName: filterName,
+        filterEmail: filterEmail,
+        filterRole: filterRole,
+        filterManagerId: filterManagerId,
+      ),
+    );
   }
 }

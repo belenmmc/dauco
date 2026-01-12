@@ -97,9 +97,10 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
           listener: (context, state) {
             if (state is GetTestsError) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error: ${state.error}'),
-                  duration: const Duration(seconds: 2),
+                const SnackBar(
+                  content: Text('Error al cargar los tests'),
+                  backgroundColor: Color.fromARGB(255, 55, 57, 82),
+                  duration: Duration(seconds: 2),
                 ),
               );
             }
@@ -180,7 +181,8 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
       builder: (context) => BlocProvider(
         create: (context) => ExportBloc(
           exportMinorUseCase: appInjector.get<ExportMinorUseCase>(),
-          getAllMinorsForExportUseCase: appInjector.get<GetAllMinorsForExportUseCase>(),
+          getAllMinorsForExportUseCase:
+              appInjector.get<GetAllMinorsForExportUseCase>(),
         ),
         child: ExportDialog(
           minor: currentMinor,

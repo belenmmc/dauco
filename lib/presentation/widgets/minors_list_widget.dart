@@ -37,67 +37,6 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
   static const _buttonColor = Color.fromARGB(255, 97, 135, 174);
   static const _animationDuration = Duration(milliseconds: 200);
 
-  bool _matchesAllFilters(Minor minor, SearchFilters filters) {
-    if (filters.isEmpty) return true;
-
-    return filters.filters.entries.every((entry) {
-      final field = entry.key;
-      final value = entry.value;
-
-      switch (field) {
-        case SearchField.name:
-          return minor.minorId
-              .toString()
-              .toLowerCase()
-              .contains(value.toString().toLowerCase());
-        case SearchField.birthdate:
-          if (value is Map<String, DateTime>) {
-            final minorDate = DateTime(minor.birthdate.year,
-                minor.birthdate.month, minor.birthdate.day);
-
-            final dateFrom = value['from'];
-            final dateTo = value['to'];
-
-            // Check if the minor's birthdate is within the range
-            bool isAfterFrom = dateFrom == null ||
-                minorDate.isAfter(dateFrom) ||
-                minorDate.isAtSameMomentAs(dateFrom);
-
-            bool isBeforeTo = dateTo == null ||
-                minorDate.isBefore(dateTo) ||
-                minorDate.isAtSameMomentAs(dateTo);
-
-            return isAfterFrom && isBeforeTo;
-          } else if (value is DateTime) {
-            // Fallback for single date (backward compatibility)
-            final filterDate = DateTime(value.year, value.month, value.day);
-            final minorDate = DateTime(minor.birthdate.year,
-                minor.birthdate.month, minor.birthdate.day);
-            return minorDate.isAtSameMomentAs(filterDate);
-          }
-          return false;
-        case SearchField.sex:
-          String filterValue = value.toString().toUpperCase();
-          String minorSex = minor.sex.toUpperCase();
-
-          // Handle different sex value formats in the database
-          if (minorSex == 'MASCULINO' || minorSex == 'MALE') {
-            minorSex = 'M';
-          } else if (minorSex == 'FEMENINO' || minorSex == 'FEMALE') {
-            minorSex = 'F';
-          }
-
-          return minorSex == filterValue;
-
-        case SearchField.zipCode:
-          return minor.zipCode
-              .toString()
-              .toLowerCase()
-              .contains(value.toString().toLowerCase());
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -112,9 +51,8 @@ class _MinorsListWidgetState extends State<MinorsListWidget> {
   }
 
   Widget _buildMinorsList() {
-    final filteredMinors = widget.minors.where((minor) {
-      return _matchesAllFilters(minor, widget.searchFilters);
-    }).toList();
+    // No client-side filtering - all filtering is done on the server
+    final filteredMinors = widget.minors;
 
     return Expanded(
       child: filteredMinors.isEmpty

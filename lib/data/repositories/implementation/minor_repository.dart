@@ -8,8 +8,24 @@ class MinorRepository implements MinorRepositoryInterface {
   MinorRepository({required this.minorService});
 
   @override
-  Future<List<Minor>> getAllMinors(int page) {
-    return minorService.getMinorsPage(page);
+  Future<List<Minor>> getAllMinors(
+    int page, {
+    String? filterManagerId,
+    String? filterName,
+    String? filterSex,
+    String? filterZipCode,
+    DateTime? filterBirthdateFrom,
+    DateTime? filterBirthdateTo,
+  }) {
+    return minorService.getMinorsPage(
+      page,
+      filterManagerId: filterManagerId,
+      filterName: filterName,
+      filterSex: filterSex,
+      filterZipCode: filterZipCode,
+      filterBirthdateFrom: filterBirthdateFrom,
+      filterBirthdateTo: filterBirthdateTo,
+    );
   }
 
   @override

@@ -516,20 +516,26 @@ class ImportService {
     var rows = file.tables[sheet]!.rows.skip(1);
 
     for (var row in rows) {
-      if (row.isNotEmpty) {
-        tests.add(Test(
-          testId: int.parse(row[0]?.value.toString() ?? "0"),
-          minorId: int.parse(row[1]?.value.toString() ?? "0"),
-          registeredAt: DateTime.parse(
-              row[2]?.value.toString() ?? DateTime.now().toString()),
-          cronologicalAge: row[3]?.value.toString() ?? "",
-          evolutionaryAge: row[4]?.value.toString() ?? "",
-          mChatTest: row[5]?.value.toString() == "TRUE" ? true : false,
-          progress: row[6]?.value.toString() ?? "",
-          activeAreas: int.parse(row[7]?.value.toString() ?? "0"),
-          professionalType: row[8]?.value.toString() ?? "",
-        ));
+      // Skip if row is empty or first cell (test_id) is null/empty/0
+      if (row.isEmpty ||
+          row[0]?.value == null ||
+          (row[0]?.value.toString().trim().isEmpty ?? true) ||
+          row[0]?.value.toString() == "0") {
+        continue;
       }
+
+      tests.add(Test(
+        testId: int.parse(row[0]?.value.toString() ?? "0"),
+        minorId: int.parse(row[1]?.value.toString() ?? "0"),
+        registeredAt: DateTime.parse(
+            row[2]?.value.toString() ?? DateTime.now().toString()),
+        cronologicalAge: row[3]?.value.toString() ?? "",
+        evolutionaryAge: row[4]?.value.toString() ?? "",
+        mChatTest: row[5]?.value.toString() == "TRUE" ? true : false,
+        progress: row[6]?.value.toString() ?? "",
+        activeAreas: int.parse(row[7]?.value.toString() ?? "0"),
+        professionalType: row[8]?.value.toString() ?? "",
+      ));
     }
 
     return tests;
@@ -541,17 +547,23 @@ class ImportService {
     var rows = file.tables[sheet]!.rows.skip(1);
 
     for (var row in rows) {
-      if (row.isNotEmpty) {
-        items.add(Item(
-          responseId: int.parse(row[0]?.value.toString() ?? "0"),
-          itemId: int.parse(row[1]?.value.toString() ?? "0"),
-          item: row[2]?.value.toString() ?? "",
-          testId: int.parse(row[3]?.value.toString() ?? "0"),
-          area: row[4]?.value.toString() ?? "",
-          question: row[5]?.value.toString() ?? "",
-          answer: row[6]?.value.toString() ?? "",
-        ));
+      // Skip if row is empty or first cell (respuesta_id) is null/empty/0
+      if (row.isEmpty ||
+          row[0]?.value == null ||
+          (row[0]?.value.toString().trim().isEmpty ?? true) ||
+          row[0]?.value.toString() == "0") {
+        continue;
       }
+
+      items.add(Item(
+        responseId: int.parse(row[0]?.value.toString() ?? "0"),
+        itemId: int.parse(row[1]?.value.toString() ?? "0"),
+        item: row[2]?.value.toString() ?? "",
+        testId: int.parse(row[3]?.value.toString() ?? "0"),
+        area: row[4]?.value.toString() ?? "",
+        question: row[5]?.value.toString() ?? "",
+        answer: row[6]?.value.toString() ?? "",
+      ));
     }
 
     return items;
