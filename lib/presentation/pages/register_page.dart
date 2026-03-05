@@ -211,19 +211,15 @@ class _RegisterPageState extends State<RegisterPage> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           toolbarHeight: 80,
+          centerTitle: true,
           title: Padding(
             padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Crear cuenta',
-                  style: GoogleFonts.inter(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 55, 57, 82)),
-                ),
-              ],
+            child: Text(
+              'Crear cuenta',
+              style: GoogleFonts.inter(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 55, 57, 82)),
             ),
           ),
           automaticallyImplyLeading: true,

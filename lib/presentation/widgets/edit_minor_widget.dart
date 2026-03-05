@@ -750,7 +750,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
           children: [
             Expanded(
               child: _buildTextField(
-                  'ID Gestor', managerIdController, TextInputType.number),
+                  'ID Responsable', managerIdController, TextInputType.number),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1786,8 +1786,9 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
 
   Widget _buildTextField(String label, TextEditingController controller,
       [TextInputType? keyboardType, bool isReadOnly = false]) {
-    final isRequired =
-        label == 'ID Menor' || label == 'Referencia' || label == 'ID Gestor';
+    final isRequired = label == 'ID Menor' ||
+        label == 'Referencia' ||
+        label == 'ID Responsable';
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(

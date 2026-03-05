@@ -25,21 +25,44 @@ class TestsListWidget extends StatelessWidget {
   }
 
   Widget _buildTestCard(BuildContext context, Test test) {
-    return GestureDetector(
-        onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TestInfoPage(test: test),
-                ),
-              ),
-            },
+    return _TestCard(test: test);
+  }
+}
+
+class _TestCard extends StatefulWidget {
+  final Test test;
+
+  const _TestCard({required this.test});
+
+  @override
+  State<_TestCard> createState() => _TestCardState();
+}
+
+class _TestCardState extends State<_TestCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TestInfoPage(test: widget.test),
+            ),
+          );
+        },
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1200),
             child: Card(
               margin: const EdgeInsets.symmetric(vertical: 8.0),
-              color: Color.fromARGB(255, 248, 251, 255),
+              color: _isHovered
+                  ? Color.fromARGB(255, 230, 240, 250)
+                  : Color.fromARGB(255, 248, 251, 255),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                     vertical: 16.0, horizontal: 32.0),
@@ -47,9 +70,9 @@ class TestsListWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Test ${test.testId.toString()}',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      'Test ${widget.test.testId.toString()}',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -59,15 +82,16 @@ class TestsListWidget extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildInfoRow('Fecha de alta',
-                                  test.registeredAt.toString()),
-                              _buildInfoRow(
-                                  'Edad cronológica', test.cronologicalAge),
-                              _buildInfoRow(
-                                  'Edad evolutiva', test.evolutionaryAge),
+                                  widget.test.registeredAt.toString()),
+                              _buildInfoRow('Edad cronológica',
+                                  widget.test.cronologicalAge),
+                              _buildInfoRow('Edad evolutiva',
+                                  widget.test.evolutionaryAge),
                             ],
                           ),
                         ),
-                        TestProgressIndicatorWidget(progress: test.progress),
+                        TestProgressIndicatorWidget(
+                            progress: widget.test.progress),
                       ],
                     ),
                   ],
@@ -75,7 +99,9 @@ class TestsListWidget extends StatelessWidget {
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildInfoRow(String label, String value) {
@@ -87,14 +113,14 @@ class TestsListWidget extends StatelessWidget {
             flex: 2,
             child: Text(
               label,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ),
         ],

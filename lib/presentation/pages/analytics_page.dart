@@ -2011,73 +2011,117 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
       height: 300,
       child: _buildChartCard(
         'Distribución de Edades de los Padres',
-        BarChart(
-          BarChartData(
-            barGroups: barGroups,
-            barTouchData: BarTouchData(
-              touchCallback: (FlTouchEvent event, barTouchResponse) {
-                // Only navigate on tap/click events, not on hover/move
-                if (event is FlTapUpEvent &&
-                    barTouchResponse != null &&
-                    barTouchResponse.spot != null) {
-                  final touchedGroupIndex =
-                      barTouchResponse.spot!.touchedBarGroupIndex;
-                  final touchedBarIndex =
-                      barTouchResponse.spot!.touchedRodDataIndex;
+        Column(
+          children: [
+            Expanded(
+              child: BarChart(
+                BarChartData(
+                  barGroups: barGroups,
+                  barTouchData: BarTouchData(
+                    touchCallback: (FlTouchEvent event, barTouchResponse) {
+                      // Only navigate on tap/click events, not on hover/move
+                      if (event is FlTapUpEvent &&
+                          barTouchResponse != null &&
+                          barTouchResponse.spot != null) {
+                        final touchedGroupIndex =
+                            barTouchResponse.spot!.touchedBarGroupIndex;
+                        final touchedBarIndex =
+                            barTouchResponse.spot!.touchedRodDataIndex;
 
-                  if (touchedGroupIndex >= 0 &&
-                      touchedGroupIndex < ageRanges.length) {
-                    final ageRange = ageRanges[touchedGroupIndex];
-                    final parentType = touchedBarIndex == 0 ? 'Padre' : 'Madre';
+                        if (touchedGroupIndex >= 0 &&
+                            touchedGroupIndex < ageRanges.length) {
+                          final ageRange = ageRanges[touchedGroupIndex];
+                          final parentType =
+                              touchedBarIndex == 0 ? 'Padre' : 'Madre';
 
-                    // Create a filter value that includes both age range and parent type
-                    final filterValue = '$parentType:$ageRange';
+                          // Create a filter value that includes both age range and parent type
+                          final filterValue = '$parentType:$ageRange';
 
-                    _navigateToFilteredList(filterValue, 'parentAge');
-                  }
-                }
-              },
-            ),
-            titlesData: FlTitlesData(
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 50, // Added reserved space for Y-axis numbers
-                  getTitlesWidget: (value, meta) {
-                    return Text(
-                      value.toInt().toString(),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                          _navigateToFilteredList(filterValue, 'parentAge');
+                        }
+                      }
+                    },
+                  ),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize:
+                            50, // Added reserved space for Y-axis numbers
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toInt().toString(),
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() < ageRanges.length) {
+                            return Text(
+                              ageRanges[value.toInt()],
+                              style: GoogleFonts.inter(fontSize: 14),
+                            );
+                          }
+                          return const Text('');
+                        },
+                      ),
+                    ),
+                    topTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  borderData: FlBorderData(show: true),
+                  gridData: FlGridData(show: true),
                 ),
               ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) {
-                    if (value.toInt() < ageRanges.length) {
-                      return Text(
-                        ageRanges[value.toInt()],
-                        style: GoogleFonts.inter(fontSize: 14),
-                      );
-                    }
-                    return const Text('');
-                  },
-                ),
-              ),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
-            borderData: FlBorderData(show: true),
-            gridData: FlGridData(show: true),
-          ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLegendItem('Padre', Colors.blue),
+                const SizedBox(width: 24),
+                _buildLegendItem('Madre', Colors.pink),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLegendItem(String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }

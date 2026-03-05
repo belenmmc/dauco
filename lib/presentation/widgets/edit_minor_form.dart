@@ -418,7 +418,7 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
               _buildTextField(
                   'Referencia', referenceController, TextInputType.number),
               _buildTextField(
-                  'ID Gestor', managerIdController, TextInputType.number),
+                  'ID Responsable', managerIdController, TextInputType.number),
               _buildTextField(
                   'Fecha de Nacimiento (dd/mm/yyyy)', birthdateController),
               _buildTextField('Rango de Edad', ageRangeController),
@@ -555,8 +555,9 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
 
   Widget _buildTextField(String label, TextEditingController controller,
       [TextInputType? keyboardType]) {
-    final isRequired =
-        label == 'ID Menor' || label == 'Referencia' || label == 'ID Gestor';
+    final isRequired = label == 'ID Menor' ||
+        label == 'Referencia' ||
+        label == 'ID Responsable';
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
