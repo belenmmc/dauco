@@ -8,9 +8,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 class EditMinorWidget extends StatefulWidget {
   final Minor minor;
+  final String role;
   final void Function(Minor updatedMinor) onSave;
 
-  const EditMinorWidget({super.key, required this.minor, required this.onSave});
+  const EditMinorWidget(
+      {super.key,
+      required this.minor,
+      required this.role,
+      required this.onSave});
 
   @override
   State<EditMinorWidget> createState() => _EditMinorWidgetState();
@@ -519,204 +524,215 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
                             ),
                           ),
                           const SizedBox(width: 20),
-                          SizedBox(
-                            height: 50,
-                            width: 250,
-                            child:
-                                BlocListener<DeleteMinorBloc, DeleteMinorState>(
-                              listener: (context, state) {
-                                if (state is DeleteMinorSuccess) {
-                                  if (Navigator.canPop(context)) {
-                                    Navigator.pop(context, true);
-                                  }
+                          if (widget.role == 'admin')
+                            SizedBox(
+                              height: 50,
+                              width: 250,
+                              child: BlocListener<DeleteMinorBloc,
+                                  DeleteMinorState>(
+                                listener: (context, state) {
+                                  if (state is DeleteMinorSuccess) {
+                                    if (Navigator.canPop(context)) {
+                                      Navigator.pop(context, true);
+                                    }
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Menor eliminado correctamente'),
-                                      backgroundColor:
-                                          Color.fromARGB(255, 55, 57, 82),
-                                    ),
-                                  );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Menor eliminado correctamente'),
+                                        backgroundColor:
+                                            Color.fromARGB(255, 55, 57, 82),
+                                      ),
+                                    );
 
-                                  context
-                                      .read<GetAllMinorsBloc>()
-                                      .add(GetEvent());
-                                } else if (state is DeleteMinorError) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text('Error al eliminar el menor'),
-                                      backgroundColor:
-                                          Color.fromARGB(255, 55, 57, 82),
-                                    ),
-                                  );
-                                }
-                              },
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 57, 64, 87),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  final bool? confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                        backgroundColor: const Color.fromARGB(
-                                            255, 248, 251, 255),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                        ),
-                                        child: Container(
-                                          constraints: const BoxConstraints(
-                                              maxWidth: 400),
-                                          padding: const EdgeInsets.all(24),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.all(12),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.red.shade400,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.delete_outline,
-                                                  color: Colors.white,
-                                                  size: 24,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 16),
-                                              const Text(
-                                                'Confirmar eliminación',
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color.fromARGB(
-                                                      255, 43, 45, 66),
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              const SizedBox(height: 12),
-                                              const Text(
-                                                '¿Está seguro de que desea eliminar este menor? Esta acción no se puede deshacer.',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Color.fromARGB(
-                                                      255, 107, 114, 128),
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              const SizedBox(height: 24),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: OutlinedButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(false),
-                                                      style: OutlinedButton
-                                                          .styleFrom(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 12),
-                                                        side: const BorderSide(
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              229,
-                                                              231,
-                                                              235),
-                                                        ),
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                        ),
-                                                      ),
-                                                      child: const Text(
-                                                        'Cancelar',
-                                                        style: TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              107,
-                                                              114,
-                                                              128),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 12),
-                                                  Expanded(
-                                                    child: ElevatedButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(true),
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Colors.red.shade400,
-                                                        foregroundColor:
-                                                            Colors.white,
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 12),
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                        ),
-                                                      ),
-                                                      child: const Text(
-                                                          'Eliminar'),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-
-                                  if (confirm == true) {
-                                    context.read<DeleteMinorBloc>().add(
-                                          DeleteMinorEvent(
-                                              minorId: widget.minor.minorId
-                                                  .toString()),
-                                        );
+                                    context
+                                        .read<GetAllMinorsBloc>()
+                                        .add(GetEvent());
+                                  } else if (state is DeleteMinorError) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text('Error al eliminar el menor'),
+                                        backgroundColor:
+                                            Color.fromARGB(255, 55, 57, 82),
+                                      ),
+                                    );
                                   }
                                 },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('Eliminar menor',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 16,
-                                          color: const Color.fromARGB(
-                                              237, 247, 238, 255),
-                                        )),
-                                    const SizedBox(width: 10),
-                                    const Icon(Icons.delete,
-                                        size: 28,
-                                        color:
-                                            Color.fromARGB(255, 248, 251, 255)),
-                                  ],
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 57, 64, 87),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    final bool? confirm =
+                                        await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return Dialog(
+                                          backgroundColor: const Color.fromARGB(
+                                              255, 248, 251, 255),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: Container(
+                                            constraints: const BoxConstraints(
+                                                maxWidth: 400),
+                                            padding: const EdgeInsets.all(24),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.all(12),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red.shade400,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: const Icon(
+                                                    Icons.delete_outline,
+                                                    color: Colors.white,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16),
+                                                const Text(
+                                                  'Confirmar eliminación',
+                                                  style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Color.fromARGB(
+                                                        255, 43, 45, 66),
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 12),
+                                                const Text(
+                                                  '¿Está seguro de que desea eliminar este menor? Esta acción no se puede deshacer.',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Color.fromARGB(
+                                                        255, 107, 114, 128),
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 24),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: OutlinedButton(
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(false),
+                                                        style: OutlinedButton
+                                                            .styleFrom(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 12),
+                                                          side:
+                                                              const BorderSide(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    229,
+                                                                    231,
+                                                                    235),
+                                                          ),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                          ),
+                                                        ),
+                                                        child: const Text(
+                                                          'Cancelar',
+                                                          style: TextStyle(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    107,
+                                                                    114,
+                                                                    128),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    Expanded(
+                                                      child: ElevatedButton(
+                                                        onPressed: () =>
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop(true),
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .red.shade400,
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 12),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                          ),
+                                                        ),
+                                                        child: const Text(
+                                                            'Eliminar'),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+
+                                    if (confirm == true) {
+                                      context.read<DeleteMinorBloc>().add(
+                                            DeleteMinorEvent(
+                                                minorId: widget.minor.minorId
+                                                    .toString()),
+                                          );
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text('Eliminar menor',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 16,
+                                            color: const Color.fromARGB(
+                                                237, 247, 238, 255),
+                                          )),
+                                      const SizedBox(width: 10),
+                                      const Icon(Icons.delete,
+                                          size: 28,
+                                          color: Color.fromARGB(
+                                              255, 248, 251, 255)),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
                         ],
                       ),
                     ]),
@@ -749,8 +765,8 @@ class _EditMinorWidgetState extends State<EditMinorWidget> {
         Row(
           children: [
             Expanded(
-              child: _buildTextField(
-                  'ID Responsable', managerIdController, TextInputType.number),
+              child: _buildTextField('ID Responsable', managerIdController,
+                  TextInputType.number, widget.role != 'admin'),
             ),
             const SizedBox(width: 12),
             Expanded(

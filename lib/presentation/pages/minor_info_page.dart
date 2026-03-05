@@ -60,15 +60,15 @@ class _MinorInfoPageState extends State<MinorInfoPage> {
                       color: Color.fromARGB(255, 55, 57, 82)),
                 ),
                 const SizedBox(width: 20),
-                if (widget.role == 'admin' && _currentIndex == 0)
+                if (_currentIndex == 0)
                   CircularButtonWidget(
                     iconData: Icons.edit_outlined,
                     onPressed: () async {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              EditMinorPage(minor: currentMinor),
+                          builder: (context) => EditMinorPage(
+                              minor: currentMinor, role: widget.role),
                         ),
                       );
 

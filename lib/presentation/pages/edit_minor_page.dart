@@ -14,8 +14,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class EditMinorPage extends StatelessWidget {
   final Minor minor;
+  final String role;
 
-  const EditMinorPage({super.key, required this.minor});
+  const EditMinorPage({super.key, required this.minor, required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +68,7 @@ class EditMinorPage extends StatelessWidget {
           ),
           body: EditMinorWidget(
             minor: minor,
+            role: role,
             onSave: (Minor updatedMinor) {
               Navigator.pop(context, updatedMinor);
             },
